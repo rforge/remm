@@ -1,0 +1,21 @@
+#imports("gclus") ## we use :: for gclus in seriate.hclust
+#imports("cluster") ## we use :: for silhouette in dissplot
+
+export(
+    EMM,
+    states,
+    size,
+    state_counts,
+    state_centers,
+
+    build,
+    transition,
+    transition_matrix,
+    merge_states,
+    remove_states,
+    cluster_states,
+    predict_state,
+    score
+)
+
+S3method("plot", "EMM")

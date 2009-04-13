@@ -1,0 +1,44 @@
+\name{transition}
+\alias{transition}
+\alias{transition_matrix}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{Access Transition Probabilities/Counts in an EMM }
+\description{
+Calculates individual transition probabilities/counts 
+or a complete transition matrix
+in an EMM.
+}
+\usage{
+transition(emm, from, to, type = c("probability", "counts", "log_odds"))
+transition_matrix(emm, type="probability")
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{emm}{ an object of class \code{EMM}.}
+  \item{from, to}{ Names a states.}
+  \item{type}{ What should be calculated? }
+}
+%\details{
+%}
+\value{
+    A scalar (for \code{transiton}) or a square matrix 
+    (for \code{transition_matrix}).
+}
+%\references{ ~put references to the literature/web site here ~ }
+%\author{ ~~who you are~~ }
+\examples{
+data("Traffic")
+emm <- EMM(measure="eJaccard", threshold=0.2)
+emm <- build(emm, Traffic)
+
+## get transition matrix
+transition_matrix(emm)
+transition_matrix(emm, type="count")
+
+## access individual transition probability (state 1 -> 2)
+transition(emm, "1","2")
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+%\keyword{ ~kwd1 }
+%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
