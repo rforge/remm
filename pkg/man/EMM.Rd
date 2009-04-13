@@ -7,7 +7,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Creator and Accessors for Class EMM}
 \description{
-    Create an empty EMM.
+    Create an empty EMM object.
 }
 \usage{
 EMM(measure = "euclidean", threshold = 0.2, centroids = TRUE)

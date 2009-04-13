@@ -1,10 +1,10 @@
 Package: rEMM
 Version: 0.0-1
 Date: 2009-XX-XX
-Title: R Implementation of Extended Markov Model (EMM)
+Title: R Implementation of Extensible Markov Model (EMM)
 Author: Michael Hahsler
 Maintainer: Michael Hahsler <michael@hahsler.net> 
-Description: Implementation of Extended Markov Model (EMM)
+Description: Implementation of Extensible Markov Models (EMM).
 Classification/ACM: G.4, H.2.8, I.5.1
 URL: http://R-Forge.R-project.org/projects/remm/
 Depends: R (>= 2.7.0), stats, graph, proxy, cluster
