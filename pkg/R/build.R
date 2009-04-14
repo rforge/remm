@@ -36,14 +36,13 @@ build <- function(emm, newdata) {
         emm$current <- "1"
         rownames(newdata) <- "1"
         emm$centers <- newdata
-        emm$counts["1"] <- 0 ## we only increment for outgoing edges
+        emm$counts["1"] <- 1 
         
         ## initialize threshold
         emm$var_thresholds["1"] <- emm$threshold
 
     }else{
 
-        ## we are about to add an outgoing edge
         emm$counts[emm$current] <- emm$counts[emm$current] +1
         
         ## find a matching state
@@ -62,7 +61,7 @@ build <- function(emm, newdata) {
             
             rownames(newdata) <- sel
             emm$centers <- rbind(emm$centers, newdata)
-            emm$counts[sel] <- 0
+            emm$counts[sel] <- 1
             ## initialize threshold
             emm$var_thresholds[sel] <- emm$threshold
 
@@ -95,8 +94,8 @@ build <- function(emm, newdata) {
             (emm$centers[sel,]*emm$counts[sel] + newdata)/(emm$counts[sel]+1)
             
             ## update counts and current state
-            #emm$counts[sel] <- emm$counts[sel] + 1
             emm$current <- sel
+            emm$counts[sel] <- emm$counts[sel] + 1
         }
     }
     

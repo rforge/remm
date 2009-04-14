@@ -8,13 +8,14 @@ transition <- function(emm, from, to,
 
     ## handle NAs as nodes
     nna <- !is.na(from)
-    ew <- rep(0, length(from))
 
-    d <- emm$counts[from]
-    ew[nna] <- edgeWeights(emm$mm, from[nna])
-    n <-  sapply(1:length(from), FUN = function(i) ew[[i]][to[i]])
+    ew <- as.list(rep(NA, length(from)))
+    ew[nna] <- lapply(from[nna], FUN = function(x) edgeWeights(emm$mm, x)[[1]])
+    
+    n <- sapply(1:length(from), FUN = function(i) ew[[i]][to[i]])
     n[is.na(n)] <- 0
-
+    d <- sapply(ew, sum)
+    
     if(type=="counts") return(as.integer(n))
     
     prob <- as.numeric(n/d)
