@@ -25,9 +25,9 @@ A new EMM with the states merged.
 %\author{ ~~who you are~~ }
 %\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
-data("Traffic")
+data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, Traffic)
+emm <- build(emm, EMMTraffic)
 states(emm)
 
 ## merge states 1-3

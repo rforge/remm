@@ -1,16 +1,17 @@
 \name{plot.EMM}
 \alias{plot.EMM}
+\alias{plot}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot EMM objects }
 \description{
 Plot EMM objects as graphs.}
 \usage{
-plot(emm,  method=c("MDS", "graph"), data = NULL, 
+plot(x,  method=c("MDS", "graph"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object. }
+  \item{x}{ an \code{EMM} object. }
   \item{method}{ plot as regular graph or position vertices according
   to the dissimilarities between the state centers using
   multi dimensional scaling (\code{"MDS"}).}
@@ -26,9 +27,9 @@ plot(emm,  method=c("MDS", "graph"), data = NULL,
 %\author{ ~~who you are~~ }
 %\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
-data("Traffic")
+data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, Traffic)
+emm <- build(emm, EMMTraffic)
 
 op <- par(mfrow = c(2, 2), pty = "s")
 plot(emm, method="graph", main="Graph (plain)", 
@@ -36,7 +37,7 @@ plot(emm, method="graph", main="Graph (plain)",
 plot(emm, method="graph", main="Graph")
 plot(emm, method="MDS", main="MDS projection", 
     xlim=c(-0.35,0.35), ylim= c(-0.35,0.35))
-plot(emm, method="MDS", Traffic, main = "Projection of centers on data")
+plot(emm, method="MDS", EMMTraffic, main = "Projection of centers on data")
 par(op)
 
 }

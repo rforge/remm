@@ -18,7 +18,7 @@ score <- function(emm, newdata, method = c("prod", "sum", "log_odds"),
     to <- ssequence[2:n]
     prob <- transition(emm, from, to)
     counts <- transition(emm, from, to, type="counts")
-    #log_odds <- transition(emm, from, to, type="log_odds")
+    log_odds <- transition(emm, from, to, type="log_odds")
     
     ## only transition table?
     if(transition_table) return(data.frame(from=from, to=to, prob=prob, 

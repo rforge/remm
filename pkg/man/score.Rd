@@ -7,7 +7,8 @@ Calculates a score of how likely it is that a new sequence was generated
 by the same process as the sequences used to build the EMM.
 }
 \usage{
-score(emm, newdata, method = c("prod", "sum", "log_odds"), match_state = c("nn", "exact"), transition_table = FALSE)
+score(emm, newdata, method = c("prod", "sum", "log_odds"), match_state = "exact", 
+transition_table = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

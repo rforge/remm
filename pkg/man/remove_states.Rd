@@ -23,9 +23,9 @@ Returns a new EMM with removed states.
 %\author{ ~~who you are~~ }
 %\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
-data("Traffic")
+data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, Traffic)
+emm <- build(emm, EMMTraffic)
 
 ## remove state 3
 emm_r3 <- remove_states(emm, "3")

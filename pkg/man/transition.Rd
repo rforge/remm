@@ -27,9 +27,9 @@ transition_matrix(emm, type="probability")
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
 \examples{
-data("Traffic")
+data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, Traffic)
+emm <- build(emm, EMMTraffic)
 
 ## get transition matrix
 transition_matrix(emm)

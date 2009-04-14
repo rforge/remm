@@ -1,7 +1,8 @@
 
-plot.EMM <- function(emm, method=c("MDS", "graph"), data = NULL, 
+plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL, 
     parameter=NULL, ...) {
     method <- match.arg(method)
+    emm <- x
 
     p <- .get_parameters(list(
             state_counts=TRUE,

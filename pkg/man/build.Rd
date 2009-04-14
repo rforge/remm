@@ -34,15 +34,15 @@ A new EMM with the data added.
 %\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
 
-## load Traffic data
-data("Traffic")
-Traffic
+## load EMMTraffic data
+data("EMMTraffic")
+EMMTraffic
 
 ## create EMM
 emm <- EMM(measure="eJaccard", threshold=0.2)
 
-## build model using Traffic data
-emm <- build(emm, Traffic)
+## build model using EMMTraffic data
+emm <- build(emm, EMMTraffic)
 
 size(emm)
 plot(emm) ## plot needs rgraphviz installed

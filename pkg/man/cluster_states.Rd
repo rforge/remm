@@ -22,9 +22,9 @@ An object of class \code{hclust}.
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
 \examples{
-data("Traffic")
+data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, Traffic)
+emm <- build(emm, EMMTraffic)
 
 ## do clustering and plot dendrogram
 hc <- cluster_states(emm)
