@@ -6,7 +6,7 @@
 \description{
 Plot EMM objects as graphs.}
 \usage{
-plot(x,  method=c("MDS", "graph"), data = NULL, 
+plot(x, method=c("MDS", "graph"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.

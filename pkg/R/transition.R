@@ -16,14 +16,13 @@ transition <- function(emm, from, to,
     n[is.na(n)] <- 0
     d <- sapply(ew, sum)
     
-    if(type=="counts") return(as.integer(n))
+    if(type=="counts") return(n)
     
     prob <- as.numeric(n/d)
-
     ## no transition means probability zero
-    if(any(is.na(prob))) prob[is.na(prob)] <- 0
+    prob[is.na(prob)] <- 0
 
-    ## last inserted state might have no outgoing edges (are leaves)!
+    ## states might have no outgoing edges (are leaves)!
     ## these are absorbing states
     l <- leaves(emm$mm, "out")
     prob[from %in% l & to %in% l] <- 1

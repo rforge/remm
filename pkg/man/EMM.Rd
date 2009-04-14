@@ -10,7 +10,7 @@
     Create an empty EMM object.
 }
 \usage{
-EMM(measure = "euclidean", threshold = 0.2, centroids = TRUE)
+EMM(measure = "euclidean", threshold = 0.2, lambda = 0, centroids = TRUE)
 states(emm)
 size(emm)
 state_counts(emm)
@@ -23,6 +23,9 @@ state_centers(emm)
     for available measures) }
   \item{threshold}{ dissimilarity threshold used for assigning a new
     observation to existing states. }
+  \item{lambda}{ learning rate. if \eqn{lambda>0}, the weight
+  of each data point in the stream is decreasing exponentially over time by a
+  factor of \eqn{2^{-lambda*t}}.}
   \item{centroids}{ use centroids for states? If \code{FALSE}, the first
     observation is used to represent a state.}
   \item{emm}{an object of class \code{EMM}. }
@@ -36,6 +39,8 @@ the following elements:
   \item{mm}{ a graph representing the Markov Model.}
   \item{centroids}{ a logical indicating if centroids are used. }
   \item{threshold}{dissimilarity threshold used for assignment.}
+  \item{lambda}{learning rate.}
+  \item{lambda_factor}{learning rate expressed as a factor. }
   \item{current}{name of current state in the EMM.}
   \item{centers}{a matrix containing the centers for the states.}
   \item{counts}{counts for states}

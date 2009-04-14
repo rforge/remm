@@ -17,7 +17,16 @@ build <- function(emm, newdata) {
         emm$mm@nodes <<- c(emm$mm@nodes, node)
         emm$mm@edgeL[[node]]$edges <<- numeric(0)
     }
-    
+   
+    ## aging is also implemented in age.R
+    .age <- function() {
+        emm$counts <<- emm$counts * emm$lambda_factor
+        emm$mm@edgeData@data <<- lapply(emm$mm@edgeData@data, FUN=function(x) {
+                x$weight <- x$weight* emm$lambda_factor
+                x
+            })
+    }
+
     
     
     ## make sure  newdata is a matrix (maybe a single row)
@@ -28,6 +37,10 @@ build <- function(emm, newdata) {
         for(i in 1:nrow(newdata)) emm <- build(emm, newdata[i,])
         return(emm)
     }
+
+    ## aging?
+    #if(emm$lambda>0) emm <- age(emm)
+    if(emm$lambda>0) .age()
 
     ## first node?
     if(size(emm)==0) {

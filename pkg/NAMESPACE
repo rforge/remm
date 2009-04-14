@@ -15,7 +15,8 @@ export(
     remove_states,
     cluster_states,
     predict_state,
-    score
+    score,
+    age
 )
 
 S3method("plot", "EMM")
