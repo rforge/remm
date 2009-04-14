@@ -5,9 +5,13 @@ transition <- function(emm, from, to,
     
     from <- as.character(from)
     to <- as.character(to)
-    
+
+    ## handle NAs as nodes
+    nna <- !is.na(from)
+    ew <- rep(0, length(from))
+
     d <- emm$counts[from]
-    ew <- edgeWeights(emm$mm, from)
+    ew[nna] <- edgeWeights(emm$mm, from[nna])
     n <-  sapply(1:length(from), FUN = function(i) ew[[i]][to[i]])
     n[is.na(n)] <- 0
 

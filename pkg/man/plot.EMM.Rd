@@ -5,7 +5,7 @@
 \description{
 Plot EMM objects as graphs.}
 \usage{
-plot.EMM(emm,  method=c("graph", "MDS"), data = NULL, 
+plot(emm,  method=c("MDS", "graph"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -31,11 +31,12 @@ emm <- EMM(measure="eJaccard", threshold=0.2)
 emm <- build(emm, Traffic)
 
 op <- par(mfrow = c(2, 2), pty = "s")
-plot(emm, main="Graph (plain)", state_counts=FALSE, transition_prob=FALSE)
-plot(emm, main="Graph")
+plot(emm, method="graph", main="Graph (plain)", 
+    state_counts=FALSE, transition_prob=FALSE)
+plot(emm, method="graph", main="Graph")
 plot(emm, method="MDS", main="MDS projection", 
     xlim=c(-0.35,0.35), ylim= c(-0.35,0.35))
-plot(emm, "MDS", Traffic, main = "Projection of centers on data")
+plot(emm, method="MDS", Traffic, main = "Projection of centers on data")
 par(op)
 
 }

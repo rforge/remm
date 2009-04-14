@@ -46,12 +46,11 @@ build <- function(emm, newdata) {
         ## we are about to add an outgoing edge
         emm$counts[emm$current] <- emm$counts[emm$current] +1
         
-        d <- dist(newdata, emm$centers, method=emm$measure)
-        sel <- which.min(d)  
+        ## find a matching state
+        sel <- find_state(emm, newdata, match_state="exact")
 
-        ## create new node?
-        #if(d[sel] > emm$threshold) {
-        if(d[sel] > emm$var_thresholds[as.character(sel)]) {
+        ## NA means no match -> create a new node
+        if(is.na(sel)) {
             ## New node
             ## get new node name (highest node number is last entry in count)
             sel <- as.character(as.integer(tail(names(emm$counts),1)) + 1)
@@ -72,7 +71,6 @@ build <- function(emm, newdata) {
 
         }else{ 
             ## assign observation to existing node
-            sel <- as.character(sel)
 
             ## add edge or update weight
             if(isAdjacent(emm$mm, emm$current, sel)) {

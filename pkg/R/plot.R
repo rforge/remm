@@ -1,8 +1,8 @@
 
-plot.EMM <- function(emm, method=c("graph", "MDS"), data = NULL, 
+plot.EMM <- function(emm, method=c("MDS", "graph"), data = NULL, 
     parameter=NULL, ...) {
     method <- match.arg(method)
-    
+
     p <- .get_parameters(list(
             state_counts=TRUE,
             transition_probability=TRUE,
@@ -15,7 +15,7 @@ plot.EMM <- function(emm, method=c("graph", "MDS"), data = NULL,
 
 
     if(method=="graph") {
-        if(!require("Rgraphviz")) stop ("Package Rpgraphviz needed!")
+        if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
         if(p$state_counts){
             nAttrs <- list(width=.5 +
@@ -25,103 +25,145 @@ plot.EMM <- function(emm, method=c("graph", "MDS"), data = NULL,
                 nodeAttrs = nAttrs, ...)
 
         }else plot(emm$mm, recipEdges="distinct", ...)
-        
-        if(p$transition_probability)
-        ## redraw arrows with different width
-        tmp <- sapply(AgEdge(pl), FUN = function(x) {
-                lwd <- 1+transition(emm, tail(x), head(x))*
+
+        if(p$transition_probability) {
+            ## redraw arrows with different width
+            ## calculate arrow length (see plot in graph.R in Rgraphviz)
+            agn <- AgNode(pl)
+            nodeDims <- sapply(agn, function(n)
+                { c(getNodeRW(n)+getNodeLW(n), getNodeHeight(n)) })
+
+            arrowLen <- par("pin")[1] / diff(par("usr")[1:2]) * 
+            min(nodeDims) / pi *1.2
+            ## I'm not quite sure why we have to make them 20% longer
+
+            tmp <- sapply(AgEdge(pl), FUN = function(x) {
+                    lwd <- 1+transition(emm, tail(x), head(x))*
                     p$lwd_multiplier*4
-                lines(x, lwd=lwd, len=.1)
-            }
-        )
+                    lines(x, lwd=lwd, len=arrowLen)
+                })
+        }
     }
 
     else if(is.null(data)){
-        d <- dist(emm$centers, method=emm$measure)
-        mds <- cmdscale(d, eig=TRUE, add=TRUE)
 
-        ## add arrows
+        if(ncol(emm$centers)>2){
+            d <- dist(emm$centers, method=emm$measure)
+            mds <- cmdscale(d, eig=TRUE, add=TRUE)
+            x <- mds$points
+        }else{
+            x <- emm$centers
+        }
+        dimnames(x) <- list(states(emm), NULL)
+        
+        ## start plotting
+        plot(x, xlab="Dimension 1", ylab="Dimension 2", type="n", ...)
+
+
+        ## use cex for point size
+        cex <- 2
+        if(p$state_counts) cex <- 
+            2+emm$counts/max(emm$counts) * p$statesize_multiplier*5
+
+        ## arrows
         ed <- edges(emm$mm)
         edges <- NULL
         for(i in 1:length(ed)) {
             to <- as.integer(ed[[i]])
             from <- rep(as.integer(names(ed)[i]), length(to))
-            edges <- rbind(edges, cbind(as.character(from), as.character(to)))         
+            edges <- rbind(edges, cbind(as.character(from), as.character(to)))
         }
-        
-        x <- mds$points
-        dimnames(x) <- list(states(emm), NULL)
 
-        lwd <- 1
-        cex <- 2
-        
-        ## use cex for point size
-        if(p$state_counts) cex <- 2+emm$counts/max(emm$counts)*
-            p$statesize_multiplier*5
-        
-        ## lwd for arrows
-        if(p$transition_probability) lwd <- 
-            1+transition(emm, edges[,1], edges[,2])*
-                p$lwd_multiplier*4
-
-        ## empty plot
-        plot(mds$points, xlab="Dimension 1", ylab="Dimension 2", type="n", ...)
-        
-        ## arrows whines about zero length arrows
         arrows_fromto <- cbind(
             from_x = x[edges[,1],1], from_y= x[edges[,1],2],
             to_x= x[edges[,2],1],to_y=x[edges[,2],2]
         )
-     
-        ## make arrows shorterby% shorter
-        shortenby <- 0.1
-        arrows_fromto[,1:2] <- arrows_fromto[,1:2] + 
-        (arrows_fromto[,3:4] - arrows_fromto[,1:2]) *(shortenby/2)
-        arrows_fromto[,3:4] <- arrows_fromto[,3:4] + 
-        (arrows_fromto[,1:2] - arrows_fromto[,3:4]) *(shortenby/2)
+
+        ## make arrows shorter so they do not cover the nodes 
+        ## (we use the largest node)
+        nodeWidth2 <- strwidth("o", cex=max(cex))^2 
+        x2 <- (arrows_fromto[,3]-arrows_fromto[,1])^2
+        y2 <- (arrows_fromto[,2]-arrows_fromto[,4])^2
+        z2 <- x2+y2
+        shorten <- cbind(
+            x=sqrt(nodeWidth2/z2 * x2)/2,
+            y=sqrt(nodeWidth2/z2 * y2)/2)
+
+        signs <- matrix(1, ncol=ncol(shorten), nrow=nrow(shorten))
+        signs[arrows_fromto[,1] > arrows_fromto[,3],1] <- -1
+        signs[arrows_fromto[,2] > arrows_fromto[,4],2] <- -1
+
+        shorten <- shorten * signs
+        shorten <- cbind(shorten, shorten*-1)
+        arrows_fromto <- arrows_fromto + shorten
+
+        ## lwd for arrows
+        lwd <- 1
+        if(p$transition_probability) lwd <- 
+        1+transition(emm, edges[,1], edges[,2])* p$lwd_multiplier*4
 
 
+        ## arrows whines about zero length arrows
         suppressWarnings(
             arrows(arrows_fromto[,1], arrows_fromto[,2], 
                 arrows_fromto[,3],arrows_fromto[,4],
                 length=0.15, col="grey", angle=20, lwd=lwd)
         )
-        
-        ## overplot points and text
-        points(mds$points, cex=cex)
-        labels <- states(emm)
-        cex <- cex/2
-        ## make sure double digit labels fit
-        cex <- cex * (strwidth("8")/strwidth(labels))
-        text(mds$points, labels=labels, cex=cex)
 
-    
+        ## overplot points and text
+        points(x, cex=cex)
+        
+        if(p$add_labels) {
+            ## plot labels
+            labels <- states(emm)
+            cex <- cex/2
+            ## make sure double digit labels fit
+            cex <- cex * (strwidth("8")/strwidth(labels))
+            text(x, labels=labels, cex=cex)
+        }
+
     } else {
-        d <- dist(rbind(emm$centers, data), method=emm$measure)
-        mds <- cmdscale(d, eig=TRUE, add=TRUE)
-        centers <- mds$points[1:nrow(emm$centers),]
-        allpoints <- mds$points[-c(1:nrow(emm$centers)),]
-        
-        
+        ## project state centers onto dataset
+
+        if(ncol(emm$centers)>2){
+            d <- dist(rbind(emm$centers, data), method=emm$measure)
+            mds <- cmdscale(d, eig=TRUE, add=TRUE)
+            centers <- mds$points[1:nrow(emm$centers),]
+            allpoints <- mds$points[-c(1:nrow(emm$centers)),]
+        }else{
+            centers <- emm$centers
+            allpoints <- data
+        }
+
         ## points
         if(p$mark_clusters){
-            d2 <- dist(emm$centers, data, method=emm$measure)
-            point_center <- apply(d2, MARGIN=2, which.min)
+            point_center <- find_state(emm, data, match_state="exact")
+            
+            ## make state name integer for pch
+            point_center <- as.integer(as.factor(point_center))
+
             ## make sure we stay below 25 for pch
-            while(any(point_center>25)) point_center[point_center>25] <- 
-                point_center[point_center>25] -25
+            while(any(point_center>25, na.rm=TRUE)) 
+            point_center[point_center>25] <- 
+            point_center[point_center>25] -25
             plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
                 col="grey", pch=point_center, ...)
+            
+            ## plot points which do not belong to any state
+            if(any(is.na(point_center)))
+            points(allpoints[is.na(point_center),,drop=FALSE], 
+                col="red", pch=1)
+        
         }else{
             plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
                 col="grey", ...)
         }
-        
+
         cex <- 1
-        
+
         ## use cex for point size (scale: 1...3)
         if(p$state_counts) cex <- 1+emm$counts/max(emm$counts)*2
-        
+
         ## centers
         points(centers, col="red", pch="+", cex=cex)
         #points(centers, col="red", pch=1:size(emm), cex=cex)
