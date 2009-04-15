@@ -1,22 +1,22 @@
-\name{age}
-\alias{age}
+\name{prune}
+\alias{prune}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Age Old Data Points}
+\title{Pune States and/or Transitions}
 \description{
-Reduces the weight of old observations in the data stream. If an EMM has
-a learning rate greater than 0, age is called before each new observation
-is added to the EMM. Therefore, calling \code{age} directly is typically not 
-be necessary.
+Simplifies an EMM by removing all states and/or transitions 
+which have a count smaller than a given threshold.
 }
 \usage{
-age(emm, t = 1, lambda = NULL)
+prune(emm, count_threshold = 0.1,
+    states = TRUE, transitions = TRUE){
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an object of class \code{EMM}. }
-  \item{t}{ number of time intervals (default=1) }
-  \item{lambda}{ learning rate. If \code{NULL} the learning rate specified 
-  for the EMM is used.}
+  \item{count_threshold}{ all states/edges with a count below the
+  threshold are removed from the model.}
+  \item{states}{ remove states?}
+  \item{transitions}{ remove transitions?}
 }
 %\details{
 %}
@@ -33,18 +33,17 @@ data("EMMTraffic")
 emm_l <- EMM(measure="eJaccard", threshold=0.2, lambda = 1)
 emm_l <- build(emm_l, EMMTraffic)
 
-## build a regular EMM for comparison
-emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, EMMTraffic)
+## show state countes and transition counts
+state_counts(emm_l)
+transition_matrix(emm_l, type="counts")
 
-## compare the transition matrix
-transition_matrix(emm)
-transition_matrix(emm_l)
+## remove all states and edges with a threshold of 0.1
+emm_lr <- prune(emm_l, count_threshold=0.1)
 
 ## compare graphs
 op <- par(mfrow = c(1, 2), pty = "m")
-plot(emm, "graph", main = "regular EMM")
 plot(emm_l, "graph", main = "EMM with high learning rate")
+plot(emm_lr, "graph", main = "Simplified EMM")
 par(op)
 
 }

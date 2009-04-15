@@ -1,6 +1,9 @@
 ## build uses its own implementation of age! See build.R
 
-age <- function(emm, t=1) {
+age <- function(emm, t=1, lambda=NULL) {
+
+    if(is.null(lambda)) lambda_factor <- emm$lambda_factor
+    else lambda_factor <- 2^(-lambda)
 
     ## age counts
     emm$counts <- emm$counts * emm$lambda_factor^t 
