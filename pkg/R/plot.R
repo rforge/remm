@@ -35,8 +35,8 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
                 { c(getNodeRW(n)+getNodeLW(n), getNodeHeight(n)) })
 
             arrowLen <- par("pin")[1] / diff(par("usr")[1:2]) * 
-            min(nodeDims) / pi *1.2
-            ## I'm not quite sure why we have to make them 20% longer
+            min(nodeDims) / pi *1.3
+            ## I'm not quite sure why we have to make them 30% longer
 
             tmp <- sapply(AgEdge(pl), FUN = function(x) {
                     lwd <- 1+transition(emm, tail(x), head(x))*

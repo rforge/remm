@@ -13,10 +13,12 @@ export(
     transition_matrix,
     merge_states,
     remove_states,
+    remove_transitions,
     cluster_states,
     predict_state,
     score,
-    age
+    age,
+    prune
 )
 
 S3method("plot", "EMM")
