@@ -12,6 +12,9 @@ remove_states <- function(emm, to_remove) {
 }
 
 remove_transitions <- function(emm, from, to) {
+    from <- as.character(from)
+    to <- as.character(to)
+
     emm$mm <- removeEdge(from, to, emm$mm)
     emm
 }

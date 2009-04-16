@@ -19,8 +19,18 @@ plot(x, method=c("MDS", "graph"), data = NULL,
   \item{parameter}{ a list of parameters for plotting. }
   \item{\dots}{ further arguments passed on to \code{plot.default}. }
 }
-%\details{
-%}
+\details{
+The following plotting parameters are currently supported:
+\describe{
+\item{state_counts}{represent state counts by vertex size.}
+\item{transition_probability}{represent transition probabilities by edge width.}
+\item{lwd_multiplier, statesize_multiplier}{ Controls the variation
+of vertex sizes and edge widths (default: 1).}
+\item{add_labels}{add labels for centers (n/a for \code{type="graph"}).}
+\item{mark_clusters}{Use different markers for points depending on the
+state they belong to (only available when a\code{data} is specified).}
+}
+}
 %\value{
 %}
 %\references{ ~put references to the literature/web site here ~ }

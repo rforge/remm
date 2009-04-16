@@ -12,7 +12,7 @@ prune <- function(emm, count_threshold = 0.1,
             from <- states(emm)[to_remove[,1]]
             to <- states(emm)[to_remove[,2]]
 
-            emm <- remove_transition(emm, from, to)
+            emm <- remove_transitions(emm, from, to)
         }
 
     }

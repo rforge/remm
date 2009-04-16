@@ -141,14 +141,12 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
             point_center <- find_state(emm, data, match_state="exact")
             
             ## make state name integer for pch
-            point_center <- as.integer(as.factor(point_center))
+            pch <- as.integer(as.factor(point_center))
 
             ## make sure we stay below 25 for pch
-            while(any(point_center>25, na.rm=TRUE)) 
-            point_center[point_center>25] <- 
-            point_center[point_center>25] -25
+            while(any(pch>25, na.rm=TRUE)) pch[pch>25] <- pch[pch>25] -25
             plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
-                col="grey", pch=point_center, ...)
+                col="grey", pch=pch, ...)
             
             ## plot points which do not belong to any state
             if(any(is.na(point_center)))

@@ -8,7 +8,7 @@ which have a count smaller than a given threshold.
 }
 \usage{
 prune(emm, count_threshold = 0.1,
-    states = TRUE, transitions = TRUE){
+    states = TRUE, transitions = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
