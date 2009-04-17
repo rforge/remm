@@ -126,15 +126,10 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
     } else {
         ## project state centers onto dataset
 
-        if(ncol(emm$centers)>2){
-            d <- dist(rbind(emm$centers, data), method=emm$measure)
-            mds <- cmdscale(d, eig=TRUE, add=TRUE)
-            centers <- mds$points[1:nrow(emm$centers),]
-            allpoints <- mds$points[-c(1:nrow(emm$centers)),]
-        }else{
-            centers <- emm$centers
-            allpoints <- data
-        }
+        d <- dist(rbind(emm$centers, data), method=emm$measure)
+        mds <- cmdscale(d, eig=TRUE, add=TRUE)
+        centers <- mds$points[1:nrow(emm$centers),]
+        allpoints <- mds$points[-c(1:nrow(emm$centers)),]
 
         ## points
         if(p$mark_clusters){
