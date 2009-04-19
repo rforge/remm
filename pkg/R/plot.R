@@ -15,8 +15,8 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL,
 
 
     if(method=="state_counts") {
-        barplot(sort(state_counts(x), decreasing=TRUE), 
-            ylim="State counts", ...)
+        barplot(sort(state_counts(emm), decreasing=TRUE), 
+            ylab="State counts", ...)
 
     }else if(method=="graph") {
         if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
@@ -83,20 +83,28 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL,
         )
 
         ## make arrows shorter so they do not cover the nodes 
-        nodeWidth2 <- sapply(cex, FUN=function(cx)  strwidth("o", cex=cx))^2 
+        nodeRad2 <- cbind(
+            x=(sapply(cex, FUN=function(cx)  
+                    strwidth("o", cex=cx/1.2))/2)^2,
+            y=(sapply(cex, FUN=function(cx)
+                    strheight("o", cex=cx/1.2))/2)^2)
+
         x2 <- (arrows_fromto[,3]-arrows_fromto[,1])^2
         y2 <- (arrows_fromto[,2]-arrows_fromto[,4])^2
         z2 <- x2+y2
         shorten <- cbind(
-            x=sqrt(nodeWidth2[edges[,1]]/z2 * x2)/2,
-            y=sqrt(nodeWidth2[edges[,2]]/z2 * y2)/2)
+            x1=sqrt(nodeRad2[edges[,1],1]/z2 * x2),
+            y1=sqrt(nodeRad2[edges[,1],2]/z2 * y2),
+            x2=sqrt(nodeRad2[edges[,2],1]/z2 * x2),
+            y2=sqrt(nodeRad2[edges[,2],2]/z2 * y2)
+        )
 
-        signs <- matrix(1, ncol=ncol(shorten), nrow=nrow(shorten))
+        signs <- matrix(1, ncol=2, nrow=nrow(shorten))
         signs[arrows_fromto[,1] > arrows_fromto[,3],1] <- -1
         signs[arrows_fromto[,2] > arrows_fromto[,4],2] <- -1
+        signs <- cbind(signs, signs*-1)
 
         shorten <- shorten * signs
-        shorten <- cbind(shorten, shorten*-1)
         arrows_fromto <- arrows_fromto + shorten
 
         ## lwd for arrows
