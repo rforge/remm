@@ -1,6 +1,7 @@
 \name{remove}
 \alias{remove_states}
 \alias{remove_transitions}
+\alias{remove_selftransitions}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Remove States/Tranditions from an EMM }
 \description{
@@ -9,6 +10,7 @@ Remove states/transitions from an EMM.
 \usage{
 remove_states(emm, to_remove)
 remove_transitions(emm, from, to)
+remove_selftransitions(emm)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,9 +18,9 @@ remove_transitions(emm, from, to)
   \item{to_remove}{ Names of states to remove.}
   \item{from, to}{ Names of states for removing transitions.}
 }
-%\details{
-%  ~~ If necessary, more details than the description above ~~
-%}
+\details{
+\code{remove_selftransitions} removes all transitions from a state to itself.
+}
 \value{
 Returns a new EMM with removed states/transitions.
 }

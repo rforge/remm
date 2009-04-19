@@ -23,3 +23,8 @@ remove_transitions <- function(emm, from, to) {
     emm$mm <- removeEdge(from, to, emm$mm)
     emm
 }
+
+remove_selftransitions <- function(emm) {
+    self <- states(emm)[isAdjacent(emm$mm, states(emm), states(emm))]
+    remove_transitions(emm, self, self)
+}
