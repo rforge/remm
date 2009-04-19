@@ -1,5 +1,5 @@
 
-plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL, 
+plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL, 
     parameter=NULL, ...) {
     method <- match.arg(method)
     emm <- x
@@ -14,8 +14,11 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
         ), parameter)
 
 
+    if(method=="state_counts") {
+        barplot(sort(state_counts(x), decreasing=TRUE), 
+            ylim="State counts", ...)
 
-    if(method=="graph") {
+    }else if(method=="graph") {
         if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
         if(p$state_counts){
@@ -48,17 +51,16 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
 
     else if(is.null(data)){
 
-        if(ncol(emm$centers)>2){
-            d <- dist(emm$centers, method=emm$measure)
-            mds <- cmdscale(d, eig=TRUE, add=TRUE)
-            x <- mds$points
-        }else{
-            x <- emm$centers
-        }
+        d <- dist(emm$centers, method=emm$measure)
+        mds <- cmdscale(d, eig=TRUE, add=TRUE)
+        x <- mds$points
         dimnames(x) <- list(states(emm), NULL)
         
         ## start plotting
-        plot(x, xlab="Dimension 1", ylab="Dimension 2", type="n", ...)
+        plot(x, xlab="Dimension 1", ylab="Dimension 2", type="n", ...,
+            sub= paste("These two dimensions explain",
+                round(100 * mds$GOF[2], digits = 2), 
+                "% of the point variability."))
 
 
         ## use cex for point size
@@ -81,14 +83,13 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
         )
 
         ## make arrows shorter so they do not cover the nodes 
-        ## (we use the largest node)
-        nodeWidth2 <- strwidth("o", cex=max(cex))^2 
+        nodeWidth2 <- sapply(cex, FUN=function(cx)  strwidth("o", cex=cx))^2 
         x2 <- (arrows_fromto[,3]-arrows_fromto[,1])^2
         y2 <- (arrows_fromto[,2]-arrows_fromto[,4])^2
         z2 <- x2+y2
         shorten <- cbind(
-            x=sqrt(nodeWidth2/z2 * x2)/2,
-            y=sqrt(nodeWidth2/z2 * y2)/2)
+            x=sqrt(nodeWidth2[edges[,1]]/z2 * x2)/2,
+            y=sqrt(nodeWidth2[edges[,2]]/z2 * y2)/2)
 
         signs <- matrix(1, ncol=ncol(shorten), nrow=nrow(shorten))
         signs[arrows_fromto[,1] > arrows_fromto[,3],1] <- -1
@@ -133,7 +134,7 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
 
         ## points
         if(p$mark_clusters){
-            point_center <- find_state(emm, data, match_state="exact")
+            point_center <- find_states(emm, data, match_state="exact")
             
             ## make state name integer for pch
             pch <- as.integer(as.factor(point_center))
@@ -141,7 +142,10 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
             ## make sure we stay below 25 for pch
             while(any(pch>25, na.rm=TRUE)) pch[pch>25] <- pch[pch>25] -25
             plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
-                col="grey", pch=pch, ...)
+                col="grey", pch=pch, ...,
+                sub= paste("These two dimensions explain",
+                    round(100 * mds$GOF[2], digits = 2),
+                    "% of the point variability."))
             
             ## plot points which do not belong to any state
             if(any(is.na(point_center)))
@@ -150,7 +154,10 @@ plot.EMM <- function(x, method=c("MDS", "graph"), data = NULL,
         
         }else{
             plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
-                col="grey", ...)
+                col="grey", ...,
+                sub= paste("These two dimensions explain",
+                    round(100 * mds$GOF[2], digits = 2),
+                    "% of the point variability."))
         }
 
         cex <- 1

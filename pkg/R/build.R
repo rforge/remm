@@ -59,7 +59,7 @@ build <- function(emm, newdata) {
         emm$counts[emm$current] <- emm$counts[emm$current] +1
         
         ## find a matching state
-        sel <- find_state(emm, newdata, match_state="exact")
+        sel <- find_states(emm, newdata, match_state="exact")
 
         ## NA means no match -> create a new node
         if(is.na(sel)) {

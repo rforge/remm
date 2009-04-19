@@ -1,4 +1,4 @@
-find_state <- function(emm, newdata, match_state=c("exact", "nn")) {
+find_states <- function(emm, newdata, match_state=c("exact", "nn")) {
 
     match_state <- match.arg(match_state)
 

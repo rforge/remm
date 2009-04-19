@@ -11,7 +11,7 @@ score <- function(emm, newdata, method = c("prod", "sum", "log_odds"),
         if(transition_table) return(data.frame(from=NA, to=NA, prob=NA))
         else return(NA)
 
-    ssequence <- find_state(emm, newdata, match_state=match_state)
+    ssequence <- find_states(emm, newdata, match_state=match_state)
 
     ## get probabilites
     from <- ssequence[1:(n-1)]

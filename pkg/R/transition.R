@@ -36,10 +36,24 @@ transition <- function(emm, from, to,
     return(log(prob*size(emm)))
 }
 
-transition_matrix <- function(emm, type="probability") {
-    tm <- outer(states(emm), states(emm),
-    FUN = function(x, y) transition(emm, x, y, type=type))
-    dimnames(tm) <- list(states(emm), states(emm))
-    tm
-}
+transition_matrix <- function(emm,
+    type=c("probability", "counts", "log_odds")){
+    type <- match.arg(type)
+    #tm <- outer(states(emm), states(emm),
+    #FUN = function(x, y) transition(emm, x, y, type=type))
+    #dimnames(tm) <- list(states(emm), states(emm))
+    #tm
 
+    ## doing it sparse is much more efficient
+    m <- matrix(0, ncol=size(emm), nrow=size(emm), 
+        dimnames=list(states(emm), states(emm)))
+    ew <- edgeWeights(emm$mm, states(emm))
+    for(i in 1:length(ew)) m[i, names(ew[[i]])] <- ew[[i]]
+    if(type=="counts") return(m)
+
+    prob <- m/rowSums(m)
+    if(type=="probability") return(prob)
+
+    ## log_odds
+    return(log(prob*size(emm)))
+}

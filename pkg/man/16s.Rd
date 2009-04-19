@@ -10,7 +10,7 @@ Alphaproteobacteria and Mollicutes. The counts for 30 sequences
 for each class were obtained by counting the occurrence of triplets
 of amino acids in windows of length 100 without any overlap. To separate
 sequences a row of dummy count of -10 is used.}
-\usage{data(16s)}
+\usage{data("16s")}
 \format{
     \code{Alphaproteobacteria16s} and \code{Mollicutes16s} are matrices
     with about 449 rows and 64 (number of possible triplets) columns. 
@@ -19,7 +19,9 @@ sequences a row of dummy count of -10 is used.}
 %  ~~ If necessary, more details than the __description__ above ~~
 %}
 \source{
-The data was kindly provided by Dr. Raiford.
+The raw sequence information was obtained from the 
+National center for biotechnology information (NCBI) website at
+http://www.ncbi.nih.gov/
 }
 %\references{
 %}

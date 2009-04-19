@@ -10,7 +10,7 @@ in an EMM.
 }
 \usage{
 transition(emm, from, to, type = c("probability", "counts", "log_odds"))
-transition_matrix(emm, type="probability")
+transition_matrix(emm, type = c("probability", "counts", "log_odds"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

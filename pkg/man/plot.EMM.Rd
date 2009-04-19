@@ -1,12 +1,12 @@
 \name{plot.EMM}
-\alias{plot.EMM}
 \alias{plot}
+\alias{plot.EMM}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot EMM objects }
 \description{
 Plot EMM objects as graphs.}
 \usage{
-plot(x, method=c("MDS", "graph"), data = NULL, 
+\method{plot}{EMM}(x, method=c("MDS", "graph", "state_counts"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -20,6 +20,10 @@ plot(x, method=c("MDS", "graph"), data = NULL,
   \item{\dots}{ further arguments passed on to \code{plot.default}. }
 }
 \details{
+\code{"MDS"} projects the state centers into 2-dimentional space.
+
+\code{"state_counts"} produces a barplot with state counts.
+
 The following plotting parameters are currently supported:
 \describe{
 \item{state_counts}{represent state counts by vertex size.}
