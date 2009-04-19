@@ -25,6 +25,9 @@ build(emm, newdata)
     If this edge already existed, the weight is incremented by one.
 
     The new state becomes the current state.
+
+    NAs are handled in the data by using only the other dimensions if the data
+    for dissimilarity computation.
 }
 \value{
 A new EMM with the data added.

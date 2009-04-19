@@ -101,11 +101,18 @@ build <- function(emm, newdata) {
             }
 
 
-            ## fixme: forget old data
             ## update center (if we use centroids)
-            if(emm$centroids) emm$centers[sel,] <- 
-            (emm$centers[sel,]*emm$counts[sel] + newdata)/(emm$counts[sel]+1)
-            
+            if(emm$centroids) {
+                ## handle NAs
+                nas <- is.na(newdata)
+                if(any(nas)) newdata[nas] <- emm$centers[sel,nas]
+                nas <- is.na(emm$centers[sel,])
+                if(any(nas)) emm$centers[sel,nas] <- newdata[nas]
+
+                emm$centers[sel,] <- 
+                (emm$centers[sel,]*emm$counts[sel] + newdata)/(emm$counts[sel]+1)
+            }
+
             ## update counts and current state
             emm$current <- sel
             emm$counts[sel] <- emm$counts[sel] + 1
