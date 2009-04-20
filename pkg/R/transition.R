@@ -51,7 +51,15 @@ transition_matrix <- function(emm,
     for(i in 1:length(ew)) m[i, names(ew[[i]])] <- ew[[i]]
     if(type=="counts") return(m)
 
-    prob <- m/rowSums(m)
+    rs <- rowSums(m)
+    prob <- m/rs
+    
+    ## we have to handle absorbing states here (row sum is 0)
+    absorbing <- which(rs==0)
+    prob[absorbing,] <- 0
+    for(i in absorbing) prob[i,i] <- 1
+
+
     if(type=="probability") return(prob)
 
     ## log_odds
