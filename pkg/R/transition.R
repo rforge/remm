@@ -1,8 +1,13 @@
 
-transition <- function(emm, from, to, 
+transition <- function(emm, from, to=NULL, 
     type=c("probability", "counts", "log_odds") ){
     type <- match.arg(type)
     
+    if(is.null(to) && ncol(from)==2) {
+        to <- from[,2]
+        from <- from[,1]
+    }
+
     from <- as.character(from)
     to <- as.character(to)
 

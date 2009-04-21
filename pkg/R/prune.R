@@ -1,22 +1,18 @@
-prune <- function(emm, count_threshold = 0.1, 
+prune <- function(emm, count_threshold = 1, 
     states = TRUE, transitions = TRUE){
 
     if(states) emm <- 
-    remove_states(emm, names(which(emm$counts < count_threshold)))
+    remove_states(emm, rare_states(emm, count_threshold=count_threshold))
 
-    if(transitions) {
-        tm <- transition_matrix(emm, type="counts")
-        to_remove <- which(tm>0 & tm<count_threshold, arr.ind=TRUE)
-
-        if(nrow(to_remove)>0) {
-            from <- states(emm)[to_remove[,1]]
-            to <- states(emm)[to_remove[,2]]
-
-            emm <- remove_transitions(emm, from, to)
-        }
-
-    }
+    if(transitions) emm <- remove_transitions(emm, 
+        rare_transitions(emm, count_threshold=count_threshold))
 
     emm
 }
 
+rare_states <- function(emm, count_threshold = 1) 
+    names(which(emm$counts < count_threshold))
+
+rare_transitions <- function(emm, count_threshold = 1) 
+    transitions(emm)[transition(emm, transitions(emm), 
+            type="counts") < count_threshold,]

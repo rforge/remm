@@ -9,13 +9,15 @@ or a complete transition matrix
 in an EMM.
 }
 \usage{
-transition(emm, from, to, type = c("probability", "counts", "log_odds"))
+transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds"))
 transition_matrix(emm, type = c("probability", "counts", "log_odds"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an object of class \code{EMM}.}
-  \item{from, to}{ Names a states.}
+  \item{from, to}{ Names a states. If to is \code{NULL}, from has
+  to contain a matrix/data.frame with two columns (a from column and a 
+  to column as returned by \code{transitions}).}
   \item{type}{ What should be calculated? }
 }
 %\details{
@@ -37,6 +39,10 @@ transition_matrix(emm, type="count")
 
 ## access individual transition probability (state 1 -> 2)
 transition(emm, "1","2")
+
+## get counts for all existing transitions
+tr <- transitions(emm)
+cbind(tr, counts=transition(emm, tr, type="counts"))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

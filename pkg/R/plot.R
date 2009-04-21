@@ -1,5 +1,6 @@
 
-plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL, 
+plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
+        "transition_counts"), data = NULL, 
     parameter=NULL, ...) {
     method <- match.arg(method)
     emm <- x
@@ -17,6 +18,14 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL,
     if(method=="state_counts") {
         barplot(sort(state_counts(emm), decreasing=TRUE), 
             ylab="State counts", ...)
+    
+    }else if(method=="transition_counts") {
+        tr <- transitions(emm)
+        cnt <- transition(emm, tr, type="counts")
+        names(cnt) <- apply(tr, MARGIN=1, FUN = 
+            function(x) paste(x, collapse="->"))
+        barplot(sort(cnt, decreasing=TRUE), 
+            ylab="Transition counts", ...)
 
     }else if(method=="graph") {
         if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
@@ -49,6 +58,8 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL,
         }
     }
 
+    if(nrow(emm$centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
+    
     else if(is.null(data)){
 
         d <- dist(emm$centers, method=emm$measure)
@@ -69,14 +80,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts"), data = NULL,
             2+emm$counts/max(emm$counts) * p$statesize_multiplier*5
 
         ## arrows
-        ed <- edges(emm$mm)
-        edges <- NULL
-        for(i in 1:length(ed)) {
-            to <- as.integer(ed[[i]])
-            from <- rep(as.integer(names(ed)[i]), length(to))
-            edges <- rbind(edges, cbind(as.character(from), as.character(to)))
-        }
-
+        edges <- transitions(emm)
         arrows_fromto <- cbind(
             from_x = x[edges[,1],1], from_y= x[edges[,1],2],
             to_x= x[edges[,2],1],to_y=x[edges[,2],2]

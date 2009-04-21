@@ -37,3 +37,15 @@ state_centers <- function(emm) {
     emm$centers
 }
 
+
+transitions <- function(emm) {
+    ed <- edges(emm$mm)
+    edges <- NULL
+    for(i in 1:length(ed)) {
+        to <- as.integer(ed[[i]])
+        from <- rep(as.integer(names(ed)[i]), length(to))
+        edges <- rbind(edges, cbind(as.character(from), as.character(to)))
+    }
+    colnames(edges) <- c("from", "to")
+    as.data.frame(edges)
+}

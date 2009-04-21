@@ -1,5 +1,7 @@
 \name{prune}
 \alias{prune}
+\alias{rare_states}
+\alias{rare_transitions}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Pune States and/or Transitions}
 \description{
@@ -7,8 +9,10 @@ Simplifies an EMM by removing all states and/or transitions
 which have a count smaller than a given threshold.
 }
 \usage{
-prune(emm, count_threshold = 0.1,
+prune(emm, count_threshold = 1,
     states = TRUE, transitions = TRUE)
+rare_states(emm, count_threshold = 1)
+rare_transitions(emm, count_threshold = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,7 +25,9 @@ prune(emm, count_threshold = 0.1,
 %\details{
 %}
 \value{
-    Returns an object of class \code{EMM}.
+    \code{prune} returns an object of class \code{EMM}.
+    \code{rare_states} returns a vector of names of rare states.
+    \code{rare_transitions} returns a data.frame of rare transitions.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
@@ -38,6 +44,8 @@ state_counts(emm_l)
 transition_matrix(emm_l, type="counts")
 
 ## remove all states and edges with a threshold of 0.1
+rare_states(emm_l, count_threshold=0.1)
+rare_transitions(emm_l, count_threshold=0.1)
 emm_lr <- prune(emm_l, count_threshold=0.1)
 
 ## compare graphs

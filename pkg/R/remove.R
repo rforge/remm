@@ -13,7 +13,13 @@ remove_states <- function(emm, to_remove) {
     emm
 }
 
-remove_transitions <- function(emm, from, to) {
+remove_transitions <- function(emm, from, to=NULL) {
+    
+    if(is.null(to) && ncol(from)==2) {
+        to <- from[,2]
+        from <- from[,1]
+    }
+    
     from <- as.character(from)
     to <- as.character(to)
     

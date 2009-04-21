@@ -6,7 +6,8 @@
 \description{
 Plot EMM objects as graphs.}
 \usage{
-\method{plot}{EMM}(x, method=c("MDS", "graph", "state_counts"), data = NULL, 
+\method{plot}{EMM}(x, method=c("MDS", "graph", "state_counts", 
+    "transition_counts"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.

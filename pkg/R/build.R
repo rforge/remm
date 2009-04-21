@@ -56,8 +56,6 @@ build <- function(emm, newdata) {
 
     }else{
 
-        emm$counts[emm$current] <- emm$counts[emm$current] +1
-        
         ## find a matching state
         sel <- find_states(emm, newdata, match_state="exact")
 

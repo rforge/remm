@@ -9,14 +9,16 @@ Remove states/transitions from an EMM.
 }
 \usage{
 remove_states(emm, to_remove)
-remove_transitions(emm, from, to)
+remove_transitions(emm, from, to=NULL)
 remove_selftransitions(emm)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an \code{EMM} object.}
   \item{to_remove}{ Names of states to remove.}
-  \item{from, to}{ Names of states for removing transitions.}
+  \item{from, to}{ Names of states for removing transitions. If to is 
+    \code{NULL} from has to contain a matrix/data.frame with two columns
+    (from and to state names).}
 }
 \details{
 \code{remove_selftransitions} removes all transitions from a state to itself.

@@ -7,6 +7,7 @@ export(
     size,
     state_counts,
     state_centers,
+    transitions,
 
     build,
     transition,
@@ -20,6 +21,8 @@ export(
     find_states,
     score,
     age,
+    rare_states,
+    rare_transitions,
     prune
 )
 

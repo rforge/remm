@@ -4,6 +4,7 @@
 \alias{size}
 \alias{state_counts}
 \alias{state_centers}
+\alias{transitions}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Creator and Accessors for Class EMM}
 \description{
@@ -15,6 +16,7 @@ states(emm)
 size(emm)
 state_counts(emm)
 state_centers(emm)
+transitions(emm)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
