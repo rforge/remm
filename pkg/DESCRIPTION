@@ -1,10 +1,15 @@
 Package: rEMM
 Version: 0.0-1
 Date: 2009-XX-XX
-Title: R Implementation of Extensible Markov Model (EMM)
+Title: R Implementation of the Extensible Markov Model (EMM)
 Author: Michael Hahsler
 Maintainer: Michael Hahsler <michael@hahsler.net> 
-Description: Implementation of Extensible Markov Models (EMM).
+Description: The Extensible Markov Model (EMM) is a 
+    time varying Markov Chain. It learns and adjusts its structure
+    (number of states and transition probabilities) based on the input.
+    It uses a very compact representation of dense regions in the data 
+    (via distance based clustering) and therefore is suited for processing 
+    data stream.
 Classification/ACM: G.4, H.2.8, I.5.1
 URL: http://R-Forge.R-project.org/projects/remm/
 Depends: R (>= 2.7.0), stats, graph, proxy, cluster
