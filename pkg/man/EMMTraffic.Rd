@@ -21,7 +21,7 @@ the preceding time interval.
 %}
 \references{
 M.H. Dunham, Y. Meng, J. Huang (2004): Extensible Markov Model, In: 
-{\em ICDM '04: Proceedings of the Fourth IEEE International 
+\emph{ICDM '04: Proceedings of the Fourth IEEE International 
 Conference on Data Mining,} pp. 371--374.
 }
 \examples{

@@ -28,9 +28,13 @@ http://www.ncbi.nih.gov/
 \examples{
 data("16s")
 
-emm <- EMM("eJaccard", threshold=0.2)
-emm <- build(emm, Mollicutes16s)
+emm <- EMM("Kullback", threshold=0.1)
+emm <- build(emm, Mollicutes16s+1)
 
 plot(emm, "graph")
+
+## start state for sequences have an initial state probability >0
+it <- initial_transition(emm)
+it[it>0]
 }
 \keyword{datasets}

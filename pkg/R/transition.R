@@ -64,9 +64,20 @@ transition_matrix <- function(emm,
     prob[absorbing,] <- 0
     for(i in absorbing) prob[i,i] <- 1
 
+    switch(type,
+        probability = prob,
+        logg_odds = log(prob*size(emm))
+    )
+}
 
-    if(type=="probability") return(prob)
 
-    ## log_odds
-    return(log(prob*size(emm)))
+initial_transition <- function(emm, 
+    type=c("probability", "counts", "log_odds")){
+    type <- match.arg(type)
+
+    switch(type,
+        probability = emm$initial_counts / sum(emm$initial_counts),
+        counts = emm$initial_counts,
+        log_odds = log(emm$initial_counts / sum(emm$initial_counts)* size(emm))
+        )
 }

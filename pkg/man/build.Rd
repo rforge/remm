@@ -1,5 +1,6 @@
 \name{build}
 \alias{build}
+\alias{reset}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Build an EMM using New Data}
 \description{
@@ -7,6 +8,7 @@ Add new data to an EMM.
 }
 \usage{
 build(emm, newdata)
+reset(emm)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,10 +17,11 @@ build(emm, newdata)
     (each row is an observation) }
 }
 \details{
-    The dissimilarity between the new object and the centers of the EMM states
-    is calculated. The new observation is assigned to the closest state
-    if the dissimilarity value is smaller than the threshold (for the state).
-    If no such state exists, a new state is created for the observation.
+    For \code{build}, the dissimilarity between the new object and the centers
+    of the EMM states is calculated. The new observation is assigned to the
+    closest state if the dissimilarity value is smaller than the threshold (for
+    the state).  If no such state exists, a new state is created for the
+    observation.
 
     The count of the current state is incremented and
     an edge with weight 1 from the current state to the new state is added.
@@ -28,6 +31,10 @@ build(emm, newdata)
 
     NAs are handled in the data by using only the other dimensions if the data
     for dissimilarity computation.
+
+    \code{reset} resets the current state to \code{NA} for reading in a
+    new sequence. A row of all \code{NA} in \code{newdata} for \code{build}
+    also resets the current state.
 }
 \value{
 A new EMM with the data added.

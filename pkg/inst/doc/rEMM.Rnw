@@ -1,0 +1,722 @@
+\documentclass[fleqn, letter, 10pt]{article}
+\usepackage[round,longnamesfirst]{natbib}
+\usepackage[left=3cm,top=3cm,right=3cm,bottom=3cm,nohead]{geometry} 
+\usepackage{graphicx,keyval,thumbpdf,url}
+\usepackage{hyperref}
+\usepackage{Sweave}
+\SweaveOpts{strip.white=TRUE, eps=FALSE}
+\AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
+
+
+\usepackage[utf8]{inputenc}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+
+\newcommand{\strong}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\newcommand{\class}[1]{\mbox{\textsf{#1}}}
+\newcommand{\func}[1]{\mbox{\texttt{#1()}}}
+\newcommand{\code}[1]{\mbox{\texttt{#1}}}
+\newcommand{\pkg}[1]{\strong{#1}}
+\newcommand{\samp}[1]{`\mbox{\texttt{#1}}'}
+\newcommand{\proglang}[1]{\textsf{#1}}
+\newcommand{\set}[1]{\mathcal{#1}}
+\newcommand{\sQuote}[1]{`{#1}'}
+\newcommand{\dQuote}[1]{``{#1}''}
+\newcommand\R{{\mathbb{R}}}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{3mm plus2mm minus2mm}
+
+%% \VignetteIndexEntry{An Implementation of EMM for R}
+
+
+\begin{document}
+
+\title{rEMM: An Implementation of EMM for \proglang{R}}
+\author{Michael Hahsler and Magaret H. Dunham}
+%\date{March 4, 2009}
+\maketitle
+%\tableofcontents
+\sloppy
+
+
+\abstract{Abstract goes here}
+
+<<echo=FALSE>>=
+options(width = 70, prompt="R> ")
+### for sampling
+set.seed(1234)
+@
+
+
+\section{Introduction}
+Short introduction of EMMs~\citep{emm:Dunham:2004}, related methods (MC, HMM,
+clustering streams) and discussion of applications.
+
+\section{Implementation details}
+
+Class EMM, package graph and complexity.
+
+\section{Extensions}
+
+clustering, visualization, aging.
+
+\section{Examples}
+
+\subsection{Basic usage}
+
+First, we load the package and a simple data set called {\em EMMTraffic,} which
+comes with the package and was used in~\cite{emm:Dunham:2004} to illustrate
+EMMs. Each observation in this hypothetical data set is a
+vector of seven values obtained from sensors located at specific points on
+roads. Each sensor collects a count of the number of vehicles which have
+crossed this sensor in the preceding time interval.
+
+<<>>=
+library("rEMM")
+data(EMMTraffic)
+EMMTraffic
+@
+
+We use \func{EMM} to create a new EMM object and then build a model
+using the EMMTraffic data set.
+<<>>=
+emm <- EMM(measure="eJaccard", threshold=0.2)
+emm <- build(emm, EMMTraffic)
+@
+
+The resulting EMM has the following number of states:
+<<>>=
+size(emm)
+@
+
+The number of observations represented by each state can be accessed
+via \func{state\_counts}. Note that the counts are only incremented when an 
+outgoing transition is created. Therefore state~7 still has a count of 0.
+<<>>=
+state_counts(emm)
+@
+
+The state centers can be inspected using \func{state\_centers}. 
+<<>>=
+state_centers(emm)
+@
+
+\pkg{rEMM} has several visualization options for EMM models. For example,
+as a graph.
+
+<<Traffic_graph, fig=TRUE, include=FALSE>>=
+plot(emm, method="graph")
+@
+
+
+The resulting graph is presented in Fig.~\ref{fig:Traffic_graph}. In this 
+representation the vertices size and the arrow width code for the number of 
+observations represented by each state and the transition probabilities.
+However, the position of the vertices is chosen to optimize the
+layout of the graph. 
+
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\linewidth]{rEMM-Traffic_graph}
+\caption{An EMM representing the EMMTraffic data set represented as a graph.} 
+\label{fig:Traffic_graph}
+\end{figure}
+
+
+The transition probabilities of the EMM model can be calculated using 
+\func{transition\_matrix}.
+<<>>=
+transition_matrix(emm)
+@
+
+Alternatively we can get also counts or log odds instead of probabilities.
+<<>>=
+transition_matrix(emm, type="counts")
+transition_matrix(emm, type="log_odds")
+@
+
+Log odds are calculated as $ln(a/(1/n))$ where $a$ is the probability of
+the transition and $n$ is the number of states in the EMM.
+$1/n$ is the probability of a transition under the null model
+which assumes that the transition probability from each state
+to each other state (including staying in the same state) is the same, i.e.,
+the null model has a transition matrix with all entries equal to $1/n$.
+Individual transition probabilities can be obtained 
+more efficiently via \func{transition}.
+
+<<>>=
+transition(emm, "1", "2", type="probability")
+@
+
+
+Using the EMM model, we can predict a future state given a current state. 
+From the transition matrix $\mathbf{T}$ we calculate a $\mathbf{T}^n$
+which is contains the probability of moving from one state to another
+state in $n$ time steps. For
+example, from the state we can predict the state in $n=2$ steps. We can also
+get the probability distribution of over all states (we predicted the state with
+the highest probability).
+<<>>=
+predict_state(emm, n=2, current="2")
+predict_state(emm, n=2, current="2", probabilities=TRUE)
+@
+
+
+
+
+\subsection{Manipulating EMMs}
+The states of EMMs can be manipulated by removing states or transitions and 
+by merging states.
+Fig.~\ref{fig:Traffic_man}(a) shows 
+again the EMM for the EMMTraffic data set. We can remove a state
+with \func{remove\_states}. For example, we remove state~3 and
+display the resulting EMM in Fig~\ref{fig:Traffic_man}(b).
+
+<<Traffic_r3, fig=TRUE, include=FALSE>>=
+emm_r3 <- remove_states(emm, "3")
+plot(emm_r3, "graph")
+@
+
+Removing transitions is done with \func{remove\_transitions}.
+In the following example we remove the transition from state~5 to state~2.
+The resulting graph is shown in Fig~\ref{fig:Traffic_man}(c).
+
+<<Traffic_rt52, fig=TRUE, include=FALSE>>=
+emm_rt52 <- remove_transitions(emm, "5", "2")
+plot(emm_rt52, "graph")
+@
+
+States can be merged using \func{merge\_states}. Here we merge 
+states~2 and 5 into a combined state. 
+The combined state automatically gets the name of the first state in the 
+merge vector. The resulting EMM is shown in Fig~\ref{fig:Traffic_man}(c).
+Note that a transition from the combined state (2) is created which 
+represents the transition from state~5 to state~2 in the original EMM. 
+
+
+<<Traffic_m25, fig=TRUE, include=FALSE>>=
+emm_m25 <- merge_states(emm, c("2","5"))
+plot(emm_m25, "graph")
+@
+
+\begin{figure}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_graph}
+\\(a)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_r3}
+\\(b)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_rt52}
+\\(c)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_m25}
+\\(d)
+\end{minipage}
+\caption{Graph representation for an EMM for the EMMTraffic data set.
+(a) shows the original EMM, in (b) state~3 was removed, in 
+(c) the transition from state~5 to state~2 was removed, and in
+(d) states~2 and 5 are merged.}
+\label{fig:Traffic_man}
+\end{figure}
+
+
+\subsection{Using a learning rate and pruning}
+
+EMMs can adapt to changes in data over time. This is achived by reducing
+the weight of old observations in the data stream over time. We use 
+a learning rate $\lambda$ to specify the weight over time. The weight
+for data that is $t$ timesteps in the past is
+
+\begin{equation}
+w_t = 2^{-\lambda t}.
+\end{equation}
+
+The learning rate is specified when the EMM is created. Every insertion of
+a new observation means a new timestep. So the latest added observation
+has weight $1$, the observation before $2^{-\lambda}$, etc. Since we do
+not store observations but only states and transitions, all the weighing is
+incorporated into the counts for states and transitions.
+
+Here we learn an EMM for the EMMTraffic data with a rather high learning
+rate of $\lambda=1$ this means that the observations are weighted 
+$1, \frac{1}{2}, \frac{1}{4},\dots$.
+
+<<Traffic_l, fig=TRUE, include=FALSE>>=
+emm_l <- EMM(measure="eJaccard", threshold=0.2, lambda = 1)
+emm_l <- build(emm_l, EMMTraffic)
+plot(emm_l, "graph")
+@
+
+The resulting graph is shown in Fig.~\ref{fig:Traffic_learning}(b) 
+(for comparison Fig.~\ref{fig:Traffic_learning}(a) contains again the original
+EMM). 
+
+Over time states in an EMM can become obsolete and no new observations
+are assigned to them. Similarily transitions might become obsolete over time.
+To simplify the model and improve efficiency, such obsolete states and
+transactions can be pruned. For the example here, we prune all states 
+and transitions which have a weighted count of less than $0.1$ and
+show the resulting model in Fig.~\ref{fig:Traffic_learning}(c).
+
+<<Traffic_lp, fig=TRUE, include=FALSE>>=
+emm_lp <- prune(emm_l, count_threshold=0.1)
+plot(emm_lp, "graph")
+@
+
+With \func{prune} is possible to only prune states or transitions.
+A more sophisticated learning scheme is possible by explicitely
+calling the function
+\func{age} instead of setting $\lambda$ when the EMM is created.
+That way the user can specify when a timestep occurs, for example, after 
+every fifth observation or following real time instead of the stream
+of observations.
+
+
+\begin{figure}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_graph}
+\\(a)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_l}
+\\(b)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.7\linewidth]{rEMM-Traffic_lp}
+\\(c)
+\end{minipage}
+\caption{Graph representation for an EMM for the EMMTraffic data set.
+(a) shows the original EMM. (b) shows an EMM with a learning rate of
+$\lambda=1$. 
+(c) EMM with learning rate after pruning with a count threshold of $0.1$.}
+\label{fig:Traffic_learning}
+\end{figure}
+
+\subsection{Visualization options}
+
+We use a simulated data set calles {\em EMMsim} which is included in \pkg{rEMM}.
+The data contains four clusters in $\mathbb{R}^2$. Each cluster is
+represented by a bivariate normally distributed random variable $X_i
+\sim N_2(\mu, \Sigma)$. $\mu$ are the coordinates of the mean of the
+distribution and $\Sigma$ is the covariance matrix.
+The clusters are well separated.
+
+
+The temporal structure of the data is modeled by the fixed sequence 
+$<1,1,1,2,3,2,4>$
+through the four clusters
+which is 
+repeated 20 times for the training data set and 2 times for the 
+test data.
+
+<<>>=
+data("EMMsim")
+@
+
+Since the data set is in $2$-dimensional space, 
+we can directly visualize the data set as a scatter plot 
+(see Fig.~\ref{fig:sim_data}). We also add
+the test sequence. To show the temporal structure, the points in the
+test data are numbered and lines
+connecting the point in sequential order.
+
+<<sim_data, fig=TRUE, include=FALSE>>=
+plot(EMMsim_train, col="gray", pch=EMMsim_sequence_train)
+lines(EMMsim_test, col ="gray")
+points(EMMsim_test, col="red", pch=5)
+text(EMMsim_test, labels=1:nrow(EMMsim_test), pos=3)
+@
+
+\begin{figure}
+\centering
+%\begin{minipage}[b]{.49\linewidth}
+%\centering
+\includegraphics[width=.5\linewidth]{rEMM-sim_data}
+%\end{minipage}
+\caption{Simulated data with four clusters. The test data is plotted in red
+and the temporal structure is depicted by lines between the data points.}%
+\label{fig:sim_data}
+\end{figure}
+
+<<>>=
+emm <- EMM(measure="euclidean", threshold=0.1)
+emm <- build(emm, EMMsim_train)
+@
+
+We can visualize the resulting EMM as a graph.
+<<sim_graph, fig=TRUE, include=FALSE>>=
+plot(emm, method="graph")
+@
+
+
+The position of the vertices of the graph is solely chosen to optimize the
+layout (see Fig.~\ref{fig:sim_graph}(a)). 
+However, the position of the vertices can
+be used to represent the dissimilarity between the centers of the states they
+represent.
+
+<<sim_MDS, fig=TRUE, include=FALSE>>=
+plot(emm)
+@
+
+This results in the visualization in Fig.~\ref{fig:sim_graph}(b) which shows
+the same EMM graph but the position of the vertices was determined in a way to
+preserve the dissimilarity information between the centers of the states they
+represent as much as possible.  For data with higher dimensionality, a
+$2$-dimensional layout is computed using multidimensional scaling (MDS).
+
+We can also project the points in the data set 
+into $2$-dimensional space and then add the centers of the states 
+(see Fig.~\ref{fig:sim_graph}(c)).
+
+<<sim_MDS2, fig=TRUE, include=FALSE>>=
+plot(emm, data=EMMsim_train)
+@
+
+
+\begin{figure}[tbp]
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.9\linewidth]{rEMM-sim_graph}
+\\(a)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.9\linewidth]{rEMM-sim_MDS}
+\\(b)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.9\linewidth]{rEMM-sim_MDS2}
+\\(c)
+\end{minipage}
+\caption{Representation of the EMM for the simulated data. 
+(a) As a simple graph. 
+(b) A graph using vertex placement to represent dissimilarities.
+(c) Projection of state centers onto the simulated data.
+}%
+\label{fig:sim_graph}
+\end{figure}
+
+The simple graph representation in Fig.~\ref{fig:sim_graph}(a) shows a rather
+complicated graph for the EMM. However, 
+Fig.~\ref{fig:sim_graph}(b) with the vertices positioned
+to represent dissimilarities between state centers shows more structure.
+The states clearly fall into four groups.
+The projection of the state centers onto the data set in
+Fig.~\ref{fig:sim_graph}(c) shows that the four groups represent the four
+clusters in the data where the larger clusters contain more states.
+
+\subsection{Scoring new sequences}
+
+A scores of how likely it is that a sequence was generated by
+a given EMM model can be calculated by the normalized product or the sum of the
+probabilities on the path along the new sequence. For this example, we
+calculate how well the test data fits the EMM.
+<<>>=
+score(emm, EMMsim_test, method="prod")
+score(emm, EMMsim_test, method="sum")
+@
+
+Even though the test data is generated using exactly the same model as 
+the training data, 
+the normalized product produces a score of 0 and the normalized sum is
+also very low. To analyze the problem we can look at the transition
+table for the test sequence.
+
+<<>>=
+score(emm, EMMsim_test, transition_table=TRUE)
+@
+
+The low score is caused by missing transitions in the matching 
+sequence of states. These missing transitions are the result of the 
+fragmentation of the real clusters into many micro-clusters
+(see Figs.~\ref{fig:sim_graph}(b) and (c)). Suppose 
+we have two clusters called cluster A and cluster B and after an 
+observation in cluster A always an observation in cluster B follows. If
+now cluster A and cluster B are represented by many micro clusters each,
+the chances are high that we find a pair of micro clusters (one in A and
+one in B) for which we did not see a transition.
+\marginpar{start with count 1 or prior prob distr.}
+
+\subsection{Finding the optimal threshold}
+
+We can create multiple EMMs using different thresholds and calculate the score
+on the test data for each model. The optimal threshold is then the threshold
+which produces the highest score on the test data.
+
+We use again the simulated data from above for the following example.
+First we create EMMs for all thresholds 
+from $0.2$ to $0.7$ in $0.05$ increments using the training data.
+
+<<>>=
+## find best predicting model (threshold)
+sq <- seq(0.2,0.7, by=0.05)
+emmt <- lapply(sq, FUN=function(t) {
+        emm <- EMM(measure="euclidean", threshold=t)
+        build(emm, EMMsim_train)
+    })
+names(emmt) <- sq
+@
+
+The number of states of the models is decreasing with an increasing 
+dissimilarity threshold.
+<<>>=
+sapply(emmt, size)
+@
+
+Next we score the test data against all models.
+<<>>=
+st <- sapply(emmt, score, EMMsim_test)
+st
+@
+
+The best performing model has a score of \Sexpr{round(max(st),3)}
+and uses a threshold of \Sexpr{names(st[which.max(st)])}.
+This model is depicted in Fig.~\ref{fig:sim_optt}.
+It almost perfectly finds the original structure with 4 clusters. 
+Only one point between states~1 and 4 is assigned to state~4 instead
+of state~1 (see Fig.~\ref{fig:sim_optt}(b)).
+This produces in the EMM a transition from state~1 to state~4 
+(see Fig.~\ref{fig:sim_optt}(a))
+which was not in the original data generation model.
+
+<<sim_optt_graph, fig=TRUE, include=FALSE, echo=FALSE>>=
+plot(emmt[[which.max(st)]], method="graph")
+@
+<<sim_optt_MDS, fig=TRUE, include=FALSE, echo = FALSE>>=
+plot(emmt[[which.max(st)]], data=EMMsim_train)
+@
+
+\begin{figure}[tbp]
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.9\linewidth]{rEMM-sim_optt_graph}\\
+(a)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=\linewidth]{rEMM-sim_optt_MDS}\\
+(b)
+\end{minipage}
+\caption{Best performaing EMM with a threshold of 
+\Sexpr{names(st[which.max(st)])}}
+\label{fig:sim_optt}
+\end{figure}
+
+
+\subsection{Cluster states}
+
+For this example, we learn an EMM with a small threshold, and then 
+find a clustering for the states of the resulting EMM.
+We use hierarchical clustering with average linkage between state centers.
+Then  states in the same cluster are merged to create the clustered
+EMM. For the clustering we have to specify
+$k$, the number of clusters. To find the optimal number of clusters,
+we  create clustered EMMs for 
+different values of $k$
+and then score
+the resulting models using the test data.
+
+<<>>=
+## use hierarchical clustering to find best model
+emm <- EMM(measure="euclidean", threshold=0.1)
+emm <- build(emm, EMMsim_train)
+@
+
+<<sim_hc, fig=TRUE, include=FALSE>>=
+## find best predicting model (clustering)
+hc <- cluster_states(emm)
+plot(hc)
+@
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=.5\linewidth]{rEMM-sim_hc}
+\caption{Dendrogram for clustering state centers of the EMM build from 
+simulated data.}
+\label{fig:sim_hc}
+\end{figure}
+
+\func{cluster\_states} performs hierarchical clustering on the state centers
+and returns the cluster structure as a dendrogram. The resulting
+dendrogram is shown in Fig~\ref{fig:sim_hc}.
+
+Next we create a list of clustered EMMs for $k=3,4,\dots,10$ and
+score each model against the test data.
+<<>>=
+sq <- 3:10
+emmc <- lapply(sq, FUN=function(k) {
+        cl <- cutree(hc, k=k)
+        merge_states(emm, cl, clustering=TRUE)
+    })
+names(emmc) <- sq
+
+sc <- sapply(emmc, score, EMMsim_test)
+sc
+@
+
+The best performing model has a score of \Sexpr{round(max(sc),3)}
+and a $k$ of \Sexpr{names(sc[which.max(sc)])}.
+This model is depicted in Fig.~\ref{fig:sim_optc}.
+
+<<sim_optc_graph, fig=TRUE, include=FALSE, echo=FALSE>>=
+plot(emmc[[which.max(sc)]], method="graph")
+@
+<<sim_optc_MDS, fig=TRUE, include=FALSE, echo=FALSE>>=
+plot(emmc[[which.max(sc)]], data=EMMsim_train)
+@
+
+\begin{figure}[tbp]
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=.9\linewidth]{rEMM-sim_optc_graph}\\
+(a)
+\end{minipage}
+\begin{minipage}[b]{.49\linewidth}
+\centering
+\includegraphics[width=\linewidth]{rEMM-sim_optc_MDS}\\
+(b)
+\end{minipage}
+\caption{Best performaing EMM with a $k$ of 
+\Sexpr{names(sc[which.max(sc)])}.}
+\label{fig:sim_optc}
+\end{figure}
+
+\marginpar{seems not to work perfectly}
+Note that clustering perfectly finds the original structure with 4 clusters
+(see Fig.~\ref{fig:sim_optc}) with all points assigned to the correct
+state. The reason why the point between states~1 and 4 can be assigned
+correctly is that during merging states, an individual new threshold is 
+calculated for each state. 
+The obtained thresholds for the example are:
+
+<<>>=
+emmc[[which.max(sc)]]$var_thresholds
+@
+
+Compared with the representation in Fig.~\ref{fig:sim_optc}(b)
+we can states representing larger clusters of points also were 
+assigned a larger threshold.
+
+
+%Use the Boost Graph Library to check if the found optimal EMMs
+%have the same structure
+%<<>>=
+%library("RBGL")
+%isomorphism(emmt[[which.max(st)]]$mm,emmc[[which.max(sc)]]$mm)
+%@
+
+\subsection{Flooding data}
+<<>>=
+data(Derwent)
+summary(Derwent)
+@
+
+<<fig=TRUE>>=
+plot(Derwent[,1], type="l")
+@
+<<>>=
+emm <- EMM(measure="euclidean", threshold=10)
+emm <- build(emm, Derwent)
+state_counts(emm)
+state_centers(emm)
+@
+
+<<>>=
+flood <- names(which(state_centers(emm)[,1]>90))
+flood
+@
+
+<<fig=TRUE>>=
+plot(emm, "graph")
+@
+
+<<fig=TRUE>>=
+plot(remove_selftransitions(emm), "graph")
+@
+
+<<fig=TRUE>>=
+plot(emm)
+@
+
+<<fig=TRUE>>=
+plot(emm, "state_counts", log="y")
+@
+
+<<fig=TRUE>>=
+plot(remove_selftransitions(prune(emm, 5)))
+@
+
+<<fig=TRUE>>=
+plot(Derwent[,1], type="l")
+ss <- find_states(emm, Derwent)
+rare <- states(emm)[state_counts(emm) < 2]
+rare
+abline(v= which(ss %in% rare), col="red")
+@
+
+<<>>=
+predict_state(remove_selftransitions(emm), current="1", probabilities=TRUE)
+predict_state(remove_selftransitions(emm), n=2, current="1", probabilities=TRUE)
+@
+
+<<fig=TRUE>>=
+hc <- cluster_states(emm)
+plot(hc)
+@
+
+<<fig=TRUE>>=
+ emm20 <- merge_states(emm, cutree(hc, h=20), clustering=TRUE)
+ state_centers(emm20)
+ plot(remove_selftransitions(emm20))
+@
+
+<<fig=TRUE>>=
+plot(remove_selftransitions(emm20), "graph")
+@
+
+\subsection{rRNA sequence}
+
+<<>>=
+data("16s")
+
+emm <- EMM("Kullback", threshold=0.1)
+emm <- build(emm, Mollicutes16s+1)
+@
+
+<<fig=TRUE>>=
+plot(emm, "graph")
+
+## start state for sequences have an initial state probability >0
+it <- initial_transition(emm)
+it[it>0]
+@
+
+
+\section{Conclusion}
+
+To come
+
+\bibliographystyle{abbrvnat}
+\bibliography{rEMM}
+\end{document}

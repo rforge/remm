@@ -58,7 +58,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         }
     }
 
-    if(nrow(emm$centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
+    else if(nrow(emm$centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
     
     else if(is.null(data)){
 
@@ -109,6 +109,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         signs <- cbind(signs, signs*-1)
 
         shorten <- shorten * signs
+        shorten[is.nan(shorten)] <- 0 ## take care of too short arrows
         arrows_fromto <- arrows_fromto + shorten
 
         ## lwd for arrows

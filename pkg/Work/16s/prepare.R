@@ -16,7 +16,7 @@ create_stream <- function(file, window=100, overlap=0,
 
 
     ## put together and add start states
-    stream <- make_stream(cnt)
+    stream <- make_stream(cnt, use_ss = TRUE, ss_val=NA)
 
     stream
 }
@@ -24,6 +24,6 @@ create_stream <- function(file, window=100, overlap=0,
 Mollicutes16s <- create_stream("Mollicutes16s-.wri", max=30)
 Alphaproteobacteria16s <- create_stream("Alphaproteobacteria16s-.wri", max=30)
 
-save(Mollicutes16s, Alphaproteobacteria16s, "16s.rda")
+save(Mollicutes16s, Alphaproteobacteria16s, file="16s.rda")
 
 

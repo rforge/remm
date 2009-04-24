@@ -8,10 +8,13 @@ export(
     state_counts,
     state_centers,
     transitions,
+    current_state,
 
     build,
+    reset,
     transition,
     transition_matrix,
+    initial_transition,
     merge_states,
     remove_states,
     remove_transitions,

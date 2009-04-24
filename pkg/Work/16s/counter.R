@@ -19,14 +19,24 @@ lapply(x, counter, window=window, overlap=overlap, word=word,
     last_window=last_window)
 
 
-make_stream <- function(cnt) {
+make_stream <- function(cnt, use_ss=TRUE, ss_val = NA) {
     ## start state
-    ss <- rep(-10, ncol(cnt[[1]]))
+    ss <- rep(ss_val, ncol(cnt[[1]]))
 
     stream <- matrix(NA, ncol= ncol(cnt[[1]]), nrow=0)
     colnames(stream) <- colnames(cnt[[1]])
 
-    for(i in 1:length(cnt)) stream <- rbind(stream, ss, cnt[[i]])
+    if(use_ss) {
+        for(i in 1:length(cnt)) stream <- rbind(stream, ss, cnt[[i]])
+    }else{
+        for(i in 1:length(cnt)) stream <- rbind(stream, cnt[[i]])
+    }
+    
+    
     stream
+
+
+
+
 }
 

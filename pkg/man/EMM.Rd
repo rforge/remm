@@ -4,6 +4,7 @@
 \alias{size}
 \alias{state_counts}
 \alias{state_centers}
+\alias{current_state}
 \alias{transitions}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Creator and Accessors for Class EMM}
@@ -17,6 +18,7 @@ size(emm)
 state_counts(emm)
 state_centers(emm)
 transitions(emm)
+current_state(emm)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -38,7 +40,7 @@ transitions(emm)
 \value{
 The creator \code{EMM} returns an \code{EMM} object which is a list with
 the following elements:
-  \item{mm}{ a graph representing the Markov Model.}
+  \item{mm}{ a graph representing the first order Markov Model.}
   \item{centroids}{ a logical indicating if centroids are used. }
   \item{threshold}{dissimilarity threshold used for assignment.}
   \item{lambda}{learning rate.}
@@ -46,12 +48,14 @@ the following elements:
   \item{current}{name of current state in the EMM.}
   \item{centers}{a matrix containing the centers for the states.}
   \item{counts}{counts for states}
+  \item{initial_counts}{how often is a state the first state in a sequence
+    (used to calculate initial probabilities for the Markov chain).}
   \item{var_thresholds}{dissimilarity thresholds for individual states (usually
     the same as threshold).}
 }
 \references{ 
 M.H. Dunham, Y. Meng, J. Huang (2004): Extensible Markov Model, In:
-{\em ICDM '04: Proceedings of the Fourth IEEE International
+\emph{ICDM '04: Proceedings of the Fourth IEEE International
 Conference on Data Mining,} pp. 371--374.
 }
 %\author{ ~~who you are~~ }

@@ -7,6 +7,7 @@ age <- function(emm, t=1, lambda=NULL) {
 
     ## age counts
     emm$counts <- emm$counts * emm$lambda_factor^t 
+    emm$initial_counts <- emm$initial_counts * emm$lambda_factor^t 
 
     ## age transition counts
     #edgeWeights(emm$mm) <-  lapply(edgeWeights(emm$mm), "*", age)

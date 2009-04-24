@@ -1,6 +1,7 @@
 \name{transition}
 \alias{transition}
 \alias{transition_matrix}
+\alias{initial_transition}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Access Transition Probabilities/Counts in an EMM }
 \description{
@@ -11,6 +12,7 @@ in an EMM.
 \usage{
 transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds"))
 transition_matrix(emm, type = c("probability", "counts", "log_odds"))
+initial_transition(emm, type = c("probability", "counts", "log_odds"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,11 +22,17 @@ transition_matrix(emm, type = c("probability", "counts", "log_odds"))
   to column as returned by \code{transitions}).}
   \item{type}{ What should be calculated? }
 }
-%\details{
-%}
+\details{
+Log odds are calculated as \eqn{ln(a/(1/n))} where \eqn{a} is the probability
+of the transition and \eqn{n} is the number of states in the EMM.  \eqn{1/n} is
+the probability of a transition under the null model which assumes that the
+transition probability from each state to each other state (including staying
+in the same state) is the same, i.e., the null model has a transition matrix
+with all entries equal to \eqn{1/n}.
+}
 \value{
-    A scalar (for \code{transition}) or a square matrix 
-    (for \code{transition_matrix}).
+    A scalar (for \code{transition}), a square matrix 
+    (for \code{transition_matrix}) or a vector (for \code{initial_transition}).
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
@@ -36,6 +44,9 @@ emm <- build(emm, EMMTraffic)
 ## get transition matrix
 transition_matrix(emm)
 transition_matrix(emm, type="count")
+
+## get initial state probabilities
+initial_transition(emm)
 
 ## access individual transition probability (state 1 -> 2)
 transition(emm, "1","2")
