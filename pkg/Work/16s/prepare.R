@@ -25,9 +25,9 @@ create_stream <- function(file, window=100, overlap=0,
     stream
 }
 
-Mollicutes16s <- create_stream("Mollicutes16s.wri", max=30)
-Alphaproteobacteria16s <- create_stream("Alphaproteobacteria16s.wri", max=30)
+Alphaproteobacteria16S <- create_stream("Alphaproteobacteria16s.wri", max=30)
+Mollicutes16S <- create_stream("Mollicutes16s.wri", max=30)
 
-save(Mollicutes16s, Alphaproteobacteria16s, file="16s.rda")
+save(Mollicutes16S, Alphaproteobacteria16S, file="16S.rda")
 
 

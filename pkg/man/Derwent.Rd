@@ -3,9 +3,9 @@
 \docType{data}
 \title{Derwent Catchment Data}
 \description{
-Data sets with river level readings from six catchments of
+Data sets with flow readings (in cubic meter per second) for six catchments of
 in the vicinity of the Derwent river in the northern UK. 
-The data was collected daily from 08/25/1986 to 02/23/1995.
+The data was collected daily from November 1, 1971 -- January 31, 1977.
 The catchments are Long Bridge, Matlock Bath, Chat Sworth,
 What Stand Well, Ashford (Wye) and Wind Field Park (Amber).
 

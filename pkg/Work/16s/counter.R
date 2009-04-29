@@ -32,11 +32,6 @@ make_stream <- function(cnt, use_ss=TRUE, ss_val = NA) {
         for(i in 1:length(cnt)) stream <- rbind(stream, cnt[[i]])
     }
     
-    
     stream
-
-
-
-
 }
 

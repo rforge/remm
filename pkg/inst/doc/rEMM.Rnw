@@ -627,81 +627,198 @@ assigned a larger threshold.
 %@
 
 \subsection{Flooding data}
+The \pkg{rEMM} package also contains a data set
+called {\em Derwent} which was originally used by~\cite{emm:Dunham:2004}.
+It contains river flow readings (measured in $m^3$ per second) 
+from six catchments of in the
+river Derwent and two of its main tributaries
+in the northern England. 
+The data was collected daily for roughly 5 years from November 1, 1971 to 
+January 31, 1977. 
+The catchments are Long Bridge, Matlock Bath, Chat Sworth, 
+What Stand Well, Ashford (river Wye) and Wind Field Park (river Amber).
+
+The data set is interesting since it cointains annual changes of
+river levels and also some special flooding events.
+
 <<>>=
 data(Derwent)
 summary(Derwent)
 @
 
-<<fig=TRUE>>=
-plot(Derwent[,1], type="l")
-@
-<<>>=
-emm <- EMM(measure="euclidean", threshold=10)
-emm <- build(emm, Derwent)
-state_counts(emm)
-state_centers(emm)
-@
-
-<<>>=
-flood <- names(which(state_centers(emm)[,1]>90))
-flood
-@
+From the summary we see that the average flows vary for the catchments
+significantly (from 0.143 to 14.238).  The influence of differences in averages
+flows can be removed by scaling the data before building the EMM.  Form the
+summary we also see that for the Ashford and Wind Filed Park catchments a
+significant amount of observations is not available.  EMM deals with these
+missing values by using only the non-missing dimensions of the observations for
+the dissimilarity calculations. 
 
 <<fig=TRUE>>=
-plot(emm, "graph")
+plot(Derwent[,1], type="l", ylab="Gauged flows", 
+main=colnames(Derwent)[1])
 @
 
+In Fig.... we can see the annual flow structure
+for the Long Bridge catchment
+with high flows in September to
+March and lower flows in the summer months. The first year seams to have more
+variability in the summer months and the second year has an unusual event
+(around the index of 600 in Fig.....) 
+with a flow above $100 m^3/s$ which can be classified flooding.
+
+We build an EMM from the (centered and) scaled river data using Euclidean
+distance between the vectors containing the flows from the six cachements and
+experimentally found a distance threshold of 3 (just above the
+3rd qartile of the distance distribution between all scaled observations) 
+to give useful results.
+
 <<fig=TRUE>>=
-plot(remove_selftransitions(emm), "graph")
+Derwent_scaled <- scale(Derwent)
+emm <- EMM(measure="euclidean", threshold=3)
+emm <- build(emm, Derwent_scaled)
+#state_counts(emm)
+#state_centers(emm)
+plot(emm, "state_counts", log="y")
 @
+
+The resulting EMM has \Sexpr{size(emm)} states. In Fig.... shows 
+that the counts for the states have a very skewed distribution 
+with states~1 and 2 representing
+most observations. 
 
 <<fig=TRUE>>=
 plot(emm)
 @
 
+The projection of the state centers into $2$-dimensional space reveals
+that all states except state~11 and 12 are placed close together and 
+are highly connected. Other states (9, 10, 17 and 19) also seem somewhat 
+different from the majority of states.
+
+
+Next we look at frequent states. We define rare states here as all 
+states that represent less than 0.5\% of the observations. 
+On average this translates into less than two daily observation per year.
+We calculate a count threshold and then plot the EMM with only the
+states which are frequent. For the plot we remove the transitions
+from each state to itself to see the most important outgoing transitions
+more clearly.
 <<fig=TRUE>>=
-plot(emm, "state_counts", log="y")
+rare_threshold <- sum(state_counts(emm))*0.005
+rare_threshold
+#plot(prune(emm, rare_threshold, transitions=FALSE))
+plot(remove_selftransitions(prune(emm, rare_threshold, transitions=FALSE)))
 @
 
-<<fig=TRUE>>=
-plot(remove_selftransitions(prune(emm, 5)))
-@
+The model shows that 5 states represent approximately 99.5\% of the river's
+behavior.  States~1 and 2 are the most frequently used states and have a wide
+arrow (representing transition probabilities) going both directions between
+them.
+%<<>>=
+%rare <- names(which(state_counts(emm)<rare_threshold))
+%rare
+%@
+To analyze the meaning of the two outlier states (11 and 12) 
+identified in Fig...... above, we plot the flows at a 
+catchment and mark the observations for these states. 
 
 <<fig=TRUE>>=
-plot(Derwent[,1], type="l")
-ss <- find_states(emm, Derwent)
-rare <- states(emm)[state_counts(emm) < 2]
-rare
-abline(v= which(ss %in% rare), col="red")
+catchment <- 1 
+plot(Derwent[,catchment], type="l", ylab="Gauged flows", 
+main=colnames(Derwent)[catchment])
+state_sequence <- find_states(emm, Derwent_scaled)
+
+mark_states <- function(states, state_sequence, ys, col=0, label=NULL, ...) {
+    x <- which(state_sequence %in% states)
+    points(x, ys[x], col=col, ...)
+    if(!is.null(label)) text(x, ys[x], label, pos=4, col=col)
+}
+
+mark_states("11", state_sequence, Derwent[,catchment], col="blue", label="11")
+mark_states("12", state_sequence, Derwent[,catchment], col="red", label="12")
+#mark_states("9", state_sequence, Derwent[,catchment], col="green", label="9")
+#mark_states("3", state_sequence, Derwent[,catchment], col="blue")
 @
+
+In Fig.... we see that state~12 has a river flow in eccess of $100 m^3/s$ which only happend once 
+in the observation period. The state~11 seems to be a regular observation
+with medium
+flow around $20 m^3/s$ and it needs more analysis to find out why this 
+state is also an outlier directly leading to state~12.
+
+<<fig=TRUE>>=
+catchment <- 6 
+plot(Derwent[,catchment], type="l", ylab="Gauged flows", 
+main=colnames(Derwent)[catchment])
+
+mark_states("11", state_sequence, Derwent[,catchment], col="blue", label="11")
+mark_states("12", state_sequence, Derwent[,catchment], col="red", label="12")
+#mark_states("9", state_sequence, Derwent[,catchment], col="green", label="9")
+#mark_states("3", state_sequence, Derwent[,catchment], col="blue")
+@
+
+The cachment at Wind Field Park is at the Amber river which is a tributary of
+the Derwent and we see that a day before the flood occurs, the flow shoots
+up to $4 m^3/s$ which is cought by state~11 and gives a clear sign that 
+a flood is iminent the next day.
+ 
+
+
+
+Next we look at the probability of going from state~1 (normal condition)
+to state~12 (flooding) in $n=1,2,\dots,10$ days.
 
 <<>>=
-predict_state(remove_selftransitions(emm), current="1", probabilities=TRUE)
-predict_state(remove_selftransitions(emm), n=2, current="1", probabilities=TRUE)
+n <- 1:10
+probs <- sapply(n, FUN = function(n) predict_state(emm, n=n, 
+current="1", probabilities=TRUE))[12,]
+names(probs) <- n
+probs
 @
 
-<<fig=TRUE>>=
-hc <- cluster_states(emm)
-plot(hc)
-@
+From the probabilities we see that we cannot go directly from 1 to 12.
+Only after two steps we can get to state~12 and the probability is then
+between 0.0005 and 0.0007.
 
-<<fig=TRUE>>=
- emm20 <- merge_states(emm, cutree(hc, h=20), clustering=TRUE)
- state_centers(emm20)
- plot(remove_selftransitions(emm20))
-@
-
-<<fig=TRUE>>=
-plot(remove_selftransitions(emm20), "graph")
-@
+%<<fig=TRUE>>=
+%hc <- cluster_states(emm)
+%plot(hc)
+%@
+%<<fig=TRUE>>=
+% emm20 <- merge_states(emm, cutree(hc, h=20), clustering=TRUE)
+% state_centers(emm20)
+% plot(remove_selftransitions(emm20))
+%@
+%<<fig=TRUE>>=
+%plot(remove_selftransitions(emm20), "graph")
+%@
 
 \subsection{rRNA sequence}
+The \pkg{rEMM} package contains data for 16S ribosomal RNA (rRNA)
+sequences for the two phylogenetic classes, Alphaproteobacteria and Mollicutes. 
+16S rRNA is a component of the ribosomal subunit 30S and is regularly 
+used for phylogenetic studies (ref .......). 
 
+The sequence data was preprocessed by cutting the sequences into windows 
+of length 100 nucleodites (bases) without overlap and then for each window
+the occurrence of triplets of nucleodites was counted resulting in $4^3=64$
+counts per window. 
+
+Idea: Structural information (Ref:.....)
+
+The windows are used as observations to build an EMM.
+Here we look at the 16S sequence of Mollicutes. As the dissimilarity
+measure we use Kullback-Leibler (KL) divergence which was identified
+in studies (REF....) as on of the best performing measure for count data
+from genetic sequences. Since KL becomes $-\infty$ for counts of zero, we
+add one to all counts which means that we start building the EMM with a
+prior that all triplets have the equal occurence probability.
 <<>>=
-data("16s")
+data("16S")
 
 emm <- EMM("Kullback", threshold=0.1)
-emm <- build(emm, Mollicutes16s+1)
+emm <- build(emm, Mollicutes16S+1)
 @
 
 <<fig=TRUE>>=
@@ -712,6 +829,24 @@ it <- initial_transition(emm)
 it[it>0]
 @
 
+The graph representation of the EMM is shown in Fig..... 
+Note that each state in the EMM corresponds to one or more windows 
+of the rRNA sequence (the size of the state indicates the number 
+of windows). The initial transition probabilities show that all sequences start with the first window in state~1
+Several interesting observations can be made from this 
+representation.
+\begin{itemize}
+\item There exists a path through the graph using only the largest states
+    which represents the most common sequence of windows.
+\item There are several places the EMM where all sequences converge (e.g., 14)
+\item There are places where many possible parallel paths exist 
+    (e.g., 32, 35, 7, 19, 27,45)
+\item The windows composition changes over the sequences since there are
+    only a few edges going back (e.g., from 24 to 2) or skiping states 
+    on the way down (e.g., from 2 to 11).
+\end{itemize}
+
+These observations merit closer analysis by biologists.
 
 \section{Conclusion}
 

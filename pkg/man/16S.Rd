@@ -1,16 +1,16 @@
-\name{16s}
-\alias{16s}
-\alias{Alphaproteobacteria16s}
-\alias{Mollicutes16s}
+\name{16S}
+\alias{16S}
+\alias{Alphaproteobacteria16S}
+\alias{Mollicutes16S}
 \docType{data}
-\title{Count Data for 16s rRNA Sequences}
+\title{Count Data for 16S rRNA Sequences}
 \description{
-This data set contains count data for 16s rRNA sequences for
-Alphaproteobacteria and Mollicutes. The counts for 30 sequences
-for each class were obtained by counting the occurrence of triplets
-of amino acids in windows of length 100 without any overlap. To separate
-sequences a row of dummy count of -10 is used.}
-\usage{data("16s")}
+This data set contains count data for 16S ribosomal RNA (rRNA) sequences for
+the two classes Alphaproteobacteria and Mollicutes. The counts for 30
+sequences for each class were obtained by counting the occurrence of triplets
+of nucleodites (bases) in windows of length 100 without any overlap.  To
+separate sequences a row of dummy count of \code{NA} is used.}
+\usage{data("16S")}
 \format{
     \code{Alphaproteobacteria16s} and \code{Mollicutes16s} are matrices
     with about 449 rows and 64 (number of possible triplets) columns. 
@@ -26,10 +26,10 @@ http://www.ncbi.nih.gov/
 %\references{
 %}
 \examples{
-data("16s")
+data("16S")
 
 emm <- EMM("Kullback", threshold=0.1)
-emm <- build(emm, Mollicutes16s+1)
+emm <- build(emm, Mollicutes16S+1)
 
 plot(emm, "graph")
 

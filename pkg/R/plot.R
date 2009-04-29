@@ -11,7 +11,10 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
             lwd_multiplier=1,
             statesize_multiplier=1,
             add_labels = TRUE,
-            mark_clusters = TRUE
+            mark_clusters = TRUE,
+            mark_states = NULL,
+            nAttrs = list(),
+            eAttrs = list()
         ), parameter)
 
 
@@ -30,15 +33,24 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
     }else if(method=="graph") {
         if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
+        nAttrs <- p$nAttrs
+        eAttrs <- p$eAttrs
+        
+        if(!is.null(p$mark_states)) {
+            nAttrs$color <- rep("red", length(p$mark_states))
+            names(nAttrs$color) <- p$mark_states
+            nAttrs$fontcolor <- rep("red", length(p$mark_states))
+            names(nAttrs$fontcolor) <- p$mark_states
+        }
+
         if(p$state_counts){
-            nAttrs <- list(width=.5 +
-                emm$counts/max(emm$counts)*p$statesize_multiplier)
-            ## setting line width for arrows does not seem to be implemented
-            pl <- plot(emm$mm, recipEdges="distinct", 
-                nodeAttrs = nAttrs, ...)
+            nAttrs$width <- .5 +
+                emm$counts/max(emm$counts)*p$statesize_multiplier
+        }
 
-        }else plot(emm$mm, recipEdges="distinct", ...)
-
+        ## setting line width for arrows does not seem to be implemented
+        pl <- plot(emm$mm, recipEdges="distinct",
+                            nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
         if(p$transition_probability) {
             ## redraw arrows with different width
             ## calculate arrow length (see plot in graph.R in Rgraphviz)
