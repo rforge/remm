@@ -3,11 +3,10 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         "transition_counts"), data = NULL, 
     parameter=NULL, ...) {
     method <- match.arg(method)
-    emm <- x
 
     p <- .get_parameters(list(
             state_counts=TRUE,
-            transition_probability=TRUE,
+            transition_probabilities=TRUE,
             lwd_multiplier=1,
             statesize_multiplier=1,
             add_labels = TRUE,
@@ -16,7 +15,9 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
             nAttrs = list(),
             eAttrs = list()
         ), parameter)
-
+    
+    emm <- x
+    emm_centers <- state_centers(emm)
 
     if(method=="state_counts") {
         barplot(sort(state_counts(emm), decreasing=TRUE), 
@@ -51,7 +52,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         ## setting line width for arrows does not seem to be implemented
         pl <- plot(emm$mm, recipEdges="distinct",
                             nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
-        if(p$transition_probability) {
+        if(p$transition_probabilities) {
             ## redraw arrows with different width
             ## calculate arrow length (see plot in graph.R in Rgraphviz)
             agn <- AgNode(pl)
@@ -70,11 +71,11 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         }
     }
 
-    else if(nrow(emm$centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
+    else if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
     
     else if(is.null(data)){
 
-        d <- dist(emm$centers, method=emm$measure)
+        d <- dist(emm_centers, method=emm$measure)
         mds <- cmdscale(d, eig=TRUE, add=TRUE)
         x <- mds$points
         dimnames(x) <- list(states(emm), NULL)
@@ -126,7 +127,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
 
         ## lwd for arrows
         lwd <- 1
-        if(p$transition_probability) lwd <- 
+        if(p$transition_probabilities) lwd <- 
         1+transition(emm, edges[,1], edges[,2])* p$lwd_multiplier*4
 
 
@@ -152,10 +153,10 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
     } else {
         ## project state centers onto dataset
 
-        d <- dist(rbind(emm$centers, data), method=emm$measure)
+        d <- dist(rbind(emm_centers, data), method=emm$measure)
         mds <- cmdscale(d, eig=TRUE, add=TRUE)
-        centers <- mds$points[1:nrow(emm$centers),]
-        allpoints <- mds$points[-c(1:nrow(emm$centers)),]
+        centers <- mds$points[1:nrow(emm_centers),]
+        allpoints <- mds$points[-c(1:nrow(emm_centers)),]
 
         ## points
         if(p$mark_clusters){

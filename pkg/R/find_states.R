@@ -6,7 +6,7 @@ find_states <- function(emm, newdata, match_state=c("exact", "nn")) {
     if(!is.matrix(newdata)) newdata <- as.matrix(rbind(newdata))
 
     ## cross-dissimilarities
-    d <- dist(newdata, emm$centers, method=emm$measure)
+    d <- dist(newdata, state_centers(emm), method=emm$measure)
 
     .which.min_NA <- function(x) {
         m <- which.min(x)

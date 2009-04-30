@@ -7,7 +7,10 @@ remove_states <- function(emm, to_remove) {
     emm$mm <- removeNode(to_remove, emm$mm)
     to_remove <- states(emm) %in% to_remove
     emm$centers <- emm$centers[!to_remove,]
+    #emm$sum_x <- emm$sum_x[!to_remove,]
+    #emm$sum_x2 <- emm$sum_x2[!to_remove,]
     emm$counts <- emm$counts[!to_remove]
+    emm$initial_counts <- emm$initial_counts[!to_remove]
     emm$var_thresholds <- emm$var_thresholds[!to_remove]
 
     emm

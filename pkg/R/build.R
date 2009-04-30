@@ -19,6 +19,9 @@ build <- function(emm, newdata) {
     }
    
     ## aging is also implemented in age.R
+    ## fixme: we might want to reduce the cluster variability (sum_x2)
+    ## or the cluster threshold also
+
     .age <- function() {
         emm$counts <<- emm$counts * emm$lambda_factor
         emm$initial_counts <<- emm$initial_counts * emm$lambda_factor
@@ -26,7 +29,6 @@ build <- function(emm, newdata) {
                 x$weight <- x$weight* emm$lambda_factor
                 x
             })
-    
     }
 
     
@@ -53,6 +55,8 @@ build <- function(emm, newdata) {
         emm$current <- "1"
         rownames(newdata) <- "1"
         emm$centers <- newdata
+        #emm$sum_x <- newdata
+        #emm$sum_x2 <- newdata^2
         emm$counts["1"] <- 1 
         emm$initial_counts["1"] <- 1  
         
@@ -83,6 +87,8 @@ build <- function(emm, newdata) {
 
             rownames(newdata) <- sel
             emm$centers <- rbind(emm$centers, newdata)
+            #emm$sum_x <- rbind(emm$sum_x, newdata)
+            #emm$sum_x2 <- rbind(emm$sum_x2, newdata^2)
             emm$counts[sel] <- 1
             ## initialize threshold
             emm$var_thresholds[sel] <- emm$threshold
@@ -116,14 +122,22 @@ build <- function(emm, newdata) {
 
             ## update center (if we use centroids)
             if(emm$centroids) {
-                ## handle NAs
-                nas <- is.na(newdata)
-                if(any(nas)) newdata[nas] <- emm$centers[sel,nas]
+                
+                nnas <- !is.na(newdata)
+                emm$centers[sel,nnas] <- (emm$centers[sel,nnas] * 
+                    emm$counts[sel] + newdata[nnas])/(emm$counts[sel]+1)
                 nas <- is.na(emm$centers[sel,])
-                if(any(nas)) emm$centers[sel,nas] <- newdata[nas]
-
-                emm$centers[sel,] <- 
-                (emm$centers[sel,]*emm$counts[sel] + newdata)/(emm$counts[sel]+1)
+                emm$centers[sel,nas] <- newdata[nas]
+                
+                #nnas <- !is.na(newdata)
+                ## for sum_x and sum_x2 we have additivity
+                #emm$sum_x[sel,nnas] <- emm$sum_x[sel,nnas] + newdata[nnas]
+                #emm$sum_x2[sel,nnas] <- emm$sum_x2[sel,nnas] + newdata[nnas]^2
+                #nas <- is.na(emm$sum_x[sel,])
+                #if(any(nas)) {
+                    #    emm$sum_x[sel,nas] <- newdata[nas]
+                    #emm$sum_x2[sel,nas] <- newdata[nas]^2
+                #}
             }
 
             ## update counts and current state

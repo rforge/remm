@@ -44,6 +44,7 @@ transition <- function(emm, from, to=NULL,
 transition_matrix <- function(emm,
     type=c("probability", "counts", "log_odds")){
     type <- match.arg(type)
+    
     #tm <- outer(states(emm), states(emm),
     #FUN = function(x, y) transition(emm, x, y, type=type))
     #dimnames(tm) <- list(states(emm), states(emm))
@@ -66,7 +67,7 @@ transition_matrix <- function(emm,
 
     switch(type,
         probability = prob,
-        logg_odds = log(prob*size(emm))
+        log_odds = log(prob*size(emm))
     )
 }
 

@@ -55,7 +55,7 @@ emm <- EMM(measure="eJaccard", threshold=0.2)
 emm <- build(emm, EMMTraffic)
 
 size(emm)
-plot(emm) ## plot needs rgraphviz installed
+plot(emm, "graph") ## plot needs rgraphviz installed
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
