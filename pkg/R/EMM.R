@@ -1,6 +1,7 @@
 
 ## constructor
-EMM <- function(measure="euclidean", threshold=0.2, lambda=0, centroids=TRUE) {
+EMM <- function(measure="euclidean", threshold=0.2, lambda=0, 
+    centroids=identical(tolower(measure), "euclidean")) {
     mm <- new("graphNEL", edgemode="directed")
     structure(list(mm=mm, 
             measure = measure,          ## used dissimilarity measure 

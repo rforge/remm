@@ -1,10 +1,17 @@
 
-merge_states <- function(emm, to_merge = NULL, clustering = FALSE) {
+merge_states <- function(emm, to_merge = NULL, 
+    clustering = FALSE, new_center = NULL) {
 
     ## handle a clustering
     if(clustering) {
         k <- max(to_merge)
-        for(i in 1:k) emm <- merge_states(emm, names(to_merge)[to_merge==i])
+        
+        if(!is.null(new_center) && nrow(new_center) != k) 
+        stop("new_center has not the right number of rows.")
+        
+        for(i in 1:k) emm <- merge_states(emm, names(to_merge)[to_merge==i],
+            clustering = FALSE, new_center[i,])
+        
         return(emm)
     }
 
@@ -27,12 +34,24 @@ merge_states <- function(emm, to_merge = NULL, clustering = FALSE) {
     old_centers <- state_centers(emm)[to_merge,]
 
     ## create new state
-    if(emm$centroid) {
-        emm$centers[new_state,] <- colSums(old_centers*emm$counts[to_merge])/
-           sum(emm$counts[to_merge])
-        #emm$sum_x[new_state,] <- colSums(emm$sum_x[to_merge,]) 
-        #emm$sum_x2[new_state,] <- colSums(emm$sum_x2[to_merge,]) 
+    if(is.null(new_center)) {
+        if(emm$centroid) {
+            emm$centers[new_state,] <- 
+                colSums(old_centers*emm$counts[to_merge])/
+                sum(emm$counts[to_merge])
+            #emm$sum_x[new_state,] <- colSums(emm$sum_x[to_merge,]) 
+            #emm$sum_x2[new_state,] <- colSums(emm$sum_x2[to_merge,]) 
+        }else {
+            ## pseudo medoids: don't do anything we keep the first one
+        }
+    }else{ 
+        ## user supplied new center
+        if(identical(length(new_center), ncol(emm$centers))) 
+        emm$centers[new_state,] <- new_center
+        else stop("new_center does not have the correct length/ncol!")
     }
+        
+    
     emm$counts[new_state] <- sum(emm$counts[to_merge])
     emm$initial_counts[new_state] <- sum(emm$initial_counts[to_merge])
     
@@ -42,7 +61,7 @@ merge_states <- function(emm, to_merge = NULL, clustering = FALSE) {
     #emm$sum_x <- emm$sum_x[!to_delete,]
     #emm$sum_x2 <- emm$sum_x2[!to_delete,]
     emm$counts <- emm$counts[!to_delete]
-    emm$initial_counts <- emm$counts[!to_delete]
+    emm$initial_counts <- emm$initial_counts[!to_delete]
 
     
     ## fix current state

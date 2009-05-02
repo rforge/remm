@@ -17,11 +17,11 @@ Sigma <- lapply(1:nrow(sd_rho), FUN = function(i) rbind(
         c(sd_rho[i,"rho"]*sd_rho[i,"x"]*sd_rho[i,"y"], sd_rho[i,"y"]^2)))
 
 
-sequence <- c(1,1,1,2,3,2,4)
-n <- 20
+sequence <- c(1,2,1,3,4)
+n <- 40
 
 EMMsim_sequence_train <- rep(sequence, n)
-EMMsim_sequence_test <- rep(sequence, 2)
+EMMsim_sequence_test <- rep(sequence, 5)
 
 library("MASS")
 EMMsim_train <- t(sapply(EMMsim_sequence_train, FUN = function(i) 

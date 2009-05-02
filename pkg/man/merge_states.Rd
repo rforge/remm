@@ -6,7 +6,7 @@
 Merge several states of an EMM into a single state preserving 
 counts/probabilities in the EMM.}
 \usage{
-merge_states(emm, to_merge, clustering = FALSE)
+merge_states(emm, to_merge, clustering = FALSE, new_center = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,6 +15,11 @@ merge_states(emm, to_merge, clustering = FALSE)
       name of the first state in \code{to_merge}
       is used as the name for the new state representing the merged states.}
   \item{clustering}{ is \code{to_merge} a clustering? }
+  \item{new_center}{ supply new centers for the merged states.
+    New centroids are automatically
+    computed. If (pseudo) medoids are used, new medoids should be supplied.
+    If none is supplied, the first state in \code{to_merge} 
+    is used as the new medoid (warning: this is probably not a good medoid!)}
 }
 %\details{
 %}

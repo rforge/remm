@@ -111,15 +111,16 @@ temporal structure of the data which might be crucial important to
 understand the
 underlying data. For example, in intrusion detection a user might change from
 behavior A to behavior B, both represented by clusters labeled non-suspicious
-behavior, but the transition form A to B might be extremely unusual and gives
-away an intrusion.  The Extensible Markov Model \citep[EMM][]{emm:Dunham:2004}
+behavior, but the transition form A to B might be extremely unusual and give
+away an intrusion. The Extensible Markov Model \citep[EMM,][]{emm:Dunham:2004}
 provides a micro cluster-based data stream clustering method which retains
-temporal information in form of an evolving Markov Model with clusters as
+temporal information in form of an evolving Markov Chain with clusters as
 states and transitions representing the temporal information.
 EMM was successfully applied to rare event and intrusion
 detection~\citep{emm:Meng:2006c, emm:Isaksson:2006, emm:Meng:2006a}, web usage
 mining~\citep{emm:Lu:2006}, and identifying emerging events and developing
 trends~\citep{emm:Meng:2006, emm:Meng:2006b}.
+\marginpar{non-stationary Markov process}
 
 The paper is organized as follows....
 
@@ -127,23 +128,23 @@ The paper is organized as follows....
 
 EMM can be seen as an evolving Markov Chain (MC) which at each point in time
 represents a regular time-homogeneous MC but is updated when new data is
-available. In the following we will restrict the discussion to first order MCs
-but it is straight forward to extend EMM to higher order models. 
+available. In the following we will restrict the discussion to first order MMs
+but it is straight forward to extend EMC to higher order models. 
 
 \marginpar{add ref}
 A (first order) Markov Chain is a sequence of random variables
 $X_1, X_2, \dots$. All random variables have the same domain
-$\mathrm{dom}(X_i) = S =\{x_1, x_2, \dots, x_k\}$, a countable 
+$\mathrm{dom}(X_i) = S =\{s_1, s_2, \dots, s_k\}$, a countable 
 set called the state space. The Markov
 property states that the next state is only dependent on the current state.
 Formally,
 
 \begin{equation}
-P(X_{n+1} = x| X_n =x_n, \dots, X_1=x_1) = P(X_{n+1} = x| X_n =x_n)
+P(X_{l+1} = s| X_l =s_l, \dots, X_1=s_1) = P(X_{l+1} = s| X_l =s_l)
 \end{equation}
 
 For simplicity we use for transition probabilities the notation 
-$a_{ij} = P(X_{n+1} = x_i| X_n =x_j)$ 
+$a_{ij} = P(X_{l+1} = s_i| X_l =s_j)$ 
 where it is appropriate.  Time-homogeneous MC can
 be represented by a so called transition matrix containing the transition
 probabilities from each state to all other state.
@@ -162,26 +163,27 @@ MCs are a perfect way to keep track of temporal information using the Markov
 Property as a relaxation.  With a MC is is easy to forecast the probability of
 future states. For example the probability to get from a state to any other
 state in $n$ time steps is given by the matrix $\mathbf{A}^n$. With an MC is
-also easy to calculate the probability of a new sequence by
+also easy to calculate the probability (likelihood???) of a new sequence by
 
 \begin{equation}
-P(X_{X_n}=x_n, X_{n-1}=x_{n-1} \dots, X_1=x_1) = 
-    \prod_{i=1}^{n-1}{P(X_{i+1} = x_{i+1}| X_{i} =x_i)}
+P(X_l=s_l, X_{l-1}=s_{l-1} \dots, X_1=s_1) = 
+    \prod_{i=1}^{l-1}{P(X_{i+1} = s_{i+1}| X_{i} =s_i)}
 \end{equation}
 
 The probabilities of a Markov Chain can be directly estimated from the 
 data using the maximum likelihood method by
 \begin{equation}
-a_{ij} = c_{ij}/c_{ii},
+a_{ij} = c_{ij}/n_i,
 \end{equation}
-where $c_{ij}$ is the count of transitions from $x_i$ to $x_j$ in the data
-and $c_{ii}$ is the marginal count for $x_i$.
+where $c_{ij}$ is the count of transitions from $s_i$ to $s_j$ in the data
+and $n_i=\sum{c_{i.}}$.
 
 Data streams typically contain dimensions with continuous data and/or have
 discreet dimensions with a large number of domain
 values~\citep{stream_clust:Aggarwal:2009}.  Therefore the data points have to
 be mapped onto a manageable number of states first. This mapping is done by
-clustering. Each cluster is the represented by a state in the MC. The
+clustering. Each cluster (or microcluster) is the represented 
+by a state in the MC. The
 transition information is maintained during the clustering process by using an
 additional data structure representing the MC as a graph which can also be
 incorporated into the cluster information which is managed by the clustering
@@ -192,20 +194,168 @@ clusters, the corresponding state in the MC automatically also gets created,
 merged or deleted resulting in an evolving MC, called an EMM.
 
 Many existing clustering algorithms can be easily 
-extended to create an EMM. For example,
+extended to maintain an EMM. For example,
 BIRCH~\citep{stream_clust:Zhang:1996},
 CluStream~\citep{stream_clust:Aggarwal:2003},
 DenStream~\citep{stream_clust:Cao:2006} or
 WSTREAM~\citep{stream_clust:Tasoulis:2006} can be used.
-Here we use for clustering a simple dissimilarity-based
+
+In the following we look at the additional data structures and the operations
+on these structure which are necessary to maintain an EMM by an existing
+clustering algorithm. But first we need to introduce some notation. We define
+$S=\{s_1, s_2,\dots,s_k\}$ to be the set of clusters/states 
+where $k$ is the current number of clusters.  
+$\mathbf{n} = (n_1, n_2,\dots,n_k)$ is a vector with $n_i$ being
+the number of data points assigned to cluster $s_i$.
+The current state $s_c \in \{\epsilon, 1,2,\dots,k\}$ is either
+no state~($\epsilon$; for the first data point) or one of the $k$ clusters.
+\marginpar{explain $\epsilon$}
+
+\paragraph{Data structures for the EMM.}
+Typically a clustering algorithm for stream data uses a very sparse
+represerntation for each cluster consisting of a way to summarize the center
+and the dispersion of the data as well as how many data points were assigned to
+the cluster so far.  Since the cluster represents a state in the EMM we need to
+add a data structure to store the outgoing edges and their counts.
+For cluster $C_i$ we need to store a count vector $c_{i.}$.
+Together with $n_i$, the number of data points assigned to the cluster, 
+it is easy to calculate the estimated transition probabilities 
+by $a_{i.}=c_{i.}/n_i$.
+
+An easy way manage all transition counts is to store all count vector
+in a count matrix $\mathbf{C}$. Now it is easy to calculate the 
+transition probability matrix by
+\begin{equation}
+\mathbf{A} = \mathbf{C} / \mathbf{n}
+\end{equation}
+A typical EMM is a sparse graph and the count vectors $c_{i.}$ stored with the
+clusters contains zeros. Storing the count matrix in sparse format helps to
+reduce space requirements significantly.
+
+For the EMM we keep track of the current state $s_c$ using a single variable
+containing a cluster identifier.
+
+\marginpar{Concurrent streams with multiple current states.}
+
+\paragraph{Adding a data point to an existing cluster.}
+
+When a data point is added to an existing cluster $s_i$, the EMM has to
+update the transition count from the current state to the new state by
+setting $c_{s_c,i} = c_{s_c,i} +1$.
+Finally the current state is set to the new state by $s_c=i$.
+
+\paragraph{Creating a new cluster.}
+
+Whenever the clustering algorithm creates a new (micro)cluster $s_{k+1}$,
+the transition count matrix $\mathbf{C}$ has to be enlarged by a row and a 
+column. Since the matrix is stored in sparse format, this modification
+incurrs only minimal work. Then we can use the same operation as 
+adding a data point to an existng cluster described above.
+
+\paragraph{Deleting clusters.}
+
+When a cluster $s_i$ (typically an outlier cluster) is deleted by 
+the clustering algorithm, all we need to do is to remove 
+the row $i$ and column $i$ in the transition count matrix $\mathbf{C}$.
+This deletes the state.
+
+\paragraph{Merging clusters.}
+
+When two clusters~$s_i$ and $s_j$ are merged into a new cluster $s_m$, 
+we need to: 
+
+\begin{enumerate}
+\item create new state $s_m$ in $\mathbf{C}$.
+\item update the outgoing edges for $s_m$  by $c_{m.} = c_{i.} +c_{j.}$.
+\item update the incomming edges for $s_m$ by $c_{.m} = c_{.i} + c_{.j}$.
+\item delete columns and rows for the  old states $s_i$ and $s_j$ 
+    from $\mathbf{C}$ (see deleting clusters above).
+\end{enumerate}
+
+Everything else is typically handled by the clustering algorithm.
+It is straight forwardto extend the merge to an arbitrary number of clusters
+at a time.
+
+Merging states also covers reclustering which is done by many stream clustering
+algorithm to create a final clustering for the user/application.
+
+
+\paragraph{Splitting clusters.}
+
+Splitting microclusters is typically not implemented in 
+data stream clustering algorithms since the individual data points are not 
+stored and therefore it is hard to find two new meaningful clusters. 
+When clusters are split by algorithms like BIRCH, it typically means that
+one or several microclusters are assigned to a different cluster. This case
+does not affect the EMM, since the states are attached to the microclusters
+and thus will move with them to the new cluster.
+
+However, if splitting cluster $s_i$ into two new clusters $s_n$ and $s_m$
+is necessary, we create two states with equal
+outgoing transition probabilities and a fraction of the incoming
+transition probabilities by:
+\begin{align*}
+c_{n.}& = n_n(c_{i.}/n_i)\\
+c_{.n}& = n_n(c_{.i}/n_i)\\
+c_{m.}& = n_m(c_{i.}/n_i)\\
+c_{.m}& = n_m(c_{.i}/n_i)
+\end{align*}
+
+These operations cover all cases typically needed to incorporate EMM into 
+a clustering algorithm. Next we introduce a simple data stream clustering 
+algorithm implemented in \pkg{rEMM}.
+
+\section{Data stream clustering}
+
+Here we use for clustering a simple density-based
 clustering algorithm described in the following section.
 
-\section{Stream Clustering}
+To represent micro clusters, we use the following 
+information:
 
+\begin{itemize}
+\item center (centroid/pseudo medoid)
+\item counts
+\item initial counts
+\item data structure with weight edges to other clusters. Weights are counts.
+(threshold)
+\end{itemize}
 
+We do not use sum\_x and sum\_x2 like BIRCH since we use arbitrary proximity
+measures and they only help for Euclidean. For Euclidean centers are still
+additive (weighted).
 
+Use centroids for Euclidean and pseudo medoids (first point) 
+for other proximity measures 
+(finding canonical centroids is expensive since there
+might not exist a closed form solution and
+all data points might be needed~\citep{stream_clust:Leisch:2006}.)
 
-Discuss related methods (MC, HMM, AMC, ...)
+One of the clusters is the current cluster.
+
+build creates micro clusters
+
+\begin{enumerate}
+\item Computed dissimilarities between the new data point and the
+centers.
+\item find the closest cluster with a dissimilarity smaller than the threshold
+\item if cluster exists then assign the new point to the cluster 
+\item otherwise we create a new cluster for the point.
+\item update the transition count from the current cluster to the new 
+cluster.
+\end{enumerate}
+
+Reclustering to get final clustering. We can use
+an arbitrary algorithm (hierarchical clustering, $k$-means, $k$-medoids, etc.)
+\begin{itemize}
+\item keep micro clusters but
+    assign to a EMM state several micro clusters 
+    (clusters of arbitrary shape, see CURE). 
+\item merge micro clusters into larger clusters (spherical clusters) and 
+    use them.
+\end{itemize}
+
+\marginpar{Discuss related methods (MM, HMM, AMM, ...)}
 
 \section{Implementation details}
 
@@ -468,10 +618,11 @@ The clusters are well separated.
 
 
 The temporal structure of the data is modeled by the fixed sequence 
-$<1,1,1,2,3,2,4>$
+$<1,2,1,3,4>$
 through the four clusters
 which is 
-repeated 20 times for the training data set and 2 times for the 
+repeated 40 times (200 data points) for the training data set 
+and 5 times (25 data points) for the 
 test data.
 
 <<>>=
@@ -636,15 +787,11 @@ st <- sapply(emmt, score, EMMsim_test)
 st
 @
 
-The best performing model has a score of \Sexpr{round(max(st),3)}
+The best performing model (with the smallest threshold) 
+has a score of \Sexpr{round(max(st),3)}
 and uses a threshold of \Sexpr{names(st[which.max(st)])}.
 This model is depicted in Fig.~\ref{fig:sim_optt}.
-It almost perfectly finds the original structure with 4 clusters. 
-Only one point between states~1 and 4 is assigned to state~4 instead
-of state~1 (see Fig.~\ref{fig:sim_optt}(b)).
-This produces in the EMM a transition from state~1 to state~4 
-(see Fig.~\ref{fig:sim_optt}(a))
-which was not in the original data generation model.
+It perfectly finds the original structure with 4 clusters. 
 
 <<sim_optt_graph, fig=TRUE, include=FALSE, echo=FALSE>>=
 plot(emmt[[which.max(st)]], method="graph")
@@ -670,10 +817,10 @@ plot(emmt[[which.max(st)]], data=EMMsim_train)
 \end{figure}
 
 
-\subsection{Cluster states}
+\subsection{Reclustering states}
 
 For this example, we learn an EMM with a small threshold, and then 
-find a clustering for the states of the resulting EMM.
+recluster the states of the EMM to find a final clustering.
 We use hierarchical clustering with average linkage between state centers.
 Then  states in the same cluster are merged to create the clustered
 EMM. For the clustering we have to specify
@@ -689,10 +836,18 @@ emm <- EMM(measure="euclidean", threshold=0.1)
 emm <- build(emm, EMMsim_train)
 @
 
+
+We use \func{recluster\_hclust} to create a list of clustered 
+EMMs for $k=2,3,\dots,10$ (hierarchical clustering with average link). 
+The attribute \code{cluster\_info} contains
+information about the clustering including the dendrogram
+which is shown in Fig~\ref{fig:sim_hc}.
+
 <<sim_hc, fig=TRUE, include=FALSE>>=
 ## find best predicting model (clustering)
-hc <- cluster_states(emm)
-plot(hc)
+sq <- 2:10
+emmc <- recluster_hclust(emm, k=sq, method ="average") 
+plot(attr(emmc, "cluster_info")$dendrogram)
 @
 
 \begin{figure}[tbp]
@@ -703,21 +858,9 @@ simulated data.}
 \label{fig:sim_hc}
 \end{figure}
 
-\func{cluster\_states} performs hierarchical clustering on the state centers
-and returns the cluster structure as a dendrogram. The resulting
-dendrogram is shown in Fig~\ref{fig:sim_hc}.
-
-Next we create a list of clustered EMMs for $k=3,4,\dots,10$ and
-score each model against the test data.
 <<>>=
-sq <- 3:10
-emmc <- lapply(sq, FUN=function(k) {
-        cl <- cutree(hc, k=k)
-        merge_states(emm, cl, clustering=TRUE)
-    })
-names(emmc) <- sq
-
 sc <- sapply(emmc, score, EMMsim_test)
+names(sc) <- sq
 sc
 @
 
@@ -748,21 +891,17 @@ plot(emmc[[which.max(sc)]], data=EMMsim_train)
 \label{fig:sim_optc}
 \end{figure}
 
-\marginpar{seems not to work perfectly}
-Note that clustering perfectly finds the original structure with 4 clusters
+Clustering also finds the original structure with 4 clusters
 (see Fig.~\ref{fig:sim_optc}) with all points assigned to the correct
-state. The reason why the point between states~1 and 4 can be assigned
-correctly is that during merging states, an individual new threshold is 
-calculated for each state. 
-The obtained thresholds for the example are:
+state. 
 
 <<>>=
 emmc[[which.max(sc)]]$var_thresholds
 @
 
-Compared with the representation in Fig.~\ref{fig:sim_optc}(b)
-we can states representing larger clusters of points also were 
-assigned a larger threshold.
+Compared with the representation in Fig.~\ref{fig:sim_optc}(b) we can see that
+states representing more dispersed clusters of points (e.g. state~1) were
+assigned larger thresholds than more compact clusters (e.g. state~5).
 
 
 %Use the Boost Graph Library to check if the found optimal EMMs

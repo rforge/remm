@@ -12,7 +12,8 @@
     Create an empty EMM object.
 }
 \usage{
-EMM(measure = "euclidean", threshold = 0.2, lambda = 0, centroids = TRUE)
+EMM(measure = "euclidean", threshold = 0.2, lambda = 0, 
+    centroids = identical(tolower(measure), "euclidean"))
 states(emm)
 size(emm)
 state_counts(emm)
@@ -30,8 +31,9 @@ current_state(emm)
   \item{lambda}{ learning rate. if \eqn{lambda>0}, the weight
   of each data point in the stream is decreasing exponentially over time by a
   factor of \eqn{2^{-lambda*t}}.}
-  \item{centroids}{ use centroids for states? If \code{FALSE}, the first
-    observation is used to represent a state.}
+  \item{centroids}{ use centroids for states? If \code{FALSE}, 
+    pseudo medians (first observation of a state) is used to represent a state.
+    Default is centroids for Euclidean and pseudo medoids otherwise.}
   \item{emm}{an object of class \code{EMM}. }
 }
 %\details{
