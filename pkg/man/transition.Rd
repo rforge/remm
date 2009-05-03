@@ -10,9 +10,12 @@ or a complete transition matrix
 in an EMM.
 }
 \usage{
-transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds"))
-transition_matrix(emm, type = c("probability", "counts", "log_odds"))
-initial_transition(emm, type = c("probability", "counts", "log_odds"))
+transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds",
+    plus_one = FALSE))
+transition_matrix(emm, type = c("probability", "counts", "log_odds",
+    plus_one = FALSE))
+initial_transition(emm, type = c("probability", "counts", "log_odds",
+    plus_one = FALSE))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,6 +24,9 @@ initial_transition(emm, type = c("probability", "counts", "log_odds"))
   to contain a matrix/data.frame with two columns (a from column and a 
   to column as returned by \code{transitions}).}
   \item{type}{ What should be calculated? }
+  \item{plus_one}{ add one to each transition count. This is equal
+      to start with one for each transition count, i.e. initially all 
+      transitions are equally likely. }
 }
 \details{
 Log odds are calculated as \eqn{ln(a/(1/n))} where \eqn{a} is the probability
@@ -43,7 +49,9 @@ emm <- build(emm, EMMTraffic)
 
 ## get transition matrix
 transition_matrix(emm)
+transition_matrix(emm, plus_one=TRUE)
 transition_matrix(emm, type="count")
+transition_matrix(emm, type="count", plus_one=TRUE)
 
 ## get initial state probabilities
 initial_transition(emm)
@@ -53,7 +61,7 @@ transition(emm, "1","2")
 
 ## get counts for all existing transitions
 tr <- transitions(emm)
-cbind(tr, counts=transition(emm, tr, type="counts"))
+cbind(as.data.frame(tr), counts=transition(emm, tr, type="counts"))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

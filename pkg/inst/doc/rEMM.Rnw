@@ -49,7 +49,7 @@
 \abstract{Abstract goes here}
 
 <<echo=FALSE>>=
-options(width = 70, prompt="R> ")
+options(width = 70, prompt="R> ", digits=4)
 ### for sampling
 set.seed(1234)
 @
@@ -298,7 +298,7 @@ transition probabilities by:
 c_{n.}& = n_n(c_{i.}/n_i)\\
 c_{.n}& = n_n(c_{.i}/n_i)\\
 c_{m.}& = n_m(c_{i.}/n_i)\\
-c_{.m}& = n_m(c_{.i}/n_i)
+c_{.m}& = n_m(c_{.i}/n_i) 
 \end{align*}
 
 These operations cover all cases typically needed to incorporate EMM into 
@@ -308,52 +308,84 @@ algorithm implemented in \pkg{rEMM}.
 \section{Data stream clustering}
 
 Here we use for clustering a simple density-based
-clustering algorithm described in the following section.
-
+clustering algorithm with a reclustering phase.
 To represent micro clusters, we use the following 
 information:
 
 \begin{itemize}
-\item center (centroid/pseudo medoid)
-\item counts
-\item initial counts
-\item data structure with weight edges to other clusters. Weights are counts.
-(threshold)
+\item Cluster centers
+\item Number of data points assigned to the cluster 
 \end{itemize}
 
-We do not use sum\_x and sum\_x2 like BIRCH since we use arbitrary proximity
-measures and they only help for Euclidean. For Euclidean centers are still
-additive (weighted).
+The cluster centers are either centroids (for Euclidean distance) or pseudo
+medoids.  We use medoids since finding canonical centroids in non-Euclidean
+space can be a computationally very expensive optimization problem
+or even not possible without storing all data 
+points belonging to the cluster~\citep{stream_clust:Leisch:2006}.
+However, since we do not store the data points for our clusters,
+even exact medoits can not be found. Therefore, we use fixed pseudo medoids 
+which we define as the first data point which creates a 
+new cluster. The idea is that since we use a fixed 
+threshold around the center, points will be added around the initial data point
+which makes it a reasonable center.
 
-Use centroids for Euclidean and pseudo medoids (first point) 
-for other proximity measures 
-(finding canonical centroids is expensive since there
-might not exist a closed form solution and
-all data points might be needed~\citep{stream_clust:Leisch:2006}.)
+Note, that we do not store the sums and sum of squares of observations 
+like BIRCH~\citep{stream_clust:Zhang:1996} and similar micro cluster based 
+algorithms since this only helps with calculating measures 
+meaningful in Euclidean space and the clustering algorithm here is independent
+from the chosen proximity measure.
 
-One of the clusters is the current cluster.
+%For the EMM we store a data structure for the transition counts
+%and a vector of initial counts 
+%One of the clusters is the current cluster.
 
-build creates micro clusters
-
+Algorithm to add a new data point to a clustering:
 \begin{enumerate}
 \item Computed dissimilarities between the new data point and the
-centers.
-\item find the closest cluster with a dissimilarity smaller than the threshold
-\item if cluster exists then assign the new point to the cluster 
-\item otherwise we create a new cluster for the point.
-\item update the transition count from the current cluster to the new 
-cluster.
+    centers.
+\item Find the closest cluster with a dissimilarity smaller than the threshold.
+\item If cluster exists then assign the new point to the cluster. 
+\item Otherwise we create a new cluster for the point.
+\item Update the transition count from the current cluster to the new 
+    cluster.
+\item Let the current cluster be the new cluster.
 \end{enumerate}
 
-Reclustering to get final clustering. We can use
-an arbitrary algorithm (hierarchical clustering, $k$-means, $k$-medoids, etc.)
-\begin{itemize}
-\item keep micro clusters but
-    assign to a EMM state several micro clusters 
-    (clusters of arbitrary shape, see CURE). 
-\item merge micro clusters into larger clusters (spherical clusters) and 
-    use them.
-\end{itemize}
+The clustering produces micro clusters. To create a final clustering to present
+to a user or to be used by an application, we recluster the micro clusters. For
+reclusterung an arbitrary algorithm (hierarchical clustering, $k$-means,
+$k$-medoids, etc.) can be used. This gives the user the flexibility 
+to accomodate
+a-priori knowledge about the data and the shape of expected clusters.
+For spherical clusters $k$-means or $k$-medoids can be used. 
+If clusters of arbitrary shape are expected hierarchical clustering 
+with single linkage can be used.
+
+To observe memory limitations, clusters with very low counts (outliers)
+can be removed or close clusters can be merged.
+
+EMMs adapts to changes in data over time. New data points influence
+transition probabilities. However, to enable the EMM to learn, it
+has also to forget old data similar to the fading used 
+by HPStream~\citep{stream_clust:Aggarwal:2004}.
+This is achieved by reducing
+the weight of old observations in the data stream over time. We use 
+a learning rate $\lambda$ to specify the weight over time. The weight
+for data that is $t$ timesteps in the past is
+\begin{equation}
+w_t = 2^{-\lambda t}.
+\end{equation}
+
+Since we do not store data points, the weighting has to be done on the 
+aggregated observation counts and transition counts. This is easy since
+the weight defined above is multiplicative:
+\begin{equation}
+w_t = \prod_{i=1}^t{2^{-\lambda}}
+\end{equation}
+This property allows us to multiply all counts with $2^{-\lambda}$ at 
+each timestep.
+
+
 
 \marginpar{Discuss related methods (MM, HMM, AMM, ...)}
 
@@ -725,13 +757,16 @@ clusters in the data where the larger clusters contain more states.
 
 \subsection{Scoring new sequences}
 
-A scores of how likely it is that a sequence was generated by
+A score of how likely it is that a sequence was generated by
 a given EMM model can be calculated by the normalized product or the sum of the
-probabilities on the path along the new sequence. For this example, we
-calculate how well the test data fits the EMM.
+probabilities on the path along the new sequence. 
+The new sequence is computed by assigning each new data point to
+the closest cluster as long as the distance to the center it is smaller
+than the threshold. For this example, we
+calculate how well the test data fits the EMM. 
 <<>>=
-score(emm, EMMsim_test, method="prod")
-score(emm, EMMsim_test, method="sum")
+score(emm, EMMsim_test, method="prod", match_state="exact", plus_one=FALSE)
+score(emm, EMMsim_test, method="sum", match_state="exact", plus_one=FALSE)
 @
 
 Even though the test data is generated using exactly the same model as 
@@ -740,82 +775,48 @@ the normalized product produces a score of 0 and the normalized sum is
 also very low. To analyze the problem we can look at the transition
 table for the test sequence.
 
+\marginpar{problem with plus\_one and age!}
 <<>>=
-score(emm, EMMsim_test, transition_table=TRUE)
+score(emm, EMMsim_test, match_state="exact", plus_one=FALSE, 
+transition_table=TRUE)
 @
 
-The low score is caused by missing transitions in the matching 
-sequence of states. These missing transitions are the result of the 
-fragmentation of the real clusters into many micro-clusters
+The low score is caused by 
+data points that could not be match to exactly to a cluster
+(\code{<NA>} above)
+and by missing transitions in the matching 
+sequence of states (counts of zero above). 
+These missing transitions are the result of the 
+fragmentation of the real clusters into many micro clusters
 (see Figs.~\ref{fig:sim_graph}(b) and (c)). Suppose 
 we have two clusters called cluster A and cluster B and after an 
 observation in cluster A always an observation in cluster B follows. If
 now cluster A and cluster B are represented by many micro clusters each,
-the chances are high that we find a pair of micro clusters (one in A and
-one in B) for which we did not see a transition.
-\marginpar{start with count 1 or prior prob distr.}
+it is very likely that we find a pair of micro clusters (one in A and
+one in B) for which we did not see a transition yet.
 
-\subsection{Finding the optimal threshold}
+To reduce the problem of not being able to match a data point to a 
+cluster we can use a nearest neighbor approach instead of exact matching
+(\code{match\_state="nn"} is the default for \func{score}).
+Here a new data point is assigned to the closest cluster even if it falls 
+outside the threshold. The problem with missing transactions can be reduced by
+starting with a prior distribution of transition probabilities. In the 
+most simple case we start with a uniform transition, i.e., if no data is
+available we assume that the transitions to all other states are equally 
+likely. This can be done by giving each transition an initial count
+of one and is implemented as the option \code{plus\_one=TRUE} 
+(also the default for \func{score}). It is called plus one since one is added
+to the counts at the time when \func{score} executed. It would be 
+inefficient to store the ones.
 
-We can create multiple EMMs using different thresholds and calculate the score
-on the test data for each model. The optimal threshold is then the threshold
-which produces the highest score on the test data.
-
-We use again the simulated data from above for the following example.
-First we create EMMs for all thresholds 
-from $0.2$ to $0.7$ in $0.05$ increments using the training data.
-
+Using nearest neighbor and uniform initial counts of one produce the
+following scores.
 <<>>=
-## find best predicting model (threshold)
-sq <- seq(0.2,0.7, by=0.05)
-emmt <- lapply(sq, FUN=function(t) {
-        emm <- EMM(measure="euclidean", threshold=t)
-        build(emm, EMMsim_train)
-    })
-names(emmt) <- sq
+score(emm, EMMsim_test, method="prod")
 @
 
-The number of states of the models is decreasing with an increasing 
-dissimilarity threshold.
-<<>>=
-sapply(emmt, size)
-@
-
-Next we score the test data against all models.
-<<>>=
-st <- sapply(emmt, score, EMMsim_test)
-st
-@
-
-The best performing model (with the smallest threshold) 
-has a score of \Sexpr{round(max(st),3)}
-and uses a threshold of \Sexpr{names(st[which.max(st)])}.
-This model is depicted in Fig.~\ref{fig:sim_optt}.
-It perfectly finds the original structure with 4 clusters. 
-
-<<sim_optt_graph, fig=TRUE, include=FALSE, echo=FALSE>>=
-plot(emmt[[which.max(st)]], method="graph")
-@
-<<sim_optt_MDS, fig=TRUE, include=FALSE, echo = FALSE>>=
-plot(emmt[[which.max(st)]], data=EMMsim_train)
-@
-
-\begin{figure}[tbp]
-\begin{minipage}[b]{.49\linewidth}
-\centering
-\includegraphics[width=.9\linewidth]{rEMM-sim_optt_graph}\\
-(a)
-\end{minipage}
-\begin{minipage}[b]{.49\linewidth}
-\centering
-\includegraphics[width=\linewidth]{rEMM-sim_optt_MDS}\\
-(b)
-\end{minipage}
-\caption{Best performing EMM with a threshold of 
-\Sexpr{names(st[which.max(st)])}}
-\label{fig:sim_optt}
-\end{figure}
-
+Since we only have micro clusters, the score is still very small. 
+To get a better model, we will recluster the states in the following section.
 
 \subsection{Reclustering states}
 
@@ -878,7 +879,7 @@ plot(emmc[[which.max(sc)]], data=EMMsim_train)
 \begin{figure}[tbp]
 \begin{minipage}[b]{.49\linewidth}
 \centering
-\includegraphics[width=.9\linewidth]{rEMM-sim_optc_graph}\\
+\includegraphics[width=.7\linewidth]{rEMM-sim_optc_graph}\\
 (a)
 \end{minipage}
 \begin{minipage}[b]{.49\linewidth}
@@ -886,7 +887,7 @@ plot(emmc[[which.max(sc)]], data=EMMsim_train)
 \includegraphics[width=\linewidth]{rEMM-sim_optc_MDS}\\
 (b)
 \end{minipage}
-\caption{Best performing EMM with a $k$ of 
+\caption{Best performing final clustering for EMM with a $k$ of 
 \Sexpr{names(sc[which.max(sc)])}.}
 \label{fig:sim_optc}
 \end{figure}

@@ -8,7 +8,8 @@ by the same process as the sequences used to build the EMM.
 }
 \usage{
 score(emm, newdata, method = c("prod", "sum", "log_odds"), 
-    initial_state_probability = FALSE, match_state = "exact", 
+    initial_state_probability = FALSE, match_state = "nn",
+    plus_one=TRUE,
     transition_table = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -21,6 +22,10 @@ score(emm, newdata, method = c("prod", "sum", "log_odds"),
   \item{match_state}{ do the new observations have to fall within
     the threshold of state (\code{"exact"}) or is the nearest neighbor 
     used (\code{"nn"})?}
+  \item{plus_one}{ add one to each transition count. This is equal
+      to start with one for each transition count, i.e. initially all
+          transitions are equally likely. It prevents the product
+          of probabilities to be zero if a transition was never observed. }
   \item{transition_table}{ Return the transition table for the sequence 
     through the EMM which is used to calculate the score. }
 }

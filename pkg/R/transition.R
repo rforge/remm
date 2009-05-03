@@ -1,6 +1,6 @@
 
 transition <- function(emm, from, to=NULL, 
-    type=c("probability", "counts", "log_odds") ){
+    type=c("probability", "counts", "log_odds"), plus_one = FALSE){
     type <- match.arg(type)
     
     if(is.null(to) && ncol(from)==2) {
@@ -19,18 +19,24 @@ transition <- function(emm, from, to=NULL,
     
     n <- sapply(1:length(from), FUN = function(i) ew[[i]][to[i]])
     n[is.na(n)] <- 0
-    d <- sapply(ew, sum)
     
+    ## start with a uniform prior distribution
+    if(plus_one) n <- n+1
+
     if(type=="counts") return(n)
     
+    d <- sapply(ew, sum)
+    if(plus_one) d <- d + size(emm)
     prob <- as.numeric(n/d)
     ## no transition means probability zero
     prob[is.na(prob)] <- 0
 
     ## states might have no outgoing edges (are leaves)!
     ## these are absorbing states
-    l <- leaves(emm$mm, "out")
-    prob[from %in% l & to %in% l] <- 1
+    if(!plus_one) {
+        l <- leaves(emm$mm, "out")
+        prob[from %in% l & to %in% l] <- 1
+    }
 
     if(type=="probability") return(prob)
 
@@ -42,7 +48,7 @@ transition <- function(emm, from, to=NULL,
 }
 
 transition_matrix <- function(emm,
-    type=c("probability", "counts", "log_odds")){
+    type=c("probability", "counts", "log_odds"), plus_one = FALSE){
     type <- match.arg(type)
     
     #tm <- outer(states(emm), states(emm),
@@ -55,6 +61,8 @@ transition_matrix <- function(emm,
         dimnames=list(states(emm), states(emm)))
     ew <- edgeWeights(emm$mm, states(emm))
     for(i in 1:length(ew)) m[i, names(ew[[i]])] <- ew[[i]]
+    if(plus_one) m <- m+1
+    
     if(type=="counts") return(m)
 
     rs <- rowSums(m)
@@ -73,12 +81,15 @@ transition_matrix <- function(emm,
 
 
 initial_transition <- function(emm, 
-    type=c("probability", "counts", "log_odds")){
+    type=c("probability", "counts", "log_odds"), plus_one = FALSE){
     type <- match.arg(type)
 
+    ic <- emm$initial_counts
+    if(plus_one) ic <- ic+1
+
     switch(type,
-        probability = emm$initial_counts / sum(emm$initial_counts),
-        counts = emm$initial_counts,
-        log_odds = log(emm$initial_counts / sum(emm$initial_counts)* size(emm))
+        probability = ic / sum(ic),
+        counts = ic,
+        log_odds = log(ic / sum(ic)* size(emm))
         )
 }
