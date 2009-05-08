@@ -6,9 +6,10 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
 
     p <- .get_parameters(list(
             state_counts=TRUE,
-            transition_probabilities=TRUE,
-            lwd_multiplier=1,
-            statesize_multiplier=1,
+            arrow_width=TRUE,
+            arrows = "counts",      ## or "probabilities"
+            arrow_width_multiplier=1,
+            state_size_multiplier=1,
             add_labels = TRUE,
             mark_clusters = TRUE,
             mark_states = NULL,
@@ -46,13 +47,13 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
 
         if(p$state_counts){
             nAttrs$width <- .5 +
-                emm$counts/max(emm$counts)*p$statesize_multiplier
+                emm$counts/max(emm$counts)*p$state_size_multiplier
         }
 
         ## setting line width for arrows does not seem to be implemented
         pl <- plot(emm$mm, recipEdges="distinct",
                             nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
-        if(p$transition_probabilities) {
+        if(p$arrow_width) {
             ## redraw arrows with different width
             ## calculate arrow length (see plot in graph.R in Rgraphviz)
             agn <- AgNode(pl)
@@ -63,12 +64,19 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
             min(nodeDims) / pi *1.3
             ## I'm not quite sure why we have to make them 30% longer
 
-            tmp <- sapply(AgEdge(pl), FUN = function(x) {
-                    lwd <- 1+transition(emm, tail(x), head(x))*
-                    p$lwd_multiplier*4
-                    lines(x, lwd=lwd, len=arrowLen)
-                })
-        }
+            ## lwd for arrows
+            edges <- AgEdge(pl)
+
+            lwd <- transition(emm, sapply(edges, tail), sapply(edges, head), 
+                type=p$arrows)
+            ## normalize 
+            lwd <- lwd/max(lwd)
+            lwd <- 1 + lwd * 5 * p$arrow_width_multiplier
+
+            for(i in 1:length(edges)) {
+                lines(edges[[i]], lwd=lwd[i], len=arrowLen)
+            }
+        } 
     }
 
     else if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
@@ -90,7 +98,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         ## use cex for point size
         cex <- 2
         if(p$state_counts) cex <- 
-            2+emm$counts/max(emm$counts) * p$statesize_multiplier*5
+            2+emm$counts/max(emm$counts) * p$state_size_multiplier*5
 
         ## arrows
         edges <- transitions(emm)
@@ -127,9 +135,12 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
 
         ## lwd for arrows
         lwd <- 1
-        if(p$transition_probabilities) lwd <- 
-        1+transition(emm, edges[,1], edges[,2])* p$lwd_multiplier*4
-
+        if(p$arrow_width) {
+            lwd <- transition(emm, edges[,1], edges[,2], type=p$arrows)
+            ## normalize 
+            lwd <- lwd/max(lwd)
+            lwd <- 1+ lwd * p$arrow_width_multiplier*5
+        }
 
         ## arrows whines about zero length arrows
         suppressWarnings(
@@ -139,7 +150,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         )
 
         ## overplot points and text
-        points(x, cex=cex)
+        points(x, cex=cex,...)
         
         if(p$add_labels) {
             ## plot labels

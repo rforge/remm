@@ -3,13 +3,18 @@
 EMM <- function(measure="euclidean", threshold=0.2, lambda=0, 
     centroids=identical(tolower(measure), "euclidean")) {
     mm <- new("graphNEL", edgemode="directed")
-    structure(list(mm=mm, 
+    structure(list(
+            ## EMM
+            mm=mm, 
+            current = NA,               ## NA means we are in the reset state
+            initial_counts = numeric(),  ## for initial trans prob
+            
+            ## clustering
             measure = measure,          ## used dissimilarity measure 
             centroids = centroids,      ## use centroids?
             threshold = threshold,      ## set threshold
             lambda = lambda,            ## learning rate
             lambda_factor = 2^(-lambda),
-            current = NA,               ## NA means we are in the reset state
             
             ## these things could go to nodeData but it is more
             ## convenient to have a matrix for centers
@@ -19,7 +24,6 @@ EMM <- function(measure="euclidean", threshold=0.2, lambda=0,
             #sum_x = matrix(),
             #sum_x2 = matrix(),
             counts = numeric(),          ## state counts
-            initial_counts = numeric(),  ## for initial trans prob
             var_thresholds = numeric()   ## one threshold per cluster? 
             ## fixme: keep approximate disimilarity matrix (between centers)
         

@@ -10,12 +10,12 @@ or a complete transition matrix
 in an EMM.
 }
 \usage{
-transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds",
-    plus_one = FALSE))
-transition_matrix(emm, type = c("probability", "counts", "log_odds",
-    plus_one = FALSE))
-initial_transition(emm, type = c("probability", "counts", "log_odds",
-    plus_one = FALSE))
+transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds"),
+    plus_one = FALSE)
+transition_matrix(emm, type = c("probability", "counts", "log_odds"),
+    plus_one = FALSE)
+initial_transition(emm, type = c("probability", "counts", "log_odds"),
+    plus_one = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

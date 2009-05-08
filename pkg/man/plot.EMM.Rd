@@ -22,18 +22,22 @@ Plot EMM objects as graphs.}
 }
 \details{
 \code{"MDS"} projects the state centers into 2-dimentional space.
-
-\code{"state_counts"} produces a barplot with state counts.
+\code{"graph"} produces a graph representation of the EMM.
+\code{"state_counts"} produces a barplot for state counts.
+\code{"transition_counts"} produces a barplot for transition counts.
 
 The following plotting parameters are currently supported:
 \describe{
-\item{state_counts}{represent state counts by vertex size.}
-\item{transition_probability}{represent transition probabilities by edge width.}
-\item{lwd_multiplier, statesize_multiplier}{ Controls the variation
-of vertex sizes and edge widths (default: 1).}
+\item{state_counts}{represent state counts by vertex size?}
+\item{arrow_width}{represent transition counts/probabilities by arrow width?}
+\item{arrows}{use \code{"counts"} or \code{"probabilities"} for 
+    arrow width.}
+\item{arrow_width_multiplier, state_size_multiplier}{ Controls the variation
+    of vertex sizes and edge widths (default: 1).}
 \item{add_labels}{add labels for centers (n/a for \code{type="graph"}).}
 \item{mark_clusters}{Use different markers for points depending on the
-state they belong to (only available when a\code{data} is specified).}
+    state they belong to (only available when a\code{data} is specified).}
+\item{mark_states}{a vector of state names to be marked.}
 }
 }
 %\value{
