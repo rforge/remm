@@ -35,6 +35,7 @@ The following plotting parameters are currently supported:
 \item{arrow_width_multiplier, state_size_multiplier}{ Controls the variation
     of vertex sizes and edge widths (default: 1).}
 \item{add_labels}{add labels for centers (n/a for \code{type="graph"}).}
+\item{state_labels}{state labels to use instead of 1,2,....}
 \item{mark_clusters}{Use different markers for points depending on the
     state they belong to (only available when a\code{data} is specified).}
 \item{mark_states}{a vector of state names to be marked.}

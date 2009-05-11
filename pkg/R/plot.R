@@ -11,6 +11,7 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
             arrow_width_multiplier=1,
             state_size_multiplier=1,
             add_labels = TRUE,
+            state_labels = NULL,
             mark_clusters = TRUE,
             mark_states = NULL,
             nAttrs = list(),
@@ -45,6 +46,19 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
             names(nAttrs$fontcolor) <- p$mark_states
         }
 
+        ## vertex labels
+        if(!is.null(p$state_labels)) {
+            names(p$state_labels) <- states(emm)
+            nAttrs$label <- p$state_labels
+        }
+        
+        if(!p$add_labels) {
+            p$state_labels <- rep("", size(emm))
+            names(p$state_labels) <- states(emm)
+            nAttrs$label <- p$state_labels
+        }
+
+        ## vertex size
         if(p$state_counts){
             nAttrs$width <- .5 +
                 emm$counts/max(emm$counts)*p$state_size_multiplier
@@ -154,10 +168,13 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         
         if(p$add_labels) {
             ## plot labels
-            labels <- states(emm)
-            cex <- cex/2
+            if(is.null(p$state_labels)) labels <- states(emm)
+            else labels <- p$state_labels
+            cex <- cex/1.7
             ## make sure double digit labels fit
-            cex <- cex * (strwidth("8")/strwidth(labels))
+            cex <- cex * (strwidth("8")/
+                apply(cbind(strwidth(labels), strheight(labels)), 
+                    MARGIN=1, max))
             text(x, labels=labels, cex=cex)
         }
 
