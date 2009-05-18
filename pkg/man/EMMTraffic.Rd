@@ -3,7 +3,7 @@
 \docType{data}
 \title{Hypothetical Traffic Data Set for EMM}
 \description{
-Each observation is as a vector of
+Each observation in this hypothetical data set is a vector of
 seven values obtained from sensors located at specific
 points on roads. Each sensor collects a count of the
 number of vehicles which have crossed this sensor in

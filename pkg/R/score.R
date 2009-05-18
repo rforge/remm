@@ -1,7 +1,7 @@
 ## does newdata come from the EMM?
 score <- function(emm, newdata, method = c("prod", "sum", "log_odds"), 
-    initial_state_probability = FALSE, match_state="nn",
-    plus_one = TRUE, transition_table = FALSE) {
+    match_state="nn", plus_one = TRUE, 
+	initial_transition_probability = FALSE, transition_table = FALSE) {
 
     ## make sure  newdata is a matrix (maybe a single row)
     if(!is.matrix(newdata)) newdata <- as.matrix(rbind(newdata))
@@ -20,8 +20,10 @@ score <- function(emm, newdata, method = c("prod", "sum", "log_odds"),
     counts <- transition(emm, from, to, type="counts", plus_one=plus_one)
     prob <- transition(emm, from, to, plus_one=plus_one)
     log_odds <- transition(emm, from, to, type="log_odds", plus_one=plus_one)
-    
-    if(initial_state_probability) {
+	n <- n-1	## we have n-1 transitions
+
+
+    if(initial_transition_probability) {
         from <- c(NA, from)
         to <- c(ssequence[1], to)
         counts <- c(initial_transition(emm, type="counts", 
@@ -32,8 +34,7 @@ score <- function(emm, newdata, method = c("prod", "sum", "log_odds"),
         log_odds <- c(initial_transition(emm, type="log_odds", 
                 plus_one=plus_one)[ssequence[1]], 
             log_odds)
-        ## we have now one transition more
-        n <- n+1
+        n <- n+1	## now we have n transitions again
     }
 
 

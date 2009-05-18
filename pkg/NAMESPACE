@@ -25,7 +25,7 @@ export(
     predict_state,
     find_states,
     score,
-    age,
+    fade,
     rare_states,
     rare_transitions,
     prune

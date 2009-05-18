@@ -18,11 +18,11 @@ build <- function(emm, newdata) {
         emm$mm@edgeL[[node]]$edges <<- numeric(0)
     }
    
-    ## aging is also implemented in age.R
+    ## aging is also implemented in fade.R
     ## fixme: we might want to reduce the cluster variability (sum_x2)
     ## or the cluster threshold also
 
-    .age <- function() {
+    .fade <- function() {
         emm$counts <<- emm$counts * emm$lambda_factor
         emm$initial_counts <<- emm$initial_counts * emm$lambda_factor
         emm$mm@edgeData@data <<- lapply(emm$mm@edgeData@data, FUN=function(x) {
@@ -44,22 +44,22 @@ build <- function(emm, newdata) {
     ## reset on all NAs
     if(all(is.na(newdata))) return(reset(emm))
 
-    ## aging?
-    #if(emm$lambda>0) emm <- age(emm)
-    if(emm$lambda>0) .age()
+    ## fade cluster structure?
+    #if(emm$lambda>0) emm <- fade(emm)
+    if(emm$lambda>0) .fade()
 
     ## first node?
     if(size(emm)==0) {
         #emm$mm <- addNode("1", emm$mm)
         .addNode("1")
         emm$current <- "1"
-        rownames(newdata) <- "1"
+        emm$initial_counts["1"] <- 1  
+        
+		rownames(newdata) <- "1"
         emm$centers <- newdata
         #emm$sum_x <- newdata
         #emm$sum_x2 <- newdata^2
         emm$counts["1"] <- 1 
-        emm$initial_counts["1"] <- 1  
-        
         ## initialize threshold
         emm$var_thresholds["1"] <- emm$threshold
 

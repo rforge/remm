@@ -3,7 +3,8 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Predict a Future State }
 \description{
-Predict a state/probability distribution over state in n time intervals.
+Predict a state or the probability distribution over states in \eqn{n} 
+time steps.
 }
 \usage{
 predict_state(emm, n = 1, current = NULL, probabilities = FALSE)
@@ -11,14 +12,15 @@ predict_state(emm, n = 1, current = NULL, probabilities = FALSE)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an \code{EMM} object. }
-  \item{n}{ number of time intervals. }
+  \item{n}{ number of time steps. }
   \item{current}{ use a specified current state. 
     If \code{NULL}, the EMM's current state is used. }
   \item{probabilities}{ if \code{TRUE},
     instead of the predicted state, the probability distribution is returned.}
 }
 \details{
-Prediction is done using P\^n where P is the transition probability matrix.
+Prediction is done using \eqn{A^n} where \eqn{A} is the transition 
+probability matrix maintained by the EMM.
 Random tie-breaking is used.
 }
 \value{
@@ -27,7 +29,7 @@ Random tie-breaking is used.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-%\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{ \code{\link{transition_matrix}} }
 \examples{
 data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)

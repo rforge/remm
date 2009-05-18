@@ -3,7 +3,7 @@
 \docType{data}
 \title{Derwent Catchment Data}
 \description{
-Data sets with flow readings (in cubic meter per second) for six catchments of
+Data set with flow readings (in cubic meter per second) for six catchments of
 in the vicinity of the Derwent river in the northern UK. 
 The data was collected daily from November 1, 1971 -- January 31, 1977.
 The catchments are Long Bridge, Matlock Bath, Chat Sworth,

@@ -3,9 +3,9 @@
 \alias{remove_transitions}
 \alias{remove_selftransitions}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Remove States/Tranditions from an EMM }
+\title{ Remove States/Clusters or Transitions from an EMM }
 \description{
-Remove states/transitions from an EMM.
+Remove states/clusters or transitions from an EMM.
 }
 \usage{
 remove_states(emm, to_remove)
@@ -15,13 +15,13 @@ remove_selftransitions(emm)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an \code{EMM} object.}
-  \item{to_remove}{ Names of states to remove.}
-  \item{from, to}{ Names of states for removing transitions. If to is 
-    \code{NULL} from has to contain a matrix/data.frame with two columns
+  \item{to_remove}{ Names of states/clusters to remove.}
+  \item{from, to}{ Names of states for removing transitions. If \code{to} is 
+    \code{NULL} \code{from} has to contain a matrix/data.frame with two columns
     (from and to state names).}
 }
 \details{
-\code{remove_selftransitions} removes all transitions from a state to itself.
+\code{remove_selftransitions} removes the transitions from each state to itself.
 }
 \value{
 Returns a new EMM with removed states/transitions.

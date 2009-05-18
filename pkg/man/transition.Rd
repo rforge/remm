@@ -7,7 +7,7 @@
 \description{
 Calculates individual transition probabilities/counts 
 or a complete transition matrix
-in an EMM.
+for an EMM.
 }
 \usage{
 transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds"),
@@ -20,7 +20,8 @@ initial_transition(emm, type = c("probability", "counts", "log_odds"),
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an object of class \code{EMM}.}
-  \item{from, to}{ Names a states. If to is \code{NULL}, from has
+  \item{from, to}{ Names a states. If \code{to} is \code{NULL}, 
+  \code{from} has
   to contain a matrix/data.frame with two columns (a from column and a 
   to column as returned by \code{transitions}).}
   \item{type}{ What should be calculated? }
@@ -42,6 +43,7 @@ with all entries equal to \eqn{1/n}.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
+%\seealso{\code{\link{transition_matrix}}}
 \examples{
 data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)

@@ -3,28 +3,29 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Merge States of an EMM }
 \description{
-Merge several states of an EMM into a single state preserving 
-counts/probabilities in the EMM.}
+Merge several clusters/states of an EMM into a single cluster/state.}
 \usage{
 merge_states(emm, to_merge, clustering = FALSE, new_center = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{emm}{ an \code{EMM} object. }
-  \item{to_merge}{ vector of names of the states to merge. The
+  \item{to_merge}{ vector of names of the states/clusters to merge. The
       name of the first state in \code{to_merge}
       is used as the name for the new state representing the merged states.}
-  \item{clustering}{ is \code{to_merge} a clustering? }
-  \item{new_center}{ supply new centers for the merged states.
+  \item{clustering}{ is \code{to_merge} a vector with
+  cluster assignments as created by a clustering algorithm? }
+  \item{new_center}{ supply new centers for the merged clusters.
     New centroids are automatically
     computed. If (pseudo) medoids are used, new medoids should be supplied.
-    If none is supplied, the first state in \code{to_merge} 
+    If none is supplied, the medoid of the cluster in \code{to_merge} 
+	which has the most assigned observations 
     is used as the new medoid (warning: this is probably not a good medoid!)}
 }
 %\details{
 %}
 \value{
-A new EMM with the states merged.
+A new EMM with the states/clusters merged.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }

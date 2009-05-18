@@ -5,7 +5,8 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Pune States and/or Transitions}
 \description{
-Simplifies an EMM by removing all states and/or transitions 
+Simplifies an EMM and/or the clustering by removing all 
+clusters/states and/or transitions 
 which have a count smaller than a given threshold.
 }
 \usage{
@@ -19,19 +20,21 @@ rare_transitions(emm, count_threshold = 1)
   \item{emm}{ an object of class \code{EMM}. }
   \item{count_threshold}{ all states/edges with a count below the
   threshold are removed from the model.}
-  \item{states}{ remove states?}
-  \item{transitions}{ remove transitions?}
+  \item{states}{ prune states?}
+  \item{transitions}{ prune transitions?}
 }
 %\details{
 %}
 \value{
     \code{prune} returns an object of class \code{EMM}.
-    \code{rare_states} returns a vector of names of rare states.
-    \code{rare_transitions} returns a data.frame of rare transitions.
+    
+	\code{rare_states} returns a vector of names of rare states/clusters.
+    
+	\code{rare_transitions} returns a data.frame of rare transitions.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-%\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{\code{\link{remove}}}
 \examples{
 data("EMMTraffic")
 

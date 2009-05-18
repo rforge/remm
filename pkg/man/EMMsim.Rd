@@ -22,7 +22,9 @@ The code to generate the data is shown in the Examples section below.
 \usage{data(EMMsim)}
 \format{
     \code{EMMsim_train} and \code{EMMsim_test} are matrices containing the
-    data. \code{EMMsim_sequence_train} and \code{EMMsim_sequence_test}
+    data.
+
+	\code{EMMsim_sequence_train} and \code{EMMsim_sequence_test}
     contain the sequence of the data through the four clusters.
 }
 %\details{
@@ -55,9 +57,8 @@ Sigma <- lapply(1:nrow(sd_rho), FUN = function(i) rbind(
 
 
 sequence <- c(1,2,1,3,4)
-n <- 40
 
-EMMsim_sequence_train <- rep(sequence, n)
+EMMsim_sequence_train <- rep(sequence, 40)
 EMMsim_sequence_test <- rep(sequence, 5)
 
 library("MASS")

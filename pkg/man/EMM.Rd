@@ -9,13 +9,16 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Creator and Accessors for Class EMM}
 \description{
-    Create an empty EMM object.
+    Create an empty EMM object and access its components. Note that
+	each cluster in the clustering has always a corresponding state in 
+	the EMM. Therefore the terms cluster and state are used 
+	interchangeably here.
 }
 \usage{
 EMM(measure = "euclidean", threshold = 0.2, lambda = 0, 
     centroids = identical(tolower(measure), "euclidean"))
-states(emm)
 size(emm)
+states(emm)
 state_counts(emm)
 state_centers(emm)
 transitions(emm)
@@ -25,15 +28,17 @@ current_state(emm)
 \arguments{
   \item{measure}{ the dissimilarity measure used by 
     the EMM (see \code{dist}
-    for available measures) }
-  \item{threshold}{ dissimilarity threshold used for assigning a new
-    observation to existing states. }
+    in \pkg{proxy} for available measures) }
+  \item{threshold}{ dissimilarity threshold used 
+	by the threshold NN clustering algorithm
+	for assigning a new
+    observation to existing clusters/states. }
   \item{lambda}{ learning rate. if \eqn{lambda>0}, the weight
   of each data point in the stream is decreasing exponentially over time by a
-  factor of \eqn{2^{-lambda*t}}.}
+  factor of \eqn{2^{-lambda t}}{2^(-lambda*t)} (see \code{fade()}).}
   \item{centroids}{ use centroids for states? If \code{FALSE}, 
-    pseudo medians (first observation of a state) is used to represent a state.
-    Default is centroids for Euclidean and pseudo medoids otherwise.}
+	pseudo medians (first observation of a cluster/state) is used to represent
+	a state.  Default is centroids for Euclidean and pseudo medoids otherwise.}
   \item{emm}{an object of class \code{EMM}. }
 }
 %\details{
@@ -43,15 +48,18 @@ current_state(emm)
 The creator \code{EMM} returns an \code{EMM} object which is a list with
 the following elements:
   \item{mm}{ a graph representing the first order Markov Model.}
+  \item{current}{name of current state in the EMM. \code{NA} means
+	no current state.}
+  \item{initial_counts}{how often is a state the first state in a sequence
+    (used to calculate initial state probabilities for the Markov chain).}
+  
+  \item{measure}{ used dissimilarity measure. }
   \item{centroids}{ a logical indicating if centroids are used. }
   \item{threshold}{dissimilarity threshold used for assignment.}
   \item{lambda}{learning rate.}
   \item{lambda_factor}{learning rate expressed as a factor. }
-  \item{current}{name of current state in the EMM.}
-  \item{centers}{a matrix containing the centers for the states.}
-  \item{counts}{counts for states}
-  \item{initial_counts}{how often is a state the first state in a sequence
-    (used to calculate initial probabilities for the Markov chain).}
+  \item{centers}{a matrix containing the cluster/state centers.}
+  \item{counts}{number of observations assigned to each cluster/state.}
   \item{var_thresholds}{dissimilarity thresholds for individual states (usually
     the same as threshold).}
 }
@@ -61,7 +69,11 @@ M.H. Dunham, Y. Meng, J. Huang (2004): Extensible Markov Model, In:
 Conference on Data Mining,} pp. 371--374.
 }
 %\author{ ~~who you are~~ }
-%\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{ \code{\link{build}} to add observations to the EMM, 
+	\code{\link{transition}} to access 
+	transition counts/probabilities in the EMM and
+	\code{\link[proxy]{dist}} in \pkg{proxy} for available dissimilarity 
+	measures.}
 \examples{
 emm <- EMM()
 emm

@@ -93,137 +93,141 @@ plot.EMM <- function(x, method=c("MDS", "graph", "state_counts",
         } 
     }
 
-    else if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
-    
-    else if(is.null(data)){
+    else {
+		if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
 
-        d <- dist(emm_centers, method=emm$measure)
-        mds <- cmdscale(d, eig=TRUE, add=TRUE)
-        x <- mds$points
-        dimnames(x) <- list(states(emm), NULL)
-        
-        ## start plotting
-        plot(x, xlab="Dimension 1", ylab="Dimension 2", type="n", ...,
-            sub= paste("These two dimensions explain",
-                round(100 * mds$GOF[2], digits = 2), 
-                "% of the point variability."))
+		## self transitions are not visible for these plots
+		emm <- remove_selftransitions(emm)
+
+		if(is.null(data)){
+
+			d <- dist(emm_centers, method=emm$measure)
+			mds <- cmdscale(d, eig=TRUE, add=TRUE)
+			x <- mds$points
+			dimnames(x) <- list(states(emm), NULL)
+
+			## start plotting
+			plot(x, xlab="Dimension 1", ylab="Dimension 2", type="n", ...,
+				sub= paste("These two dimensions explain",
+					round(100 * mds$GOF[2], digits = 2), 
+					"% of the point variability."))
 
 
-        ## use cex for point size
-        cex <- 2
-        if(p$state_counts) cex <- 
-            2+emm$counts/max(emm$counts) * p$state_size_multiplier*5
+			## use cex for point size
+			cex <- 2
+			if(p$state_counts) cex <- 
+			2+emm$counts/max(emm$counts) * p$state_size_multiplier*5
 
-        ## arrows
-        edges <- transitions(emm)
-        arrows_fromto <- cbind(
-            from_x = x[edges[,1],1], from_y= x[edges[,1],2],
-            to_x= x[edges[,2],1],to_y=x[edges[,2],2]
-        )
+			## arrows
+			edges <- transitions(emm)
+			arrows_fromto <- cbind(
+				from_x = x[edges[,1],1], from_y= x[edges[,1],2],
+				to_x= x[edges[,2],1],to_y=x[edges[,2],2]
+			)
 
-        ## make arrows shorter so they do not cover the nodes 
-        nodeRad2 <- cbind(
-            x=(sapply(cex, FUN=function(cx)  
-                    strwidth("o", cex=cx/1.2))/2)^2,
-            y=(sapply(cex, FUN=function(cx)
-                    strheight("o", cex=cx/1.2))/2)^2)
+			## make arrows shorter so they do not cover the nodes 
+			nodeRad2 <- cbind(
+				x=(sapply(cex, FUN=function(cx)  
+						strwidth("o", cex=cx/1.2))/2)^2,
+				y=(sapply(cex, FUN=function(cx)
+						strheight("o", cex=cx/1.2))/2)^2)
 
-        x2 <- (arrows_fromto[,3]-arrows_fromto[,1])^2
-        y2 <- (arrows_fromto[,2]-arrows_fromto[,4])^2
-        z2 <- x2+y2
-        shorten <- cbind(
-            x1=sqrt(nodeRad2[edges[,1],1]/z2 * x2),
-            y1=sqrt(nodeRad2[edges[,1],2]/z2 * y2),
-            x2=sqrt(nodeRad2[edges[,2],1]/z2 * x2),
-            y2=sqrt(nodeRad2[edges[,2],2]/z2 * y2)
-        )
+			x2 <- (arrows_fromto[,3]-arrows_fromto[,1])^2
+			y2 <- (arrows_fromto[,2]-arrows_fromto[,4])^2
+			z2 <- x2+y2
+			shorten <- cbind(
+				x1=sqrt(nodeRad2[edges[,1],1]/z2 * x2),
+				y1=sqrt(nodeRad2[edges[,1],2]/z2 * y2),
+				x2=sqrt(nodeRad2[edges[,2],1]/z2 * x2),
+				y2=sqrt(nodeRad2[edges[,2],2]/z2 * y2)
+			)
 
-        signs <- matrix(1, ncol=2, nrow=nrow(shorten))
-        signs[arrows_fromto[,1] > arrows_fromto[,3],1] <- -1
-        signs[arrows_fromto[,2] > arrows_fromto[,4],2] <- -1
-        signs <- cbind(signs, signs*-1)
+			signs <- matrix(1, ncol=2, nrow=nrow(shorten))
+			signs[arrows_fromto[,1] > arrows_fromto[,3],1] <- -1
+			signs[arrows_fromto[,2] > arrows_fromto[,4],2] <- -1
+			signs <- cbind(signs, signs*-1)
 
-        shorten <- shorten * signs
-        shorten[is.nan(shorten)] <- 0 ## take care of too short arrows
-        arrows_fromto <- arrows_fromto + shorten
+			shorten <- shorten * signs
+			shorten[is.nan(shorten)] <- 0 ## take care of too short arrows
+			arrows_fromto <- arrows_fromto + shorten
 
-        ## lwd for arrows
-        lwd <- 1
-        if(p$arrow_width) {
-            lwd <- transition(emm, edges[,1], edges[,2], type=p$arrows)
-            ## normalize 
-            lwd <- lwd/max(lwd)
-            lwd <- 1+ lwd * p$arrow_width_multiplier*5
-        }
+			## lwd for arrows
+			lwd <- 1
+			if(p$arrow_width) {
+				lwd <- transition(emm, edges[,1], edges[,2], type=p$arrows)
+				## normalize 
+				lwd <- lwd/max(lwd)
+				lwd <- 1+ lwd * p$arrow_width_multiplier*5
+			}
 
-        ## arrows whines about zero length arrows
-        suppressWarnings(
-            arrows(arrows_fromto[,1], arrows_fromto[,2], 
-                arrows_fromto[,3],arrows_fromto[,4],
-                length=0.15, col="grey", angle=20, lwd=lwd)
-        )
+			## arrows whines about zero length arrows
+			suppressWarnings(
+				arrows(arrows_fromto[,1], arrows_fromto[,2], 
+					arrows_fromto[,3],arrows_fromto[,4],
+					length=0.15, col="grey", angle=20, lwd=lwd)
+			)
 
-        ## overplot points and text
-        points(x, cex=cex,...)
-        
-        if(p$add_labels) {
-            ## plot labels
-            if(is.null(p$state_labels)) labels <- states(emm)
-            else labels <- p$state_labels
-            cex <- cex/1.7
-            ## make sure double digit labels fit
-            cex <- cex * (strwidth("8")/
-                apply(cbind(strwidth(labels), strheight(labels)), 
-                    MARGIN=1, max))
-            text(x, labels=labels, cex=cex)
-        }
+			## overplot points and text
+			points(x, cex=cex,...)
 
-    } else {
-        ## project state centers onto dataset
+			if(p$add_labels) {
+				## plot labels
+				if(is.null(p$state_labels)) labels <- states(emm)
+				else labels <- p$state_labels
+				cex <- cex/1.7
+				## make sure double digit labels fit
+				cex <- cex * (strwidth("8")/
+					apply(cbind(strwidth(labels), strheight(labels)), 
+						MARGIN=1, max))
+				text(x, labels=labels, cex=cex)
+			}
 
-        d <- dist(rbind(emm_centers, data), method=emm$measure)
-        mds <- cmdscale(d, eig=TRUE, add=TRUE)
-        centers <- mds$points[1:nrow(emm_centers),]
-        allpoints <- mds$points[-c(1:nrow(emm_centers)),]
+		} else {
+			## project state centers onto dataset
 
-        ## points
-        if(p$mark_clusters){
-            point_center <- find_states(emm, data, match_state="exact")
-            
-            ## make state name integer for pch
-            pch <- as.integer(as.factor(point_center))
+			d <- dist(rbind(emm_centers, data), method=emm$measure)
+			mds <- cmdscale(d, eig=TRUE, add=TRUE)
+			centers <- mds$points[1:nrow(emm_centers),]
+			allpoints <- mds$points[-c(1:nrow(emm_centers)),]
 
-            ## make sure we stay below 25 for pch
-            while(any(pch>25, na.rm=TRUE)) pch[pch>25] <- pch[pch>25] -25
-            plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
-                col="grey", pch=pch, ...,
-                sub= paste("These two dimensions explain",
-                    round(100 * mds$GOF[2], digits = 2),
-                    "% of the point variability."))
-            
-            ## plot points which do not belong to any state
-            if(any(is.na(point_center)))
-            points(allpoints[is.na(point_center),,drop=FALSE], 
-                col="red", pch=1)
-        
-        }else{
-            plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
-                col="grey", ...,
-                sub= paste("These two dimensions explain",
-                    round(100 * mds$GOF[2], digits = 2),
-                    "% of the point variability."))
-        }
+			## points
+			if(p$mark_clusters){
+				point_center <- find_states(emm, data, match_state="exact")
 
-        cex <- 1
+				## make state name integer for pch
+				pch <- as.integer(as.factor(point_center))
 
-        ## use cex for point size (scale: 1...3)
-        if(p$state_counts) cex <- 1+emm$counts/max(emm$counts)*2
+				## make sure we stay below 25 for pch
+				while(any(pch>25, na.rm=TRUE)) pch[pch>25] <- pch[pch>25] -25
+				plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
+					col="grey", pch=pch, ...,
+					sub= paste("These two dimensions explain",
+						round(100 * mds$GOF[2], digits = 2),
+						"% of the point variability."))
 
-        ## centers
-        points(centers, col="red", pch="+", cex=cex)
-        #points(centers, col="red", pch=1:size(emm), cex=cex)
-        if(p$add_labels) text(centers, labels=states(emm), pos=3)
-    }
+				## plot points which do not belong to any state
+				if(any(is.na(point_center)))
+				points(allpoints[is.na(point_center),,drop=FALSE], 
+					col="red", pch=1)
 
+			}else{
+				plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
+					col="grey", ...,
+					sub= paste("These two dimensions explain",
+						round(100 * mds$GOF[2], digits = 2),
+						"% of the point variability."))
+			}
+
+			cex <- 1
+
+			## use cex for point size (scale: 1...3)
+			if(p$state_counts) cex <- 1+emm$counts/max(emm$counts)*2
+
+			## centers
+			points(centers, col="red", pch="+", cex=cex)
+			#points(centers, col="red", pch=1:size(emm), cex=cex)
+			if(p$add_labels) text(centers, labels=states(emm), pos=3)
+		}
+
+	}
 }
-

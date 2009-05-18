@@ -1,4 +1,6 @@
 
+## fixme: find medoids for hclust
+
 ## medoid is defined as the object of a cluster, whose average 
 ## dissimilarity to all the objects in the cluster is minimal
 ## min_{m\inC}(1/n_C sum_{i\inC\m}(d(i,m))
@@ -20,7 +22,10 @@ recluster_hclust <- function(emm, k=NULL, h=NULL,  method="average",
     d <- dist(state_centers(emm), method = emm$measure)
     hc <- hclust(d, method=method)
     cl <- cutree(hc , k=k, h=h)
-    
+   
+	## if only h was given
+	if(is.null(k)) k <- max(cl)
+
     if(is(cl, "matrix")) emm <- lapply(1:ncol(cl), 
         FUN=function(i) 
         {

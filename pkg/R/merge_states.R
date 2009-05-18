@@ -42,8 +42,10 @@ merge_states <- function(emm, to_merge = NULL,
             #emm$sum_x[new_state,] <- colSums(emm$sum_x[to_merge,]) 
             #emm$sum_x2[new_state,] <- colSums(emm$sum_x2[to_merge,]) 
         }else {
-            ## pseudo medoids: don't do anything we keep the first one
-        }
+			## we take the medoid of the larger cluster
+			emm$centers[new_state,] <-
+				old_centers[which.max(state_counts(emm)[to_merge]),]
+		}
     }else{ 
         ## user supplied new center
         if(identical(length(new_center), ncol(emm$centers))) 

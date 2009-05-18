@@ -1,9 +1,9 @@
 \name{find_states}
 \alias{find_states}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ Find the EMM State for an Observation }
+\title{ Find the EMM State/Cluster for an Observation }
 \description{
-Finds the EMM states for observations.
+Finds the cluster and thus the EMM states for observations.
 }
 \usage{
 find_states(emm, newdata, match_state=c("exact", "nn"))
@@ -12,13 +12,13 @@ find_states(emm, newdata, match_state=c("exact", "nn"))
 \arguments{
   \item{emm}{ an \code{EMM} object.}
   \item{newdata}{ a matrix with observations.}
-  \item{match_state}{ find exact or nearest neighbor state.}
+  \item{match_state}{ find exact or nearest neighbor cluster/state.}
 }
 %\details{
 %  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-Returns the name of the matching states.
+Returns the name of the matching clusters/states.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
