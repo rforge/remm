@@ -32,7 +32,7 @@ data("16S")
 emm <- EMM("Kullback", threshold=0.1)
 emm <- build(emm, Mollicutes16S+1)
 
-plot(emm, "graph")
+plot(emm, method = "graph")
 
 ## start state for sequences have an initial state probability >0
 it <- initial_transition(emm)

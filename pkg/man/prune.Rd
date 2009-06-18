@@ -1,7 +1,10 @@
 \name{prune}
 \alias{prune}
+\alias{prune,EMM-method}
 \alias{rare_states}
+\alias{rare_states,EMM-method}
 \alias{rare_transitions}
+\alias{rare_transitions,EMM-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Pune States and/or Transitions}
 \description{
@@ -10,18 +13,19 @@ clusters/states and/or transitions
 which have a count smaller than a given threshold.
 }
 \usage{
-prune(emm, count_threshold = 1,
-    states = TRUE, transitions = TRUE)
-rare_states(emm, count_threshold = 1)
-rare_transitions(emm, count_threshold = 1)
+\S4method{prune}{EMM}(x, count_threshold, states = TRUE, transitions = TRUE)
+
+rare_states(x, count_threshold, ...)
+rare_transitions(x, count_threshold, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an object of class \code{EMM}. }
+  \item{x}{ an object of class \code{"EMM"}. }
   \item{count_threshold}{ all states/edges with a count below the
   threshold are removed from the model.}
   \item{states}{ prune states?}
   \item{transitions}{ prune transitions?}
+  \item{...}{ furher arguments (currently not used).}
 }
 %\details{
 %}
@@ -53,8 +57,8 @@ emm_lr <- prune(emm_l, count_threshold=0.1)
 
 ## compare graphs
 op <- par(mfrow = c(1, 2), pty = "m")
-plot(emm_l, "graph", main = "EMM with high learning rate")
-plot(emm_lr, "graph", main = "Simplified EMM")
+plot(emm_l, method = "graph", main = "EMM with high learning rate")
+plot(emm_lr, method = "graph", main = "Simplified EMM")
 par(op)
 
 }

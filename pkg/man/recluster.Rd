@@ -1,7 +1,11 @@
 \name{recluster}
+\alias{recluster}
 \alias{recluster_hclust}
+\alias{recluster_hclust,EMM-method}
 \alias{recluster_kmeans}
+\alias{recluster_kmeans,EMM-method}
 \alias{recluster_pam}
+\alias{recluster_pam,EMM-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Reclustering EMM states}
 \description{
@@ -11,13 +15,13 @@ data points by the reclustering algorithm. States/centers put by reclustering
 into the same cluster are merged to produce a new reclustered EMM.
 }
 \usage{
-recluster_hclust(emm, k=NULL, h=NULL, method="average", prune=NULL)
-recluster_kmeans(emm, k, ..., prune=NULL)
-recluster_pam(emm, k, ..., prune=NULL)
+\S4method{recluster_hclust}{EMM}(x, k=NULL, h=NULL, method="average", prune=NULL)
+\S4method{recluster_kmeans}{EMM}(x, k, ..., prune=NULL)
+\S4method{recluster_pam}{EMM}(x, k, ..., prune=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object. }
+  \item{x}{ an \code{"EMM"} object. }
   \item{prune}{ prune states/clusters with less 
 	than \code{prune} counts before reclustering. }
   \item{k}{ number of clusters. }
@@ -33,7 +37,7 @@ For \code{recluster_hclust} \code{k} or \code{h} can also be a vector.
 The result is then a list with several (nested) EMMs, one for each value.
 }
 \value{
-An object of class \code{EMM}. Clustering information is available
+An object of class \code{"EMM"}. Clustering information is available
 as the attribute \code{"cluster_info"}. The information provided depends
 in the clustering algorithm (see \code{hclust}, \code{kmeans} and \code{pam}).
 }

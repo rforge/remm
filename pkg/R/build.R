@@ -1,159 +1,157 @@
 
-build <- function(emm, newdata) {
-    
-    ## low level graph manipulations w/o copying (work on emm$mm)
-    .addEdge <- function(from, to, w=1) {
-        emm$mm@edgeL[[from]]$edges <<- c(emm$mm@edgeL[[from]]$edges, 
-            which(emm$mm@nodes==to))
-        emm$mm@edgeData@data[[paste(from,to,sep="|")]]$weight <<- w
-    }
+## make  newdata a matrix (with a single row)
+setMethod("build", signature(x = "EMM", newdata = "numeric"),
+	function(x, newdata) build(x, as.matrix(rbind(newdata)))
+)
 
-    .incWeight <- function(from, to) {
-        emm$mm@edgeData@data[[paste(from,to,sep="|")]]$weight <<-
-        emm$mm@edgeData@data[[paste(from,to,sep="|")]]$weight +1
-    }
+setMethod("build", signature(x = "EMM", newdata = "data.frame"),
+	function(x, newdata) build(x, as.matrix(newdata))
+)
 
-    .addNode <- function(node) {
-        emm$mm@nodes <<- c(emm$mm@nodes, node)
-        emm$mm@edgeL[[node]]$edges <<- numeric(0)
-    }
-   
-    ## aging is also implemented in fade.R
-    ## fixme: we might want to reduce the cluster variability (sum_x2)
-    ## or the cluster threshold also
+setMethod("build", signature(x = "EMM", newdata = "matrix"),
+	function(x, newdata) {
 
-    .fade <- function() {
-        emm$counts <<- emm$counts * emm$lambda_factor
-        emm$initial_counts <<- emm$initial_counts * emm$lambda_factor
-        emm$mm@edgeData@data <<- lapply(emm$mm@edgeData@data, FUN=function(x) {
-                x$weight <- x$weight* emm$lambda_factor
-                x
-            })
-    }
+		## low level graph manipulations w/o copying (work on x@mm)
+		.addEdge <- function(from, to, w=1) {
+			x@mm@edgeL[[from]]$edges <<- c(x@mm@edgeL[[from]]$edges, 
+				which(x@mm@nodes==to))
+			x@mm@edgeData@data[[paste(from,to,sep="|")]]$weight <<- w
+		}
 
-    
-    ## make sure  newdata is a matrix (maybe a single row)
-    if(!is.matrix(newdata)) newdata <- as.matrix(rbind(newdata))
+		.incWeight <- function(from, to) {
+			x@mm@edgeData@data[[paste(from,to,sep="|")]]$weight <<-
+			x@mm@edgeData@data[[paste(from,to,sep="|")]]$weight +1
+		}
 
-    ## this allows us to add more objects at once
-    if(nrow(newdata)>1) {
-        for(i in 1:nrow(newdata)) emm <- build(emm, newdata[i,])
-        return(emm)
-    }
+		.addNode <- function(node) {
+			x@mm@nodes <<- c(x@mm@nodes, node)
+			x@mm@edgeL[[node]]$edges <<- numeric(0)
+		}
 
-    ## reset on all NAs
-    if(all(is.na(newdata))) return(reset(emm))
+		## aging is also implemented in fade.R
+		## fixme: we might want to reduce the cluster variability (sum_x2)
+		## or the cluster threshold also
 
-    ## fade cluster structure?
-    #if(emm$lambda>0) emm <- fade(emm)
-    if(emm$lambda>0) .fade()
-
-    ## first node?
-    if(size(emm)==0) {
-        #emm$mm <- addNode("1", emm$mm)
-        .addNode("1")
-        emm$current <- "1"
-        emm$initial_counts["1"] <- 1  
-        
-		rownames(newdata) <- "1"
-        emm$centers <- newdata
-        #emm$sum_x <- newdata
-        #emm$sum_x2 <- newdata^2
-        emm$counts["1"] <- 1 
-        ## initialize threshold
-        emm$var_thresholds["1"] <- emm$threshold
-
-    }else{
-
-        ## find a matching state
-        sel <- find_states(emm, newdata, match_state="exact")
-
-        ## NA means no match -> create a new node
-        if(is.na(sel)) {
-            ## New node
-            ## get new node name (highest node number is last entry in count)
-            sel <- as.character(as.integer(tail(names(emm$counts),1)) + 1)
-
-            #emm$mm <- addNode(sel, emm$mm)
-            .addNode(sel)
-            
-            if(!is.na(emm$current)) {
-                #emm$mm <- addEdge(emm$current, sel, emm$mm, 1)
-                .addEdge(emm$current, sel, 1)
-                emm$initial_counts[sel] <- 0  
-            }else{
-                emm$initial_counts[sel] <- 1  
-            }
-
-            rownames(newdata) <- sel
-            emm$centers <- rbind(emm$centers, newdata)
-            #emm$sum_x <- rbind(emm$sum_x, newdata)
-            #emm$sum_x2 <- rbind(emm$sum_x2, newdata^2)
-            emm$counts[sel] <- 1
-            ## initialize threshold
-            emm$var_thresholds[sel] <- emm$threshold
-
-            ## update current
-            emm$current <- sel
-
-        }else{ 
-            ## assign observation to existing node
-
-            if(!is.na(emm$current)) {
-                ## add edge or update weight
-                if(isAdjacent(emm$mm, emm$current, sel)) {
-
-                    ## this is slow and complains because the 
-                    ## edge already exists
-                    #suppressWarnings(
-                        #emm$mm <- addEdge(emm$current, sel, emm$mm,
-                            #as.numeric(edgeWeights(emm$mm)[[emm$current]][sel]) +1)
-                        #)
-                    .incWeight(emm$current, sel)
-
-                }else{
-                    ## new edge
-                    #emm$mm <- addEdge(emm$current, sel, emm$mm, 1)
-                    .addEdge(emm$current, sel, 1)
-                }
-            }else{
-                emm$initial_counts[sel] <- emm$initial_counts[sel]+1  
-            }
-
-            ## update center (if we use centroids)
-            if(emm$centroids) {
-                
-                nnas <- !is.na(newdata)
-                emm$centers[sel,nnas] <- (emm$centers[sel,nnas] * 
-                    emm$counts[sel] + newdata[nnas])/(emm$counts[sel]+1)
-                nas <- is.na(emm$centers[sel,])
-                emm$centers[sel,nas] <- newdata[nas]
-                
-                #nnas <- !is.na(newdata)
-                ## for sum_x and sum_x2 we have additivity
-                #emm$sum_x[sel,nnas] <- emm$sum_x[sel,nnas] + newdata[nnas]
-                #emm$sum_x2[sel,nnas] <- emm$sum_x2[sel,nnas] + newdata[nnas]^2
-                #nas <- is.na(emm$sum_x[sel,])
-                #if(any(nas)) {
-                    #    emm$sum_x[sel,nas] <- newdata[nas]
-                    #emm$sum_x2[sel,nas] <- newdata[nas]^2
-                #}
-            }
-
-            ## update counts and current state
-            emm$current <- sel
-            emm$counts[sel] <- emm$counts[sel] + 1
-        }
-    }
-    
-    emm
-
-}
+		.fade <- function() {
+			x@counts <<- x@counts * x@lambda_factor
+			x@initial_counts <<- x@initial_counts * x@lambda_factor
+			x@mm@edgeData@data <<- lapply(x@mm@edgeData@data, FUN=function(z) {
+					z$weight <- z$weight* x@lambda_factor
+					z
+				})
+		}
 
 
-## reset the EMM for new sequence
-## reset is also done by an observation of all NAs
-reset <- function(emm) { 
-    emm$current <- NA
-    emm
-}
+		## this allows us to add more objects at once
+		if(nrow(newdata)>1) {
+			for(i in 1:nrow(newdata)) x <- build(x, newdata[i,, drop=FALSE])
+			return(x)
+		}
+
+		## reset on all NAs
+		if(all(is.na(newdata))) return(reset(x))
+
+		## fade cluster structure?
+		#if(x@lambda>0) x <- fade(x)
+		if(x@lambda>0) .fade()
+
+		## first node?
+		if(size(x)==0) {
+			#x@mm <- addNode("1", x@mm)
+			.addNode("1")
+			x@current_state <- "1"
+			x@initial_counts["1"] <- 1  
+
+			rownames(newdata) <- "1"
+			x@centers <- newdata
+			x@counts["1"] <- 1 
+			## initialize threshold
+			x@var_thresholds["1"] <- x@threshold
+
+		}else{
+
+			## find a matching state
+			sel <- find_states(x, newdata, match_state="exact")
+
+			## NA means no match -> create a new node
+			if(is.na(sel)) {
+				## New node
+				## get new node name (highest node number is last entry in count)
+				sel <- as.character(as.integer(tail(names(x@counts),1)) + 1)
+
+				#x@mm <- addNode(sel, x@mm)
+				.addNode(sel)
+
+				if(!is.na(x@current_state)) {
+					#x@mm <- addEdge(x@current_state, sel, x@mm, 1)
+					.addEdge(x@current_state, sel, 1)
+					x@initial_counts[sel] <- 0  
+				}else{
+					x@initial_counts[sel] <- 1  
+				}
+
+				rownames(newdata) <- sel
+				x@centers <- rbind(x@centers, newdata)
+				#x@sum_x <- rbind(x@sum_x, newdata)
+				#x@sum_x2 <- rbind(x@sum_x2, newdata^2)
+				x@counts[sel] <- 1
+				## initialize threshold
+				x@var_thresholds[sel] <- x@threshold
+
+				## update current_state
+				x@current_state <- sel
+
+			}else{ 
+				## assign observation to existing node
+
+				if(!is.na(x@current_state)) {
+					## add edge or update weight
+					if(isAdjacent(x@mm, x@current_state, sel)) {
+
+						## this is slow and complains because the 
+						## edge already exists
+						#suppressWarnings(
+							#x@mm <- addEdge(x@current_state, sel, x@mm,
+								#as.numeric(edgeWeights(x@mm)[[x@current_state]][sel]) +1)
+							#)
+						.incWeight(x@current_state, sel)
+
+					}else{
+						## new edge
+						#x@mm <- addEdge(x@current_state, sel, x@mm, 1)
+						.addEdge(x@current_state, sel, 1)
+					}
+				}else{
+					x@initial_counts[sel] <- x@initial_counts[sel]+1  
+				}
+
+				## update center (if we use centroids)
+				if(x@centroids) {
+
+					nnas <- !is.na(newdata)
+					x@centers[sel,nnas] <- (x@centers[sel,nnas] * 
+						x@counts[sel] + newdata[nnas])/(x@counts[sel]+1)
+					nas <- is.na(x@centers[sel,])
+					x@centers[sel,nas] <- newdata[nas]
+
+					#nnas <- !is.na(newdata)
+					## for sum_x and sum_x2 we have additivity
+					#x@sum_x[sel,nnas] <- x@sum_x[sel,nnas] + newdata[nnas]
+					#x@sum_x2[sel,nnas] <- x@sum_x2[sel,nnas] + newdata[nnas]^2
+					#nas <- is.na(x@sum_x[sel,])
+					#if(any(nas)) {
+						#    x@sum_x[sel,nas] <- newdata[nas]
+						#x@sum_x2[sel,nas] <- newdata[nas]^2
+						#}
+				}
+
+				## update counts and current_state state
+				x@current_state <- sel
+				x@counts[sel] <- x@counts[sel] + 1
+			}
+		}
+
+		x
+
+	}
+)

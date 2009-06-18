@@ -10,7 +10,7 @@ Description: The Extensible Markov Model (EMM) adds a temporal component
 	simple clustering algorithm for data streams.
 Classification/ACM: G.4, H.2.8, I.5.1
 URL: http://R-Forge.R-project.org/projects/remm/
-Depends: R (>= 2.7.0), stats, graph, proxy, cluster
+Depends: R (>= 2.7.0), methods, stats, graph, proxy, cluster
 Imports: stats
 Suggests: Rgraphviz, RBGL
 License: GPL-2

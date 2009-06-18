@@ -1,20 +1,25 @@
 \name{build}
 \alias{build}
+\alias{build,EMM,data.frame-method}
+\alias{build,EMM,matrix-method}
+\alias{build,EMM,numeric-method}
 \alias{reset}
+\alias{reset,EMMLayer-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Building an EMM using New Data}
 \description{
 Add new data to an EMM.
 }
 \usage{
-build(emm, newdata)
-reset(emm)
+build(x, newdata, ...)
+reset(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object. }
-  \item{newdata}{ a vector (one observation) or a matrix 
+  \item{x}{ an \code{EMM} object. }
+  \item{newdata}{ a vector (one observation), or a matrix or data.frame
     (each row is an observation) }
+  \item{...}{ further arguments (currently not used). }
 }
 \details{
 	For \code{build()} the dissimilarity between the new observation and the
@@ -43,7 +48,9 @@ A new EMM object with the data added.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-\seealso{ \code{\link{EMM}}, \code{\link{fade}} and \code{\link[proxy]{dist}} 
+\seealso{ 
+	Class \code{"\linkS4class{EMM}"}, 
+	\code{\link{fade}} and \code{\link[proxy]{dist}} 
 	in \pkg{proxy}.}
 \examples{
 
@@ -58,7 +65,7 @@ emm <- EMM(measure="eJaccard", threshold=0.2)
 emm <- build(emm, EMMTraffic)
 
 size(emm)
-plot(emm, "graph") ## plot needs rgraphviz installed
+plot(emm, method = "graph") ## plot needs Rgraphviz installed
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

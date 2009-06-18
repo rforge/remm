@@ -1,18 +1,19 @@
-\name{plot.EMM}
-\alias{plot}
-\alias{plot.EMM}
+\name{plot}
+\alias{plot,EMM,missing-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Visualize EMM Objects }
 \description{
 Visualize EMM objects.}
 \usage{
-\method{plot}{EMM}(x, method=c("MDS", "graph", "state_counts", 
+\S4method{plot}{EMM,missing}(x, y, method=c("MDS", "graph", "state_counts", 
     "transition_counts"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an \code{EMM} object. }
+  \item{y}{ unused (just for compartibility with the generic for plot in
+   \pkg{graphics}) }
   \item{method}{ see details section.}
   \item{data}{ Project the state centers onto these data. }
   \item{parameter}{ a list of parameters for plotting. }
@@ -48,7 +49,7 @@ The following plotting parameters are currently supported:
 %}
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-%\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{\code{\linkS4class{EMM}}}
 \examples{
 data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
@@ -59,8 +60,9 @@ plot(emm, method="graph", main="Graph (plain)",
     parameter=list(state_counts=FALSE, arrow_width=FALSE))
 plot(emm, method="graph", main="Graph")
 plot(emm, method="MDS", main="MDS projection", 
-    xlim=c(-0.4,0.4), ylim= c(-0.4,0.4))
-plot(emm, method="MDS", EMMTraffic, main = "Projection of centers on data")
+    xlim=c(-0.5,0.5), ylim= c(-0.5,0.5))
+plot(emm, method="MDS", data = EMMTraffic, 
+	main = "Projection of centers on data")
 par(op)
 
 }

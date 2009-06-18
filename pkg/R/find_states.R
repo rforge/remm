@@ -1,32 +1,40 @@
-find_states <- function(emm, newdata, match_state=c("exact", "nn")) {
 
-    match_state <- match.arg(match_state)
+setMethod("find_states", signature(x = "tNN", newdata = "numeric"),
+	function(x, newdata, match_state=c("exact", "nn"))
+	find_states(x, as.matrix(rbind(newdata), match_state))
+)	
 
-    ## make sure  newdata is a matrix (maybe a single row)
-    if(!is.matrix(newdata)) newdata <- as.matrix(rbind(newdata))
+setMethod("find_states", signature(x = "tNN", newdata = "data.frame"),
+	function(x, newdata, match_state=c("exact", "nn")) 
+	find_states(x, as.matrix(newdata), match_state))
 
-    ## cross-dissimilarities
-    d <- dist(newdata, state_centers(emm), method=emm$measure)
+setMethod("find_states", signature(x = "tNN", newdata = "matrix"),
+	function(x, newdata, match_state=c("exact", "nn")) {
 
-    .which.min_NA <- function(x) {
-        m <- which.min(x)
-        if(length(m)==0) m <- NA
-        m
-    }
+		match_state <- match.arg(match_state)
 
-    if(match_state=="nn") return (states(emm)[apply(d, MARGIN=1, 
-                .which.min_NA)])
+		## cross-dissimilarities
+		d <- dist(newdata, state_centers(x), method=x@measure)
 
-    ## exact matching using thresholds (using the largest margin)
-    ## NA ... no match
+		.which.min_NA <- function(x) {
+			m <- which.min(x)
+			if(length(m)==0) m <- NA
+			m
+		}
 
-    ## subtract threshold and take the smallest value if <=0
-    d <- d - matrix(emm$var_thresholds,
-        ncol=length(emm$var_thresholds), nrow=nrow(d), byrow=TRUE)
+		if(match_state=="nn") return (states(x)[apply(d, MARGIN=1, 
+					.which.min_NA)])
 
-    closest <- states(emm)[apply(d, MARGIN=1, .which.min_NA)]
-    closest_val <- apply(d, MARGIN=1, min)
-    closest[closest_val>0] <- NA
-    closest
-}
+		## exact matching using thresholds (using the largest margin)
+		## NA ... no match
 
+		## subtract threshold and take the smallest value if <=0
+		d <- d - matrix(x@var_thresholds,
+			ncol=length(x@var_thresholds), nrow=nrow(d), byrow=TRUE)
+
+		closest <- states(x)[apply(d, MARGIN=1, .which.min_NA)]
+		closest_val <- apply(d, MARGIN=1, min)
+		closest[closest_val>0] <- NA
+		closest
+	}
+)

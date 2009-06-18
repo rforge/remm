@@ -1,17 +1,20 @@
 \name{find_states}
 \alias{find_states}
+\alias{find_states,tNN,numeric-method}
+\alias{find_states,tNN,matrix-method}
+\alias{find_states,tNN,data.frame-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Find the EMM State/Cluster for an Observation }
 \description{
 Finds the cluster and thus the EMM states for observations.
 }
 \usage{
-find_states(emm, newdata, match_state=c("exact", "nn"))
+\S4method{find_states}{tNN,matrix}(x, newdata, match_state=c("exact", "nn"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object.}
-  \item{newdata}{ a matrix with observations.}
+  \item{x}{ an \code{EMM} object.}
+  \item{newdata}{ a matrix/data.frame with observations.}
   \item{match_state}{ find exact or nearest neighbor cluster/state.}
 }
 %\details{
@@ -22,7 +25,7 @@ Returns the name of the matching clusters/states.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-%\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\seealso{\code{\linkS4class{EMM}} and \code{\linkS4class{tNN}} }
 \examples{
 data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)

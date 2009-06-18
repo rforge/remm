@@ -1,5 +1,8 @@
 \name{score}
 \alias{score}
+\alias{score,EMM,numeric-method}
+\alias{score,EMM,data.frame-method}
+\alias{score,EMM,matrix-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Score a New Sequence Given an EMM}
 \description{
@@ -7,13 +10,11 @@ Calculates a score of how likely it is that a new sequence was generated
 by the same process as the sequences used to build the EMM.
 }
 \usage{
-score(emm, newdata, method = c("prod", "sum", "log_odds"), 
-match_state = "nn", plus_one=TRUE,
-initial_transition_probability = FALSE, transition_table = FALSE)
+\S4method{score}{EMM,matrix}(x, newdata, method = c("prod", "sum", "log_odds"), match_state = "nn", plus_one=TRUE, initial_transition_probability = FALSE, transition_table = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object. }
+  \item{x}{ an \code{EMM} object. }
   \item{newdata}{ sequence to score }
   \item{method}{ method to calculate the score (see details) }
   \item{match_state}{ do the new observations have to fall within

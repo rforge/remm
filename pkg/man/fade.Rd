@@ -1,5 +1,8 @@
 \name{fade}
 \alias{fade}
+\alias{fade,EMM,numeric,numeric-method}
+\alias{fade,EMM,missing,missing-method}
+\alias{fade,EMM,numeric,missing-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Fading Cluster Structure and EMM Layer}
 \description{
@@ -15,14 +18,14 @@ rate, \code{fade} could be called at regular time intervals
 (e.g., every second).
 }
 \usage{
-fade(emm, t = 1, lambda = NULL)
+fade(x, t, lambda)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an object of class \code{EMM}. }
-  \item{t}{ number of time intervals (default=1) }
-  \item{lambda}{ learning rate. If \code{NULL} the learning rate specified 
-  for the EMM is used.}
+  \item{x}{ an object of class \code{"EMM"}. }
+  \item{t}{ number of time intervals (if missing 1 is used) }
+  \item{lambda}{ learning rate. If \code{lambda} is missing, 
+	the learning rate specified for the EMM is used.}
 }
 \details{
 Old data points are faded by using a weight.
@@ -42,7 +45,7 @@ and all transition counts are faded.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-\seealso{\code{\link{EMM}} and \code{\link{build}}}
+\seealso{\code{\linkS4class{EMM}} and \code{\link{build}}}
 \examples{
 data("EMMTraffic")
 
@@ -60,8 +63,8 @@ transition_matrix(emm_l)
 
 ## compare graphs
 op <- par(mfrow = c(1, 2), pty = "m")
-plot(emm, "graph", main = "regular EMM")
-plot(emm_l, "graph", main = "EMM with high learning rate")
+plot(emm, method = "graph", main = "regular EMM")
+plot(emm_l, method = "graph", main = "EMM with high learning rate")
 par(op)
 
 }

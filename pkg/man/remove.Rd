@@ -1,23 +1,27 @@
 \name{remove}
 \alias{remove_states}
+\alias{remove_states,EMM,character-method}
 \alias{remove_transitions}
+\alias{remove_transitions,EMM,character,character-method}
+\alias{remove_transitions,EMM,matrix,missing-method}
 \alias{remove_selftransitions}
+\alias{remove_selftransitions,EMM-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Remove States/Clusters or Transitions from an EMM }
 \description{
 Remove states/clusters or transitions from an EMM.
 }
 \usage{
-remove_states(emm, to_remove)
-remove_transitions(emm, from, to=NULL)
-remove_selftransitions(emm)
+remove_states(x, to_remove)
+remove_transitions(x, from, to)
+remove_selftransitions(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object.}
+  \item{x}{ an \code{EMM} object.}
   \item{to_remove}{ Names of states/clusters to remove.}
   \item{from, to}{ Names of states for removing transitions. If \code{to} is 
-    \code{NULL} \code{from} has to contain a matrix/data.frame with two columns
+    missing \code{from} has to contain a matrix with two columns
     (from and to state names).}
 }
 \details{
@@ -42,9 +46,9 @@ emm_rt52 <- remove_transitions(emm, "5", "2")
 
 ## compare EMMs
 op <- par(mfrow = c(2, 2), pty = "m")
-plot(emm, "graph", main = "original EMM")
-plot(emm_rs3, "graph", main = "state 3 removed")
-plot(emm_rt52, "graph", main = "transition 5->2 removed")
+plot(emm, method = "graph", main = "original EMM")
+plot(emm_rs3, method = "graph", main = "state 3 removed")
+plot(emm_rt52, method = "graph", main = "transition 5->2 removed")
 par(op)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

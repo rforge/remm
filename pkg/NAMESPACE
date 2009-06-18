@@ -1,6 +1,13 @@
 #imports("gclus") ## we use :: for gclus in seriate.hclust
 #imports("cluster") ## we use :: for silhouette in dissplot
 
+importFrom(graphics, plot)
+## Fixme: Rgraphviz has to be loaded after rEMM for plot to work!
+
+importFrom(stats, predict)
+
+exportClasses(EMM, EMMLayer, tNN)
+
 export(
     EMM,
     states,
@@ -22,13 +29,13 @@ export(
     recluster_hclust,
     recluster_kmeans,
     recluster_pam,
-    predict_state,
+    predict,
     find_states,
     score,
     fade,
     rare_states,
     rare_transitions,
-    prune
+    prune,
+	plot
 )
 
-S3method("plot", "EMM")

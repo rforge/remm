@@ -1,18 +1,23 @@
-prune <- function(emm, count_threshold = 1, 
-    states = TRUE, transitions = TRUE){
+setMethod("prune", signature(x = "EMM"),
+	function(x, count_threshold, states = TRUE, transitions = TRUE){
 
-    if(states) emm <- 
-    remove_states(emm, rare_states(emm, count_threshold=count_threshold))
+		if(states) x <- 
+		remove_states(x, rare_states(x, count_threshold=count_threshold))
 
-    if(transitions) emm <- remove_transitions(emm, 
-        rare_transitions(emm, count_threshold=count_threshold))
+		if(transitions) x <- remove_transitions(x, 
+			rare_transitions(x, count_threshold=count_threshold))
 
-    emm
-}
+		x
+	}
+)
 
-rare_states <- function(emm, count_threshold = 1) 
-    names(which(emm$counts < count_threshold))
+setMethod("rare_states", signature(x = "EMM"),
+	function(x, count_threshold) 
+	names(which(x@counts < count_threshold))
+)
 
-rare_transitions <- function(emm, count_threshold = 1) 
-    transitions(emm)[transition(emm, transitions(emm), 
-            type="counts") < count_threshold,]
+setMethod("rare_transitions", signature(x = "EMM"),
+	function(x, count_threshold) 
+	transitions(x)[transition(x, transitions(x), 
+			type="counts") < count_threshold,]
+)

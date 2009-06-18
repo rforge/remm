@@ -1,28 +1,29 @@
 \name{transition}
 \alias{transition}
+\alias{transition,EMMLayer,character,character-method}
+\alias{transition,EMMLayer,matrix,missing-method}
 \alias{transition_matrix}
+\alias{transition_matrix,EMMLayer-method}
 \alias{initial_transition}
+\alias{initial_transition,EMMLayer-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Access Transition Probabilities/Counts in an EMM }
 \description{
 Calculates individual transition probabilities/counts 
 or a complete transition matrix
-for an EMM.
+for an EMM (which contains \code{"EMMLayer"}).
 }
 \usage{
-transition(emm, from, to=NULL, type = c("probability", "counts", "log_odds"),
-    plus_one = FALSE)
-transition_matrix(emm, type = c("probability", "counts", "log_odds"),
-    plus_one = FALSE)
-initial_transition(emm, type = c("probability", "counts", "log_odds"),
-    plus_one = FALSE)
+\S4method{transition}{EMMLayer,character,character}(x, from, to, type = c("probability", "counts", "log_odds"), plus_one = FALSE)
+\S4method{transition_matrix}{EMMLayer}(x, type = c("probability", "counts", "log_odds"), plus_one = FALSE)
+\S4method{initial_transition}{EMMLayer}(x, type = c("probability", "counts", "log_odds"), plus_one = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an object of class \code{EMM}.}
-  \item{from, to}{ Names a states. If \code{to} is \code{NULL}, 
+  \item{x}{ an object of class \code{"EMM"}/\code{"EMMLayer"}.}
+  \item{from, to}{ Names a states. If \code{to} is missing, 
   \code{from} has
-  to contain a matrix/data.frame with two columns (a from column and a 
+  to contain a matrix with two columns (a from column and a 
   to column as returned by \code{transitions}).}
   \item{type}{ What should be calculated? }
   \item{plus_one}{ add one to each transition count. This is equal
@@ -43,7 +44,8 @@ with all entries equal to \eqn{1/n}.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-%\seealso{\code{\link{transition_matrix}}}
+\seealso{\code{\linkS4class{EMM}} which conntains 
+\code{\linkS4class{EMMLayer}}}
 \examples{
 data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)

@@ -1,5 +1,6 @@
-\name{predict_state}
-\alias{predict_state}
+\name{predict}
+\alias{predict}
+\alias{predict,EMMLayer-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Predict a Future State }
 \description{
@@ -7,11 +8,12 @@ Predict a state or the probability distribution over states in \eqn{n}
 time steps.
 }
 \usage{
-predict_state(emm, n = 1, current = NULL, probabilities = FALSE)
+\S4method{predict}{EMMLayer}(object, n = 1, current = NULL, 
+	probabilities = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object. }
+  \item{object}{ an \code{"EMM"}/\code{"EMMLayer"} object. }
   \item{n}{ number of time steps. }
   \item{current}{ use a specified current state. 
     If \code{NULL}, the EMM's current state is used. }
@@ -39,12 +41,12 @@ emm <- build(emm, EMMTraffic)
 
 ## Predict state starting an state 1 after 1, 2 and 100 time intervals
 ## Note, state 7 is an absorbing state.
-predict_state(emm, n=1, current="1")
-predict_state(emm, n=2, current="1")
-predict_state(emm, n=100, current="1")
+predict(emm, n=1, current="1")
+predict(emm, n=2, current="1")
+predict(emm, n=100, current="1")
 
 ## Get probability distribution
-predict_state(emm, n=2, current="1", probabilities = TRUE)
+predict(emm, n=2, current="1", probabilities = TRUE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

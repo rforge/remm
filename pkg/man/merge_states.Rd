@@ -1,15 +1,17 @@
 \name{merge_states}
 \alias{merge_states}
+\alias{merge_states,EMM,character-method}
+\alias{merge_states,EMM,integer-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Merge States of an EMM }
 \description{
 Merge several clusters/states of an EMM into a single cluster/state.}
 \usage{
-merge_states(emm, to_merge, clustering = FALSE, new_center = NULL)
+\S4method{merge_states}{EMM,character}(x, to_merge, clustering = FALSE, new_center = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{emm}{ an \code{EMM} object. }
+  \item{x}{ an \code{"EMM"} object. }
   \item{to_merge}{ vector of names of the states/clusters to merge. The
       name of the first state in \code{to_merge}
       is used as the name for the new state representing the merged states.}

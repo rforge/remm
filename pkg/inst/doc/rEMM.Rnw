@@ -693,7 +693,7 @@ can also be supplied to \func{merge\_states} as \code{new\_center}.
 %\marginpar{var threshold}
 
 Predicting a future state and calculating
-the probability of a new sequence are implemented as \func{predict\_state}
+the probability of a new sequence are implemented as \func{predict}
 and \func{score}, respectively.
 
 The helper function \func{find\_states} returns the
@@ -806,13 +806,13 @@ Using the EMM model, we can predict a future state given a current state.
 For example, we can predict the most likely state two time steps away from 
 state~2. 
 <<>>=
-predict_state(emm, n=2, current="2")
+predict(emm, n=2, current="2")
 @
 
-\func{predict\_state} with \code{probabilities=TRUE} produced the
+\func{predict} with \code{probabilities=TRUE} produced the
 probability distribution over all states.
 <<>>=
-predict_state(emm, n=2, current="2", probabilities=TRUE)
+predict(emm, n=2, current="2", probabilities=TRUE)
 @
 
 In this example
@@ -830,7 +830,7 @@ display the resulting EMM in Fig~\ref{fig:Traffic_man}(b).
 
 <<Traffic_r3, fig=TRUE, include=FALSE>>=
 emm_3removed <- remove_states(emm, "3")
-plot(emm_3removed, "graph")
+plot(emm_3removed, method = "graph")
 @
 
 Removing transitions is done with \func{remove\_transitions}.
@@ -840,7 +840,7 @@ The resulting graph is shown in Fig~\ref{fig:Traffic_man}(c).
 
 <<Traffic_rt52, fig=TRUE, include=FALSE>>=
 emm_52removed <- remove_transitions(emm, "5", "2")
-plot(emm_52removed, "graph")
+plot(emm_52removed, method = "graph")
 @
 
 States can be merged using \func{merge\_states}. Here we merge 
@@ -851,7 +851,7 @@ merge vector. The resulting EMM is shown in Fig~\ref{fig:Traffic_man}(d).
 
 <<Traffic_m25, fig=TRUE, include=FALSE>>=
 emm_25merged <- merge_states(emm, c("2","5"))
-plot(emm_25merged, "graph")
+plot(emm_25merged, method = "graph")
 @
 
 \begin{figure}
@@ -897,7 +897,7 @@ the observations are weighted $1, \frac{1}{2}, \frac{1}{4},\dots$.
 <<Traffic_l, fig=TRUE, include=FALSE>>=
 emm_fading <- EMM(measure="eJaccard", threshold=0.2, lambda = 1)
 emm_fading <- build(emm_fading, EMMTraffic)
-plot(emm_fading, "graph")
+plot(emm_fading, method = "graph")
 @
 
 The resulting graph is shown in Figure~\ref{fig:Traffic_learning}(b).
@@ -916,7 +916,7 @@ show the resulting model in Figure~\ref{fig:Traffic_learning}(c).
 
 <<Traffic_lp, fig=TRUE, include=FALSE>>=
 emm_pruned <- prune(emm_fading, count_threshold=0.1)
-plot(emm_pruned, "graph")
+plot(emm_pruned, method= "graph")
 @
 
 
@@ -1292,7 +1292,7 @@ emm <- EMM(measure="euclidean", threshold=3)
 emm <- build(emm, Derwent_scaled)
 #state_counts(emm)
 #state_centers(emm)
-plot(emm, "state_counts", log="y")
+plot(emm, method = "state_counts", log="y")
 @
 \begin{figure}
 \centering
@@ -1422,7 +1422,7 @@ temporal structure gives a clear sign that a flood is imminent the next day.
 %
 %<<>>=
 %n <- 1:10
-%probs <- sapply(n, FUN = function(n) predict_state(emm, n=n, 
+%probs <- sapply(n, FUN = function(n) predict(emm, n=n, 
 %current="1", probabilities=TRUE))[12,]
 %names(probs) <- n
 %probs
@@ -1442,7 +1442,7 @@ temporal structure gives a clear sign that a flood is imminent the next day.
 % plot(remove_selftransitions(emm20))
 %@
 %<<fig=TRUE>>=
-%plot(remove_selftransitions(emm20), "graph")
+%plot(remove_selftransitions(emm20), method = "graph")
 %@
 
 \subsection{Genetic sequence analysis}
@@ -1496,7 +1496,7 @@ emm <- build(emm, Mollicutes16S+1)
 @
 
 <<Mollicutes_graph, fig=TRUE, include=FALSE>>=
-plot(emm, "graph")
+plot(emm, method = "graph")
 ## start state for sequences have an initial state probability >0
 it <- initial_transition(emm)
 it[it>0]
