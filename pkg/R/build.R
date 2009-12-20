@@ -5,11 +5,12 @@ setMethod("build", signature(x = "EMM", newdata = "numeric"),
 )
 
 setMethod("build", signature(x = "EMM", newdata = "data.frame"),
-	function(x, newdata) build(x, as.matrix(newdata))
+	function(x, newdata, verbose = FALSE) build(x, as.matrix(newdata), 
+                verbose)
 )
 
 setMethod("build", signature(x = "EMM", newdata = "matrix"),
-	function(x, newdata) {
+	function(x, newdata, verbose = FALSE) {
 
 		## low level graph manipulations w/o copying (work on x@mm)
 		.addEdge <- function(from, to, w=1) {
@@ -44,7 +45,13 @@ setMethod("build", signature(x = "EMM", newdata = "matrix"),
 
 		## this allows us to add more objects at once
 		if(nrow(newdata)>1) {
-			for(i in 1:nrow(newdata)) x <- build(x, newdata[i,, drop=FALSE])
+			for(i in 1:nrow(newdata)) 
+                        {
+                            if(verbose && i%%50==0) cat("Added", i, "observations -",size(x), "states.\n")
+                            x <- build(x, newdata[i,, drop=FALSE])
+                        }
+                        
+                        if(verbose) cat ("Done -",size(x), "states.\n")
 			return(x)
 		}
 

@@ -11,6 +11,9 @@ setMethod("remove_states", signature(x = "EMM", to_remove = "character"),
 		x@counts <- x@counts[!to_remove]
 		x@initial_counts <- x@initial_counts[!to_remove]
 		x@var_thresholds <- x@var_thresholds[!to_remove]
+		
+		if(x@current_state == to_remove) x@current_state <- as.character(NA)
+
 
 		x
 	}

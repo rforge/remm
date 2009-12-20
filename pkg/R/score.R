@@ -38,7 +38,8 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		counts <- transition(x, from, to, type="counts", plus_one=plus_one)
 		prob <- transition(x, from, to, plus_one=plus_one)
 		log_odds <- transition(x, from, to, type="log_odds", plus_one=plus_one)
-		n <- n-1	## we have n-1 transitions
+		
+		n <- n-1	## we only have n-1 transitions!
 
 
 		if(initial_transition_probability) {

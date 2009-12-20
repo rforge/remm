@@ -29,7 +29,8 @@ of a simple data stream clustering algorithm (class \code{"tNN"}) and
 a temporal layer (class \code{"EMMLayer"}).}
 \section{Objects from the Class}{
 Objects can be created using the creator function \code{EMM} or by 
-directly calling \code{new("EMM", ...)}.
+directly calling \code{new("EMM", ...)}. Most slots for the extended
+classes can be used as parameters for \code{EMM}. 
 }
 \section{Slots}{
 	The slots are described in corresponding the extended classes 

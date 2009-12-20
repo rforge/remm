@@ -19,7 +19,9 @@ reset(x)
   \item{x}{ an \code{EMM} object. }
   \item{newdata}{ a vector (one observation), or a matrix or data.frame
     (each row is an observation) }
-  \item{...}{ further arguments (currently not used). }
+  \item{...}{ further arguments. If \code{newdata} is a matrix
+  or a data.frame \code{verbose = TRUE} can be used to monitor the progress of
+  building the model.}
 }
 \details{
 	For \code{build()} the dissimilarity between the new observation and the
