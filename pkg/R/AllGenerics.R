@@ -15,6 +15,8 @@ setGeneric("transition", function(x, from, to, ...)
 	standardGeneric("transition"))
 setGeneric("transition_matrix", function(x, ...) 
 	standardGeneric("transition_matrix"))
+setGeneric("transition_table", function(x, newdata, ...) 
+	standardGeneric("transition_table"))
 setGeneric("initial_transition", function(x, ...) 
 	standardGeneric("initial_transition"))
 

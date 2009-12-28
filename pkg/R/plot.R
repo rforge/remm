@@ -208,16 +208,21 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     ## points
                     if(p$mark_clusters){
                         point_center <- find_states(x, data, match_state="exact")
-
                         ## make state name integer for pch
-                        pch <- as.integer(as.factor(point_center))
-
+                        pch <- as.integer(factor(point_center, 
+                                        levels = states(x)))
+                        pch_center <- 1:size(x)
+                        
                         ## make sure we stay below 25 for pch
                         while(any(pch>25, na.rm=TRUE)) {
                             reduce <- pch>25
                             reduce[is.na(reduce)] <- FALSE
                             pch[reduce] <- pch[reduce] -25
                         }
+                        while(any(pch_center>25)) pch_center[pch_center>25] <-
+                            pch_center[pch_center>25] -25
+
+
                         plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
                                 col="grey", pch=pch, ...,
                                 sub= paste("These two dimensions explain",
@@ -243,7 +248,9 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     if(p$state_counts) cex <- 1+x@counts/max(x@counts)*2
 
                     ## centers
-                    points(centers, col="red", pch="+", cex=cex)
+                    if(p$mark_clusters) points(centers, 
+                            col="red", pch=pch_center, cex=cex)
+                    else points(centers, col="red", pch="+", cex=cex)
                     #points(centers, col="red", pch=1:size(x), cex=cex)
                     if(p$add_labels) text(centers, labels=states(x), pos=3)
                 }

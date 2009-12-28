@@ -692,16 +692,17 @@ calculated by the clustering algorithm
 can also be supplied to \func{merge\_states} as \code{new\_center}.
 %\marginpar{var threshold}
 
-Predicting a future state and calculating
-the probability of a new sequence are implemented as \func{predict}
-and \func{score}, respectively.
+Predicting a future state finding the transition probabilites for a new
+sequence and calculating the probability of a new sequence 
+given an EMM are implemented as
+\func{predict}, \func{transition\_table} and \func{score}, respectively.
 
-The helper function \func{find\_states} returns the
-cluster/state sequence for given data points. The matching can be
+The helper function \func{find\_states} can be used to return the
+cluster/state sequence for the new sequence. The matching can be
 nearest neighbor or exact. 
 Nearest neighbor always returns a matching state, while exact will return no 
 state (\code{NA}) if a data point does not fall within the threshold of any
-cluster.
+cluster. 
 
 Finally, for visualization \func{plot} is implemented for class~\class{EMM}.
 
@@ -1103,9 +1104,9 @@ for the EMMsim data in the section above. The test data is
 supplied together with the training set in \pkg{rEMM}.
 <<>>=
 score(emm, EMMsim_test, method="prod", match_state="exact", plus_one=FALSE,
-initial_transition_probability = FALSE)
+initial_transition = FALSE)
 score(emm, EMMsim_test, method="sum", match_state="exact", plus_one=FALSE,
-initial_transition_probability = FALSE)
+initial_transition = FALSE)
 @
 
 %\marginpar{Maybe introduce log\_odds for comparing EMMs of different size?}
@@ -1114,15 +1115,17 @@ Even though the test data was generated using exactly the same model as
 the training data, 
 the normalized product~(\code{method="prod"})
 produces a score of 0 and the normalized sum~(\code{method="sum"}) is
-also low. To analyze the problem we can look at the transition
-table for the test sequence. Note that we do not explicitly
-state the parameter \code{initial\_transition\_probability = FALSE}
-from here on since it is the default for \func{score}.
+also low. To analyze this problem we can look at the transition
+table which is used to calulate the score for the test sequence.
+The transition table is computed by \func{transition\_table}. 
+
+%Note that we do not explicitly
+%state the parameter \code{initial\_transition = FALSE}
+%from here on since it is the default for \func{score}.
 
 %\marginpar{Problem with plus\_one and age!}
 <<>>=
-score(emm, EMMsim_test, match_state="exact", plus_one=FALSE, 
-transition_table=TRUE)
+transition_table(emm, EMMsim_test, match_state="exact", plus_one=FALSE)
 @
 
 The low score is caused by data points that do not fall within the threshold
@@ -1139,7 +1142,7 @@ transition count/probability of zero.
 
 To reduce the problem of not being able to match a data point to a 
 cluster we can use a nearest neighbor approach instead of exact matching
-(\code{match\_state="nn"} is the default for \func{score}).
+(\code{match\_state="nn"} is the default for \func{score} and \func{transition\_table}).
 Here a new data point is assigned to the closest cluster even if it falls 
 outside the threshold. The problem with missing transactions can be reduced by
 starting with a prior distribution of transition probabilities. In the 

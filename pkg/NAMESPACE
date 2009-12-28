@@ -21,6 +21,7 @@ export(
     reset,
     transition,
     transition_matrix,
+    transition_table,
     initial_transition,
     merge_states,
     remove_states,

@@ -16,12 +16,15 @@ Finds the cluster and thus the EMM states for observations.
   \item{x}{ an \code{EMM} object.}
   \item{newdata}{ a matrix/data.frame with observations.}
   \item{match_state}{ find exact or nearest neighbor cluster/state.}
+  \item{dist}{ also report the distance to the chosen cluster/state (as a
+  data.frame).}
 }
 %\details{
 %  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-Returns the name of the matching clusters/states.
+Returns the name of the matching clusters/states or a data.frame with
+columns "state" and "dist" if \code{dist=TRUE}. 
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }

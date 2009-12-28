@@ -1,5 +1,6 @@
 \name{plot}
 \alias{plot,EMM,missing-method}
+\alias{plot}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Visualize EMM Objects }
 \description{
