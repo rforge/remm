@@ -16,6 +16,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             state_labels = NULL,
                             mark_clusters = TRUE,
                             mark_states = NULL,
+                            draw_ellipses = FALSE,
                             nAttrs = list(),
                             eAttrs = list()
                             ), parameter)
@@ -24,7 +25,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
             if(method=="state_counts") {
                 barplot(sort(state_counts(x), decreasing=TRUE), 
-                        ylab="State counts", ...)
+                        ylab="Count", xlab = "State", ...)
 
             }else if(method=="transition_counts") {
                 tr <- transitions(x)
@@ -65,36 +66,27 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     x@counts/max(x@counts)*p$state_size_multiplier
                 }
 
+		if(p$arrow_width) {
+                    edges <- edges(x@mm)
+		    edges <- cbind(rep(names(edges), sapply(edges, length)),
+			    unlist(edges))
+		    lwd <- transition(x, edges, type=p$arrows)
+		    ## normalize 
+		    lwd <- lwd/max(lwd)
+		    lwd <- 1 + lwd * 5 * p$arrow_width_multiplier
+
+		    #names(lwd) <- edgeNames(x@mm) ## edgeNames seems broken
+		    names(lwd) <- apply(edges, 
+			    MARGIN=1, FUN = function(z) paste(z, collapse="~"))
+		    eAttrs$lwd <- lwd
+		}
+
+		p$arrow_width <- 0
+
                 ## setting line width for arrows does not seem to be implemented
                 pl <- plot(x@mm, recipEdges="distinct",
                         nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
-                if(p$arrow_width) {
-                    ## redraw arrows with different width
-                    ## calculate arrow length (see plot in graph.R in Rgraphviz)
-                    agn <- AgNode(pl)
-                    nodeDims <- sapply(agn, function(n)
-                            { c(getNodeRW(n)+getNodeLW(n), getNodeHeight(n)) })
-
-                    arrowLen <- par("pin")[1] / diff(par("usr")[1:2]) * 
-                    min(nodeDims) / pi *1.3
-                    ## I'm not quite sure why we have to make them 30% longer
-
-                    ## lwd for arrows
-                    edges <- AgEdge(pl)
-
-                    lwd <- transition(x, sapply(edges, tail), sapply(edges, head), 
-                            type=p$arrows)
-                    ## normalize 
-                    lwd <- lwd/max(lwd)
-                    lwd <- 1 + lwd * 5 * p$arrow_width_multiplier
-
-                    for(i in 1:length(edges)) {
-                        lines(edges[[i]], lwd=lwd[i], len=arrowLen)
-                    }
-                } 
-            }
-
-            else {
+            } else {
                 if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
 
                 ## self transitions are not visible for these plots
@@ -233,6 +225,20 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                         if(any(is.na(point_center)))
                             points(allpoints[is.na(point_center),,drop=FALSE], 
                                 col="blue", pch=1)
+
+                        ## add ellipses
+                        ## FIXME: does not work with d>2
+                        if(p$draw_ellipses) {
+                            library(sfsmisc)
+                            tmp <- lapply(1:size(x),
+                                    FUN = function (i) {
+                                        thr <- x@var_thresholds[i]
+                                        loc <- state_centers(x)[i,]
+                                        lines(ellipsePoints(thr, thr, loc=loc), 
+                                                col = "black", lty=2)
+                                    })
+                            }
+
 
                     }else{
                         plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
