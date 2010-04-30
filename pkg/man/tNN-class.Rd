@@ -47,7 +47,7 @@ to build the Extensible Markov Model.}
 %    \item{find_states}{\code{signature(x = "tNN", newdata = "matrix")}: ... }
     \item{state_centers}{\code{signature(x = "tNN")}: returns the state
 		centers as a matrix.}
-    \item{state_counts}{\code{signature(x = "tNN")}: retunst the state 
+    \item{state_counts}{\code{signature(x = "tNN")}: returns the state 
 		counts as a vector.}
 	 }
 }

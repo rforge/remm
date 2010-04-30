@@ -3,6 +3,7 @@
 \docType{class}
 \alias{EMM-class}
 \alias{EMM}
+\alias{show,EMM}
 %\alias{build,EMM,numeric-method}
 %\alias{build,EMM,data.frame-method}
 %\alias{build,EMM,matrix-method}

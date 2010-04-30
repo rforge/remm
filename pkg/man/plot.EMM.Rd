@@ -13,7 +13,7 @@ Visualize EMM objects.}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an \code{EMM} object. }
-  \item{y}{ unused (just for compartibility with the generic for plot in
+  \item{y}{ unused (just for compatibility with the generic for plot in
    \pkg{graphics}) }
   \item{method}{ see details section.}
   \item{data}{ Project the state centers onto these data. }
@@ -21,7 +21,7 @@ Visualize EMM objects.}
   \item{\dots}{ further arguments passed on to \code{plot.default}. }
 }
 \details{
-\code{"MDS"} projects the state centers into 2-dimentional space.
+\code{"MDS"} projects the state centers into 2-dimensional space.
 
 \code{"graph"} produces a graph representation of the EMM.
 

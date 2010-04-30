@@ -6,7 +6,7 @@
 \alias{rare_transitions}
 \alias{rare_transitions,EMM-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Pune States and/or Transitions}
+\title{Prune States and/or Transitions}
 \description{
 Simplifies an EMM and/or the clustering by removing all 
 clusters/states and/or transitions 
@@ -25,7 +25,7 @@ rare_transitions(x, count_threshold, ...)
   threshold are removed from the model.}
   \item{states}{ prune states?}
   \item{transitions}{ prune transitions?}
-  \item{...}{ furher arguments (currently not used).}
+  \item{...}{ further arguments (currently not used).}
 }
 %\details{
 %}
@@ -46,7 +46,7 @@ data("EMMTraffic")
 emm_l <- EMM(measure="eJaccard", threshold=0.2, lambda = 1)
 emm_l <- build(emm_l, EMMTraffic)
 
-## show state countes and transition counts
+## show state counts and transition counts
 state_counts(emm_l)
 transition_matrix(emm_l, type="counts")
 

@@ -6,6 +6,8 @@
 \alias{recluster_kmeans,EMM-method}
 \alias{recluster_pam}
 \alias{recluster_pam,EMM-method}
+\alias{recluster_reachability}
+\alias{recluster_reachability,EMM-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Reclustering EMM states}
 \description{
@@ -18,6 +20,7 @@ into the same cluster are merged to produce a new reclustered EMM.
 \S4method{recluster_hclust}{EMM}(x, k=NULL, h=NULL, method="average", prune=NULL)
 \S4method{recluster_kmeans}{EMM}(x, k, ..., prune=NULL)
 \S4method{recluster_pam}{EMM}(x, k, ..., prune=NULL)
+\S4method{recluster_reachability}{EMM}(x, h, ..., prune=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,6 +38,11 @@ centers (see argument \code{centers} for \code{kmeans} in package \pkg{stats}).
 
 For \code{recluster_hclust} \code{k} or \code{h} can also be a vector. 
 The result is then a list with several (nested) EMMs, one for each value.
+
+For \code{recluster_reachability} reclusters all clusters which are reachable
+from each other. A cluster \eqn{j} is reachable from \eqn{i} if
+\eqn{j}'s center is closer to \eqn{i}'s center than \code{h} or if \eqn{j} is
+reachable by any cluster reachable by \eqn{i}.
 }
 \value{
 An object of class \code{"EMM"}. Clustering information is available

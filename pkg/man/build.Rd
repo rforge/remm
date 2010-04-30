@@ -29,7 +29,7 @@ reset(x)
 	the closest cluster if the dissimilarity value is smaller than the
 	threshold (for the state).  If no such state exists, a new state is created
 	for the observation. This simple clustering algorithm is called
-	nearest neightbor threshold neares neighbor (threshold NN).
+	nearest neighbor threshold nearest neighbor (threshold NN).
 
     After clustering, the EMM is updated. 
 	An edge with weight 1 from the current state to the new state (determined

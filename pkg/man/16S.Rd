@@ -9,7 +9,7 @@ This data set contains count data for 16S ribosomal RNA (rRNA) sequences for
 the two phylogenetic classes Alphaproteobacteria and Mollicutes. 
 The counts for 30
 sequences for each class were obtained by counting the occurrence of triplets
-of nucleodites in windows of length 100 without any overlap. To
+of nucleotides in windows of length 100 without any overlap. To
 separate sequences a row of dummy count of \code{NA} is used.}
 \usage{data("16S")}
 \format{

@@ -63,7 +63,7 @@ Conference on Data Mining,} pp. 371--374.
 	\code{\link{transition_matrix}} and 
 	\code{\link{initial_transition}} to access the transition information in
 	the EMM.
-	\code{\link{predict}} is used to fredict future states of an EMM.
+	\code{\link{predict}} is used to predict future states of an EMM.
 	\code{\linkS4class{EMM}} extends \code{"EMMLayer"}.
 }
 %\examples{

@@ -30,6 +30,7 @@ export(
     recluster_hclust,
     recluster_kmeans,
     recluster_pam,
+    recluster_reachability,
     predict,
     find_states,
     score,
@@ -37,6 +38,8 @@ export(
     rare_states,
     rare_transitions,
     prune,
-	plot
+    plot,
+
+    synthetic_stream
 )
 

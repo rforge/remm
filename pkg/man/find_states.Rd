@@ -9,7 +9,7 @@
 Finds the cluster and thus the EMM states for observations.
 }
 \usage{
-\S4method{find_states}{tNN,matrix}(x, newdata, match_state=c("exact", "nn"))
+\S4method{find_states}{tNN,matrix}(x, newdata, match_state=c("exact", "nn"), dist = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

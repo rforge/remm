@@ -44,7 +44,7 @@ with all entries equal to \eqn{1/n}.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-\seealso{\code{\linkS4class{EMM}} which conntains 
+\seealso{\code{\linkS4class{EMM}} which contains 
 \code{\linkS4class{EMMLayer}}}
 \examples{
 data("EMMTraffic")
