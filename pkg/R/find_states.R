@@ -35,7 +35,7 @@ setMethod("find_states", signature(x = "tNN", newdata = "matrix"),
                                     newdata[blockStart:blockEnd,],
                                     match_state, dist)
 
-                            states[blockStart:blockEnd] <- tmp[,1]
+                            states[blockStart:blockEnd] <- as.character(tmp[,1])
                             d_state[blockStart:blockEnd] <- tmp[,2]
 
                         }else states[blockStart:blockEnd] <- find_states(x, 

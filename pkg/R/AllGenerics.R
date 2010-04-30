@@ -52,5 +52,7 @@ setGeneric("recluster_kmeans", function(x, ...)
 	standardGeneric("recluster_kmeans"))
 setGeneric("recluster_pam", function(x, ...) 
 	standardGeneric("recluster_pam"))
+setGeneric("recluster_reachability", function(x, ...) 
+	standardGeneric("recluster_reachability"))
 
 setGeneric("score", function(x, newdata, ...) standardGeneric("score"))

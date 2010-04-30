@@ -88,3 +88,35 @@ setMethod("recluster_pam", signature(x = "EMM"),
 	}
 )
 
+## reachability
+setMethod("recluster_reachability", signature(x = "EMM"),
+	function(x, h, ..., prune=NULL) {
+
+		if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
+			transitions = FALSE)
+
+		
+                d <- as.matrix(dist(state_centers(x), method = x@measure))
+
+                # get adjecency matrix and find all paths 
+                a_mat <- d < h
+                r_mat <- a_mat
+                for(i in 1:size(x)) {
+                    r_mat <- r_mat%*%a_mat
+                    storage.mode(r_mat) <- "logical"
+                }
+
+                to_merge <- unique(apply(r_mat, MARGIN=1, FUN = which))
+                to_merge <- lapply(to_merge, as.character)
+
+                x_merged <- x
+                for(i in 1:length(to_merge)) {
+                    m <- to_merge[[i]]
+                    if(length(m)>1) {
+                        x_merged <- merge_states(x_merged, to_merge = m)
+                    }
+                }
+
+                x_merged
+	}
+)
