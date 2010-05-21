@@ -21,6 +21,7 @@ setGeneric("initial_transition", function(x, ...)
 	standardGeneric("initial_transition"))
 
 ## tNN
+setGeneric("cluster", function(x, newdata, ...) standardGeneric("cluster"))
 setGeneric("state_counts", function(x) standardGeneric("state_counts"))
 setGeneric("state_centers", function(x) standardGeneric("state_centers"))
 setGeneric("find_states", function(x, newdata, ...) 
@@ -28,6 +29,7 @@ setGeneric("find_states", function(x, newdata, ...)
 
 ## EMM
 setGeneric("build", function(x, newdata, ...) standardGeneric("build"))
+#setGeneric("update", function(object, ...) standardGeneric("update"))
 setGeneric("fade", function(x, t, lambda) standardGeneric("fade"))
 setGeneric("merge_states", function(x, to_merge, ...) 
 	standardGeneric("merge_states"))

@@ -8,6 +8,8 @@
 \alias{state_centers,tNN-method}
 \alias{state_counts}
 \alias{state_counts,tNN-method}
+\alias{states,tNN-method}
+\alias{size,tNN-method}
 
 \title{Class "tNN"}
 \description{Implements the threshold Nearest Neighbor clustering algorithm
@@ -39,6 +41,8 @@ to build the Extensible Markov Model.}
 		learning rate.}
     \item{\code{lambda_factor}:}{Object of class \code{"numeric"} expressing
 		the learning rate expressed as a factor.}
+    \item{\code{last}:}{A \code{"character"} vector containing the
+		clusters the last few points were assigned to.}
   }
 }
 \section{Methods}{
@@ -49,6 +53,12 @@ to build the Extensible Markov Model.}
 		centers as a matrix.}
     \item{state_counts}{\code{signature(x = "tNN")}: returns the state 
 		counts as a vector.}
+
+    \item{size}{\code{signature(x = "tNN")}: returns the number of states
+	in the EMM.}
+    \item{states}{\code{signature(x = "tNN")}: returns the names of the
+	states in the EMM.}
+
 	 }
 }
 \references{

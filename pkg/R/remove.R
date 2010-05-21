@@ -3,7 +3,10 @@ setMethod("remove_states", signature(x = "EMM", to_remove = "character"),
 
 		if(length(to_remove)==0) return(x)
 
+		## EMMLayer 
 		x@mm <- removeNode(to_remove, x@mm)
+		
+		## tNN
 		to_remove <- states(x) %in% to_remove
 		x@centers <- x@centers[!to_remove,]
 		#x@sum_x <- x@sum_x[!to_remove,]

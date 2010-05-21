@@ -18,6 +18,8 @@ export(
     current_state,
 
     build,
+    cluster,
+    #update,
     reset,
     transition,
     transition_matrix,
