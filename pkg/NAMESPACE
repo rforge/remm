@@ -12,13 +12,15 @@ export(
     EMM,
     states,
     size,
+    
+    cluster,
     state_counts,
     state_centers,
+    
     transitions,
     current_state,
 
     build,
-    cluster,
     #update,
     reset,
     transition,

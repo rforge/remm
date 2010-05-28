@@ -38,7 +38,9 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
             }else if(method=="graph") {
                 if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
-                nAttrs <- p$nAttrs
+                g <- smc_as.graph(x@mm)
+		
+		nAttrs <- p$nAttrs
                 eAttrs <- p$eAttrs
 
                 if(!is.null(p$mark_states)) {
@@ -67,24 +69,31 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                 }
 
 		if(p$arrow_width) {
-                    edges <- edges(x@mm)
-		    edges <- cbind(rep(names(edges), sapply(edges, length)),
-			    unlist(edges))
-		    lwd <- transition(x, edges, type=p$arrows)
-		    ## normalize 
-		    lwd <- lwd/max(lwd)
-		    lwd <- 1 + lwd * 5 * p$arrow_width_multiplier
+		    ## this should work but the order in graph
+		    ## lwd ordering seems to be broken in graph
+		    #edges <- transitions(x)
+		    
+		    edg <- edges(g)
+		    from <- character()
+		    to <- unlist(edg)
+		    for(n in names(edg)) 
+			from <- c(from, rep(n, length(edg[[n]])))
+		    edges <- cbind(from=from, to=to)
+		    ## end work around for graph
 
-		    #names(lwd) <- edgeNames(x@mm) ## edgeNames seems broken
+		    lwd <- transition(x, edges, type=p$arrows)
+		    
+		    ## normalize 
+		    lwd <- lwd-min(lwd)
+		    lwd <- lwd/max(lwd)
+		    lwd <- 1 + lwd * 4 * p$arrow_width_multiplier
+
 		    names(lwd) <- apply(edges, 
-			    MARGIN=1, FUN = function(z) paste(z, collapse="~"))
+		    	    MARGIN=1, FUN = function(z) paste(z, collapse="~"))
 		    eAttrs$lwd <- lwd
 		}
 
-		p$arrow_width <- 0
-
-                ## setting line width for arrows does not seem to be implemented
-                pl <- plot(x@mm, recipEdges="distinct",
+                pl <- plot(g, recipEdges="distinct",
                         nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
             } else {
                 if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
@@ -155,8 +164,9 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     if(p$arrow_width) {
                         lwd <- transition(x, edges[,1], edges[,2], type=p$arrows)
                         ## normalize 
+                        lwd <- lwd-min(lwd)
                         lwd <- lwd/max(lwd)
-                        lwd <- 1+ lwd * p$arrow_width_multiplier*5
+                        lwd <- 1 + lwd * 4 * p$arrow_width_multiplier
                     }
 
                     ## arrows whines about zero length arrows

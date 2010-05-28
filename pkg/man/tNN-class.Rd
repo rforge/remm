@@ -49,15 +49,15 @@ to build the Extensible Markov Model.}
   \describe{
 %    \item{find_states}{\code{signature(x = "tNN", newdata = "numeric")}: ... }
 %    \item{find_states}{\code{signature(x = "tNN", newdata = "matrix")}: ... }
-    \item{state_centers}{\code{signature(x = "tNN")}: returns the state
+    \item{state_centers}{\code{signature(x = "tNN")}: returns the cluster/state
 		centers as a matrix.}
-    \item{state_counts}{\code{signature(x = "tNN")}: returns the state 
+    \item{state_counts}{\code{signature(x = "tNN")}: returns the cluster/state 
 		counts as a vector.}
 
-    \item{size}{\code{signature(x = "tNN")}: returns the number of states
-	in the EMM.}
+    \item{size}{\code{signature(x = "tNN")}: returns the number of clusters/states
+	in the clustering.}
     \item{states}{\code{signature(x = "tNN")}: returns the names of the
-	states in the EMM.}
+	clusters/states in the EMM.}
 
 	 }
 }

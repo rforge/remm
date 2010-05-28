@@ -27,17 +27,18 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
 		if(length(to_merge) < 2) return(x)
 
 		new_state <- to_merge[1]
+		to_delete <- states(x) %in% to_merge[-1]
 
-		## handle edges between states to be merged
-		new_w <- sum(sapply(edgeWeights(x@mm, to_merge), 
-				FUN = function(e) sum(e[names(e) %in% to_merge])))
+		
+		## EMMLayer
+		x@mm <- smc_mergeStates(x@mm, to_merge)
+		
+		## fix current state
+		if(x@current_state %in% to_delete) 
+		    x@current_state <- new_state
+		
 
-		## merge states into new_state
-		x@mm <- combineNodes(to_merge, x@mm, new_state)
-
-		## add edge new_state -> new_state
-		if(new_w >0) x@mm <- addEdge(new_state, new_state, x@mm, new_w)
-
+		## Clustering
 		## save old state centers
 		old_centers <- state_centers(x)[to_merge,]
 
@@ -63,19 +64,13 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
 
 
 		x@counts[new_state] <- sum(x@counts[to_merge])
-		x@initial_counts[new_state] <- sum(x@initial_counts[to_merge])
 
-		## remove states
-		to_delete <- states(x) %in% to_merge[-1]
 		x@centers <- x@centers[!to_delete,]
 		#x@sum_x <- x@sum_x[!to_delete,]
 		#x@sum_x2 <- x@sum_x2[!to_delete,]
 		x@counts <- x@counts[!to_delete]
-		x@initial_counts <- x@initial_counts[!to_delete]
 
 
-		## fix current state
-		if(x@current_state %in% to_delete) x@current_state <- new_state
 
 		## fixme: this only works for metric dissimilarities (distances)
 		## new threshold is max. dissimilarity vom new centroid to any old

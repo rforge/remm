@@ -19,91 +19,122 @@ setMethod("build", signature(x = "EMM", newdata = "data.frame"),
 setMethod("build", signature(x = "EMM", newdata = "matrix"),
 	function(x, newdata, verbose = FALSE) {
 
-	    ## low level graph manipulations w/o copying (work on x@mm)
-	    .addEdge <- function(from, to, w=1) {
-		x@mm@edgeL[[from]]$edges <<- c(x@mm@edgeL[[from]]$edges, 
-			which(x@mm@nodes==to))
-		x@mm@edgeData@data[[paste(from,to,sep="|")]]$weight <<- w
-	    }
-
-	    .incWeight <- function(from, to, w=1) {
-		x@mm@edgeData@data[[paste(from,to,sep="|")]]$weight <<-
-		x@mm@edgeData@data[[paste(from,to,sep="|")]]$weight + w
-	    }
-
-	    .addNode <- function(node) {
-		x@mm@nodes <<- c(x@mm@nodes, node)
-		x@mm@edgeL[[node]]$edges <<- numeric(0)
-	    }
-
-	    ## aging is also implemented in fade.R
-	    ## fixme: we might want to reduce the cluster variability (sum_x2)
-	    ## or the cluster threshold also
-
+	    ## inline functions for performance
 	    .fade <- function() {
-		# is done in cluster.R
-		#x@counts <<- x@counts * x@lambda_factor
-		x@initial_counts <<- x@initial_counts * x@lambda_factor
-		x@mm@edgeData@data <<- lapply(x@mm@edgeData@data, 
-			FUN=function(z) {
-			    z$weight <- z$weight* x@lambda_factor
-			    z
-			})
+		#x@mm@initial_counts <<- x@mm@initial_counts * x@lambda_factor
+		#x@mm@counts <<- x@mm@counts * x@lambda_factor
+		initial_counts <<- initial_counts * x@lambda_factor
+		counts <<- counts * x@lambda_factor
 	    }
 
+	    
+	    .addNode <- function(name) {
+		## expand?
+		#if(x@mm@top < 1) x@mm <<- smc_expand(x@mm)
+		if(top < 1) {
+		    #.expand <- function() {
+		    old_size <- length(initial_counts)
 
-	    ## this allows us to add more objects at once
-	    if(nrow(newdata)>1) {
-		for(i in 1:nrow(newdata)) 
-		{
-		    if(verbose && i%%50==0) cat("Added", i, "observations -",
-			    size(x), "states.\n")
-		    x <- build(x, newdata[i,, drop=FALSE])
+		    new_size <- old_size*2L
+		    new_counts <- matrix(0, ncol=new_size, nrow=new_size)
+		    new_counts[1:old_size, 1:old_size] <- counts
+		    counts <<- new_counts
+
+		    new_initial_counts <- numeric(new_size)
+		    new_initial_counts[1:old_size] <- initial_counts
+		    names(new_initial_counts)[1:old_size] <- names(initial_counts)
+		    initial_counts <<- new_initial_counts
+
+		    new_unused <- new_size:1
+		    new_unused[(old_size+1):length(new_unused)] <- unused
+		    unused <<- new_unused
+
+		    top <<- old_size+top
+		    #}
+		
 		}
 
-		if(verbose) cat ("Done -",size(x), "states.\n")
-		return(x)
+		## add node
+		#pos <- x@mm@unused[x@mm@top]
+		#x@mm@unused[x@mm@top] <<- NA
+		#x@mm@top <<- x@mm@top-1L
+		#names(x@mm@initial_counts)[pos] <<- name
+
+		pos <- unused[top]
+		unused[top] <<- NA
+		top <<- top-1L
+		names(initial_counts)[pos] <<- name
+
+		## delete takes care of this
+		#x@mm@mat[pos,] <<- 0
+		#x@mm@mat[,pos] <<- 0
+		#x@initial_counts[pos] <<- 0
+
+		pos
 	    }
 
+	    .incEdge <- function(from, to) {
+		#x@mm@counts[from, to] <<- x@mm@counts[from, to] + 1
+		counts[from, to] <<- counts[from, to] + 1
+	    }
+	    
+	    ## take some elements out to improve performance
+	    initial_counts <- x@mm@initial_counts
+	    unused <- x@mm@unused
+	    top <- x@mm@top
+	    counts <- x@mm@counts
+	    x@mm <- SimpleMC(0) ## otherwise cluster will copy it x times
 
-	    ## prepare
-	    ## reset on all NAs
-	    if(all(is.na(newdata))) return(reset(x))
-
-	    ## fade cluster structure?
-	    #if(x@lambda>0) x <- fade(x)
-	    if(x@lambda>0) .fade()
-
-	    ## cluster
+	    ## cluster all the data
 	    x <- cluster(x, newdata)
 
-	    ## get assignment
-	    sel <- x@last
+	    pos_current <- which(names(x@mm@initial_counts) == x@current_state)
+	    
+	    ## iterate over cluster assignments
+	    for(sel in x@last) {
 
-	    ## create state?
-	    if(is.na(x@initial_counts[sel])) {
-		.addNode(sel)
-		x@initial_counts[sel] <- 0 
-	    }
-
-	    ## add transition
-	    ## no current state
-	    if(is.na(x@current_state)) {
-		x@initial_counts[sel] <- x@initial_counts[sel]+1 
-	    }else{
-		if(isAdjacent(x@mm, x@current_state, sel)) {
-		    .incWeight(x@current_state, sel, 1)
-		}else{
-		    .addEdge(x@current_state, sel, 1)
+		## reset?
+		if(is.na(sel)) {
+		    pos_current <- numeric(0)
+		    next
 		}
+
+		## fade cluster structure?
+		if(x@lambda>0) .fade()
+
+		#pos_new <- which(names(x@mm@initial_counts) == sel)
+		pos_new <- which(names(initial_counts) == sel)
+		
+		## create state?
+		if(!length(pos_new)) {
+		    pos_new <- .addNode(sel)
+		    #x@mm@initial_counts[pos_new] <- 0 
+		    initial_counts[pos_new] <- 0 
+		}
+
+		## add transition
+		## no current state
+		if(!length(pos_current)) {
+		    #x@mm@initial_counts[pos_new] <- x@mm@initial_counts[pos_new]+1 
+		    initial_counts[pos_new] <- initial_counts[pos_new]+1 
+		}else{
+		    #.incEdge(pos_current, pos_new)
+		    ### this is O(n^2) since "[<-" copies
+		    counts[pos_current, pos_new] <- counts[pos_current, pos_new] + 1
+		}
+
+		## update current_state
+		pos_current <- pos_new
 	    }
 
-	    ## update current_state
+	    ## put elements back in
+	    x@mm@initial_counts <- initial_counts
+	    x@mm@unused <- unused
+	    x@mm@top <- top
+	    x@mm@counts <- counts
+	    ## save the last current state
 	    x@current_state <- sel
-
+	    
 	    x
-
 	}
 	)
-
-

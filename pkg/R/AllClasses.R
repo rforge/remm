@@ -3,7 +3,7 @@ setClass("tNN",
 		measure		= "character",
 		centroids	= "logical",
 		threshold	= "numeric",
-		centers		= "matrix",
+		centers		= "matrix",	## row names are cluster names
 		counts		= "numeric",
 		var_thresholds	= "numeric",
 		lambda		= "numeric",
@@ -28,23 +28,44 @@ setClass("tNN",
 	#validity= function(object) {}
 )
 
+.smc_size <- 10L
+setClass("SimpleMC",
+	representation(
+		unused      = "integer", ## list of unused cols/rows
+		top         = "integer", ## top of unused
+		counts      = "matrix",
+		initial_counts = "numeric" 
+		),
+	
+	prototype(
+		unused	    = .smc_size:1,
+		top	    = .smc_size,
+		counts	    = matrix(0, ncol=.smc_size, nrow=.smc_size),
+		initial_counts = structure(rep(0, .smc_size), 
+			names=rep(NA, .smc_size))  ## also holds cluster names
+		)
+
+	## FIXME: Implement check
+	#validity= function(object) {
+	#}
+	)
+
 setClass("EMMLayer",
 	representation(
-		mm		= "graphNEL", 
-		current_state	= "character",
-		initial_counts	= "numeric"
+		mm		= "SimpleMC", 
+		current_state	= "character"
 		),
 
 	prototype(
-		mm		= new("graphNEL", edgemode="directed"),
-		current_state	= as.character(NA),
-		initial_counts	= numeric()
+		mm		= new("SimpleMC"),
+		current_state	= as.character(NA)
 		),
 
 	## FIXME: Implement check
 	#validity= function(object) {
 	#}
 	)
+
 
 setClass("EMM", contains = c("tNN", "EMMLayer"))
 

@@ -29,9 +29,9 @@ to build the Extensible Markov Model.
     \item{\code{current_state}:}{Object of class \code{"character"} with the
 		name of current state in the EMM. \code{NA} means
 			no current state.}
-	\item{\code{initial_counts}:}{Object of class \code{"numeric"} indicating
-		how often a state is the first state in a sequence
-		(used to calculate initial state probabilities for the Markov chain).}
+%	\item{\code{initial_counts}:}{Object of class \code{"numeric"} indicating
+%		how often a state is the first state in a sequence
+%		(used to calculate initial state probabilities for the Markov chain).}
 	 }
 }
 \section{Methods}{

@@ -650,8 +650,9 @@ The package uses the \proglang{S4} class system and
 builds on the infrastructure provided by the
 packages~\pkg{proxy}~\citep{R:proxy:2009} for dissimilarity computation,
 \pkg{cluster}~\citep{R:cluster:2009} for clustering,
-\pkg{graph}~\citep{R:graph:2009} to represent and manipulate the Markov chain
-as a graph, and \pkg{Rgraphviz}~\citep{R:Rgraphviz:2009} for one of the
+%\pkg{graph}~\citep{R:graph:2009} to represent and manipulate the Markov chain
+%as a graph, 
+and \pkg{Rgraphviz}~\citep{R:Rgraphviz:2009} for one of the
 visualization options. 
 
 The central class in the package is \class{EMM} which contains
@@ -690,14 +691,18 @@ currently assigned to each cluster.
 
 Class~\class{EMMLayer} contains exclusively temporal information:
 \begin{itemize}
-\item The Markov Chain as an object of class \class{graphNEL}. The 
-directed graph is represented by nodes and an edge 
-list (see package~\pkg{graph}) and represents
-the transition count matrix~$\mat{C}$ in a sparse format which can 
-efficiently be manipulated.
+%\item The Markov Chain as an object of class \class{graphNEL}. The 
+%directed graph is represented by nodes and an edge 
+%list (see package~\pkg{graph}) and represents
+%the transition count matrix~$\mat{C}$ in a sparse format which can 
+%efficiently be manipulated.
+%\item Initial transition count vector $\vect{c^\epsilon}$. 
+\item The Markov Chain is represented by an object of the internal class
+\class{SimpleMC} which allows for fast manipulation of
+the transition count matrix~$\mat{C}$ and the initial transition count 
+vector $\vect{c^\epsilon}$.
 \item Current state~$\gamma$ as a state index. \code{NA} represents
 no state~($\epsilon$).
-\item Initial transition count vector $\vect{c^\epsilon}$. 
 \end{itemize}
 
 An \class{EMM}~object is created by function \func{EMM} which
@@ -732,12 +737,12 @@ Once such an infrastructure becomes available we will add a
 function~\func{update} which will retrieve all new data points from the 
 stream and updates the model.
 
-To speed up
-processing, \func{build} directly manipulates the \class{graphNEL} 
-data structure 
-without using the functions provided in \pkg{graph}.
-This removes the overhead of copying the whole graph data structure for each
-manipulation. 
+%To speed up
+%processing, \func{build} directly manipulates the \class{graphNEL} 
+%data structure 
+%without using the functions provided in \pkg{graph}.
+%This removes the overhead of copying the whole graph data structure for each
+%manipulation. 
 
 To process multiple sequences, \func{reset} is provided. It sets the 
 current state to no state~($\gamma=\epsilon$). The next observation
@@ -816,8 +821,10 @@ vector of seven values obtained from sensors located at specific points on
 roads. Each sensor collects a count of the number of vehicles which have
 crossed this sensor in the preceding time interval.
 
-<<>>=
+<<results=hide>>=
 library("rEMM")
+@
+<<>>=
 data(EMMTraffic)
 EMMTraffic
 @
@@ -1583,7 +1590,7 @@ during the build process.
 \cite{rna:Vinga:2003} review dissimilarity measures used for alignment-free
 methods. The most commonly used measures are Euclidean distance, $d^2$ distance
 (a weighted Euclidean distance), Mahalanobis distance and Kullback-Leibler
-discrepancy (KLD). Since \cite{rna:Wu:2001} find in their experiments that
+discrepancy~(KLD). Since \cite{rna:Wu:2001} find in their experiments that
 KLD provides good results while it still can
 be computed as fast as Euclidean distance, it is also used here.
 Since KLD becomes $-\infty$ for counts of zero, we

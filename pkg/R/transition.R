@@ -35,16 +35,9 @@ setMethod("transition_matrix", signature(x = "EMMLayer"),
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 		type <- match.arg(type)
 
-		#tm <- outer(states(x), states(x),
-			#FUN = function(x, y) transition(x, x, y, type=type))
-		#dimnames(tm) <- list(states(x), states(x))
-		#tm
-
-		## doing it sparse is much more efficient
-		m <- matrix(0, ncol=size(x), nrow=size(x), 
-			dimnames=list(states(x), states(x)))
-		ew <- edgeWeights(x@mm, states(x))
-		for(i in 1:length(ew)) m[i, names(ew[[i]])] <- ew[[i]]
+		## get transition count matrix
+		m <- smc_countMatrix(x@mm)
+		
 		if(plus_one) m <- m+1
 
 		if(type=="counts") return(m)
@@ -70,7 +63,7 @@ setMethod("initial_transition", signature(x = "EMMLayer"),
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 		type <- match.arg(type)
 
-		ic <- x@initial_counts
+		ic <- smc_initialCounts(x@mm)
 		if(plus_one) ic <- ic+1
 
 		switch(type,
