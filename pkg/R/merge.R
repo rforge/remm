@@ -1,6 +1,6 @@
 
 ## clustering = TRUE gets integer
-setMethod("merge_states", signature(x = "EMM", to_merge = "integer"),
+setMethod("merge_clusters", signature(x = "EMM", to_merge = "integer"),
 	function(x, to_merge, clustering = FALSE, new_center = NULL) {
 		
 		## handle a clustering
@@ -10,7 +10,7 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "integer"),
 		if(!is.null(new_center) && nrow(new_center) != k) 
 		stop("new_center has not the right number of rows.")
 
-		for(i in 1:k) x <- merge_states(x, names(to_merge)[to_merge==i],
+		for(i in 1:k) x <- merge_clusters(x, names(to_merge)[to_merge==i],
 			clustering = FALSE, new_center[i,])
 
 		return(x)
@@ -18,7 +18,7 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "integer"),
 )
 
 ## clustering = FALSE gets character
-setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
+setMethod("merge_clusters", signature(x = "EMM", to_merge = "character"),
 	function(x, to_merge, clustering = FALSE, new_center = NULL) {
 
 		if(clustering) stop("to_merge has the wrong format for clustering!")
@@ -30,7 +30,7 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
 		to_delete <- states(x) %in% to_merge[-1]
 
 		
-		## EMMLayer
+		## TRACDS
 		x@mm <- smc_mergeStates(x@mm, to_merge)
 		
 		## fix current state
@@ -40,7 +40,7 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
 
 		## Clustering
 		## save old state centers
-		old_centers <- state_centers(x)[to_merge,]
+		old_centers <- cluster_centers(x)[to_merge,]
 
 		## create new state
 		if(is.null(new_center)) {
@@ -53,7 +53,7 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
 			}else {
 				## we take the medoid of the larger cluster
 				x@centers[new_state,] <-
-				old_centers[which.max(state_counts(x)[to_merge]),]
+				old_centers[which.max(cluster_counts(x)[to_merge]),]
 			}
 		}else{ 
 			## user supplied new center
@@ -76,7 +76,7 @@ setMethod("merge_states", signature(x = "EMM", to_merge = "character"),
 		## new threshold is max. dissimilarity vom new centroid to any old
 		## centroid + its threshold
 
-		d <- dist(state_centers(x)[new_state,,drop=FALSE], old_centers, 
+		d <- dist(cluster_centers(x)[new_state,,drop=FALSE], old_centers, 
 			method=x@measure)[1,]
 
 		new_threshold <- max(d + x@var_thresholds[names(d)])

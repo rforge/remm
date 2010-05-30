@@ -1,5 +1,5 @@
 Package: rEMM
-Version: 1.1-0
+Version: 1.0-0
 Date: 2010-05-28
 Title: Extensible Markov Model (EMM) for Data Stream Clustering in R
 Author: Michael Hahsler and Margaret H. Dunham

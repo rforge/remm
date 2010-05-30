@@ -7,7 +7,7 @@
 	## fade counts (clustering)
 	x@counts <- x@counts * lambda_factor^t 
 
-	## fade transition counts (EMMLayer)
+	## fade transition counts (TRACDS)
 	x@initial_counts <- x@initial_counts * lambda_factor^t 
 	x <- smc_fade(x, lambda_factor^t)
 	

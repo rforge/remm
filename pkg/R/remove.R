@@ -1,11 +1,11 @@
-setMethod("remove_states", signature(x = "EMM", to_remove = "character"),
+setMethod("remove_clusters", signature(x = "EMM", to_remove = "character"),
 	function(x, to_remove) {
 
 		if(length(to_remove)==0) return(x)
 		
 		to_remove_pos <- states(x) %in% to_remove
 
-		## EMMLayer 
+		## TRACDS 
 		x@mm <- smc_removeState(x@mm, to_remove)
 		if(is.element(x@current_state, to_remove)) 
 		    x@current_state <- as.character(NA)

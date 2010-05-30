@@ -174,7 +174,7 @@ Many algorithms for data stream clustering have been proposed recently.
 For example, 
 \cite{stream_clust:O'Callaghan:2002}~\citep[see also][]{stream_clust:Guha:2003} 
 study the $k$-medians problem. Their algorithm
-called {\em LOCALSEARCH} divides the data stream into pieces,
+called {\em STREAM} divides the data stream into pieces,
 clusters each piece individually and then iteratively reclusters the resulting
 centers to obtain a final clustering.
 \cite{stream_clust:Aggarwal:2003} present {\em CluStream} which uses
@@ -318,6 +318,7 @@ The probabilities of a Markov Chain can be directly estimated from
 data using the maximum likelihood method by
 \begin{equation}
 a_{ij} = c_{ij}/n_i,
+\label{eqn:estim}
 \end{equation}
 where $c_{ij}$ is the 
 observed count of transitions from $s_i$ to $s_j$ in the data
@@ -332,7 +333,10 @@ possibly infinite number of
 observations. Therefore data points have to be mapped onto a manageable
 number of states. This mapping is done online as data arrives using
 data stream clustering where each cluster (or
-micro-cluster) is represented by a state in the MC.  
+micro-cluster) is represented by a state in the MC.
+Because of this one-to-one relationship we use cluster and state 
+for EMM often as synonyms.
+
 %% MFH: I don't understand
 %%Due to the fact that the
 %%stream data may arrive from many differ sources, the evolving EMM we use for
@@ -364,7 +368,8 @@ add a data structure to store the outgoing edges and their counts.
 For each cluster $i$ representing state $s_i$ we need to store a 
 transition count vector~$\vect{c}_{i}$.
 Conceptually, all transition counts in an EMM can be seen as a 
-transition count matrix~$\mat{C}$ composed of all transition count vectors. 
+transition $K \times K$ count matrix~$\mat{C}$ composed 
+of all transition count vectors. 
 It is easy to 
 calculate the estimated transition probability matrix from the 
 transition count matrix (see Equation~(\ref{eqn:estim})).
@@ -384,11 +389,12 @@ However, this is desirable since it ensures that the probabilities
 calculated for the transition probability matrix $\mat{A}$ 
 stay consistent and keep adding up to unity.
 
-For data with an existing temporal structure, 
-EMM will produce a transition count matrix
-$\mat{C}$ with many of the $K^2$ entries containing a count of zero.  Storing
-the transition count matrix in a sparse data structure 
-helps to reduce space requirements significantly.
+%For data with an existing temporal structure, 
+%EMM will produce a transition count matrix
+%$\mat{C}$ with many of the $K^2$ entries containing a count of zero.  Storing
+%the transition count matrix in a sparse data structure 
+%helps to reduce space requirements significantly, however, using a 
+%full matrix increases processing speed.
 
 For EMM we also need to keep track of the current state 
 $\gamma \in \{\epsilon, 1,2,\dots,K\}$ which is either
@@ -499,7 +505,7 @@ Fading the cluster structure is
 for example used by HPStream~\citep{stream_clust:Aggarwal:2004}.
 Fading is achieved by reducing
 the weight of old observations in the data stream over time. We use 
-a learning rate $\lambda \ge 0$ to specify the weight over time. We
+a decay rate $\lambda \ge 0$ to specify the weight over time. We
 define the weight
 for data that is $t$ timesteps in the past by the following strictly decreasing
 function:
@@ -657,11 +663,11 @@ visualization options.
 
 The central class in the package is \class{EMM} which contains
 two classes, class~\class{tNN} which contains all information
-pertaining to the clustering and class~\class{EMMLayer} for the 
+pertaining to the clustering and class~\class{TRACDS} 
+(short for temporal relationship among clusters for data streams) for the 
 temporal aspects. Figure~\ref{fig:rEMM_classes} shows the UML class 
 diagram~\citep{misc:Fowler:2004}.
-\class{tNN} and \class{EMMLayer} are defined abstract since they are only
-meant to be used together by \class{EMM}. However, the advantage of 
+The advantage of 
 separating the classes is that 
 for future development
 it is easier to replace the clustering algorithm
@@ -689,7 +695,7 @@ over time when clusters are added or deleted.
 currently assigned to each cluster.
 \end{itemize}
 
-Class~\class{EMMLayer} contains exclusively temporal information:
+Class~\class{TRACDS} contains exclusively temporal information:
 \begin{itemize}
 %\item The Markov Chain as an object of class \class{graphNEL}. The 
 %directed graph is represented by nodes and an edge 
@@ -699,24 +705,26 @@ Class~\class{EMMLayer} contains exclusively temporal information:
 %\item Initial transition count vector $\vect{c^\epsilon}$. 
 \item The Markov Chain is represented by an object of the internal class
 \class{SimpleMC} which allows for fast manipulation of
-the transition count matrix~$\mat{C}$ and the initial transition count 
+the transition count matrix~$\mat{C}$. It also stores the 
+initial transition count 
 vector $\vect{c^\epsilon}$.
 \item Current state~$\gamma$ as a state index. \code{NA} represents
 no state~($\epsilon$).
 \end{itemize}
 
 An \class{EMM}~object is created by function \func{EMM} which
-initializes an empty clustering with an EMM layer. Several methods are defined
-for the classes~\class{tNN} and \class{EMMLayer} and only methods which need
+initializes an empty clustering with a temporal layer. 
+Several methods are defined
+for the classes~\class{tNN} and \class{TRACDS} and only methods which need
 clustering and temporal information together (e.g., building a new EMM or
 plotting an EMM) are directly defined for \class{EMM}.  Since \class{EMM}
-contains \class{tNN} and \class{EMMLayer}, all methods can directly be used
+contains \class{tNN} and \class{TRACDS}, all methods can directly be used
 for \class{EMM} objects. The reason of separation is again flexibility for
 future development.
 
 The EMM layer information can be accessed using
 \func{size} (number of states/clusters), 
-\func{states} (name of states/clusters),
+\func{states}/\func{clusters}(name of states/clusters),
 \func{current\_state} (get current state),
 \func{transition} (access count or probability of a certain transition),
 \func{transition\_matrix} (compute a transition count or probability
@@ -724,18 +732,18 @@ The EMM layer information can be accessed using
 \func{initial\_transition} (get initial transition count vector).
 To access information about the clustering,
 we provide the functions 
-\func{state\_counts} (number of observations assigned to each state/cluster) 
-and \func{state\_centers} (centroids/medoids of clusters). 
+\func{cluster\_counts} (number of observations assigned to each cluster) 
+and \func{cluster\_centers} (centroids/medoids of clusters). 
 
 Clustering and building the EMM is integrated in the 
 function~\func{build}. It adds new data points by first 
 clustering and then updating the MC structure. For convenience,
 \func{build} can be called with several data points as a matrix, however,
 internally the data points (rows) are processed sequentially. 
-Currently \proglang{R} has no infrastructure to manage data stream sources.
-Once such an infrastructure becomes available we will add a
-function~\func{update} which will retrieve all new data points from the 
-stream and updates the model.
+%Currently \proglang{R} has no infrastructure to manage data stream sources.
+%Once such an infrastructure becomes available we will add a
+%function~\func{update} which will retrieve all new data points from the 
+%stream and updates the model.
 
 %To speed up
 %processing, \func{build} directly manipulates the \class{graphNEL} 
@@ -751,7 +759,7 @@ be updated. For convenience, a row of all \code{NA} in a sequence of
 data points supplied to \func{build} as a matrix also works as a reset.
 
 \pkg{rEMM} implements cluster structure fading by two  mechanisms. First, 
-\func{build} has a learning rate parameter~\code{lambda}. 
+\func{build} has a decay rate parameter~\code{lambda}. 
 If this parameter is set, \func{build} automatically
 fades all counts before a new data point is added. The second
 mechanism is to explicitly call the function~\func{fade} whenever
@@ -762,16 +770,16 @@ rate, \func{fade} could be called at regular time intervals
 (e.g., every second).
 
 To manipulate states/clusters and transitions, \pkg{rEMM} offers a wide array
-of functions.  \func{remove\_states} and \func{remove\_transitions} remove
+of functions.  \func{remove\_clusters} and \func{remove\_transitions} remove
 user specified states/clusters or transitions from the model.  To find rare
-states or transitions  with a count below a specified threshold
-\func{rare\_states} and \func{rare\_transitions} can be used.  \func{prune}
-combines finding rare states or transitions and removing them into a
+clusters or transitions  with a count below a specified threshold
+\func{rare\_clusters} and \func{rare\_transitions} can be used.  \func{prune}
+combines finding rare clusters or transitions and removing them into a
 convenience function. 
 For some applications transitions from a state to itself might not be 
 interesting. These transitions can be removed by using 
 \func{remove\_selftransitions}. The last manipulation function is
-\func{merge\_states} which combines several clusters/states into a single
+\func{merge\_clusters} which combines several clusters/states into a single
 cluster/state.
 
 As described above, the threshold NN data stream clustering algorithm can 
@@ -784,10 +792,10 @@ clustering methods in \pkg{rEMM}:
 \func{recluster\_pam} for $k$-medoids.
 However, it is easy to use any other clustering method. All that is needed is
 a vector with the cluster assignments for each state/cluster. This vector
-can be supplied to \func{merge\_states} with \code{clustering=TRUE}
+can be supplied to \func{merge\_clusters} with \code{clustering=TRUE}
 to create a reclustered EMM. Optionally new centers 
 calculated by the clustering algorithm
-can also be supplied to \func{merge\_states} as 
+can also be supplied to \func{merge\_clusters} as 
 the parameter \code{new\_center}.
 %\marginpar{var threshold}
 
@@ -795,11 +803,11 @@ Predicting a future state and calculating
 the probability of a new sequence are implemented as \func{predict}
 and \func{score}, respectively.
 
-The helper function \func{find\_states} returns the
-cluster/state sequence for given data points. The matching can be
+The helper function \func{find\_clusters} returns the
+cluster sequence for given data points. The matching can be
 nearest neighbor or exact. 
-Nearest neighbor always returns a matching state, while exact will return no 
-state (\code{NA}) if a data point does not fall within the threshold of any
+Nearest neighbor always returns a matching cluster, while exact will return no 
+cluster (\code{NA}) if a data point does not fall within the threshold of any
 cluster.
 
 Finally, \func{plot} implements several visualization methods
@@ -821,10 +829,8 @@ vector of seven values obtained from sensors located at specific points on
 roads. Each sensor collects a count of the number of vehicles which have
 crossed this sensor in the preceding time interval.
 
-<<results=hide>>=
-library("rEMM")
-@
 <<>>=
+library("rEMM")
 data(EMMTraffic)
 EMMTraffic
 @
@@ -845,16 +851,16 @@ size(emm)
 @
 
 The resulting EMM has \Sexpr{size(emm)} states.
-The number of data points represented by each state/cluster can be accessed
-via \func{state\_counts}.
+The number of data points represented by each cluster can be accessed
+via \func{cluster\_counts}.
 <<>>=
-state_counts(emm)
+cluster_counts(emm)
 @
 
 State~2 has with a count of three the most assigned data points.
-The state/cluster centers can be inspected using \func{state\_centers}. 
+The cluster centers can be inspected using \func{cluster\_centers}. 
 <<>>=
-state_centers(emm)
+cluster_centers(emm)
 @
 
 \func{plot} for \class{EMM} objects provides several visualization methods.
@@ -920,20 +926,20 @@ predict(emm, n=2, current="2", probabilities=TRUE)
 @
 
 In this example
-state~4 was predicted since it has the highest probability. If several states
+cluster~4 was predicted since it has the highest probability. If several clusters
 have the same probability the tie is randomly broken.
 
 \subsection{Manipulating EMMs}
-EMMs can be manipulated by removing states or transitions and 
-by merging states.
+EMMs can be manipulated by removing clusters (and states) or transitions and 
+by merging clusters/states.
 Figure~\ref{fig:Traffic_man}(a) shows 
 again the EMM for the EMMTraffic data set created above. 
-We can remove a state
-with \func{remove\_states}. For example, we remove state~3 and
+We can remove a cluster
+with \func{remove\_clusters}. For example, we remove cluster~3 and
 display the resulting EMM in Fig~\ref{fig:Traffic_man}(b).
 
 <<Traffic_r3, fig=TRUE, include=FALSE>>=
-emm_3removed <- remove_states(emm, "3")
+emm_3removed <- remove_clusters(emm, "3")
 plot(emm_3removed, method = "graph")
 @
 
@@ -947,14 +953,14 @@ emm_52removed <- remove_transitions(emm, "5", "2")
 plot(emm_52removed, method = "graph")
 @
 
-States can be merged using \func{merge\_states}. Here we merge 
-states~2 and 5 into a combined state. 
-The combined state automatically gets the name of the first state in the 
+Clusters can be merged using \func{merge\_clusters}. Here we merge 
+clusters~2 and 5 into a combined cluster. 
+The combined cluster automatically gets the name of the first cluster in the 
 merge vector. The resulting EMM is shown in Fig~\ref{fig:Traffic_man}(d).
 
 
 <<Traffic_m25, fig=TRUE, include=FALSE>>=
-emm_25merged <- merge_states(emm, c("2","5"))
+emm_25merged <- merge_clusters(emm, c("2","5"))
 plot(emm_25merged, method = "graph")
 @
 
@@ -980,41 +986,41 @@ plot(emm_25merged, method = "graph")
 \\(d)
 \end{minipage}
 \caption{Graph representation for an EMM for the EMMTraffic data set.
-(a) shows the original EMM, in (b) state~3 is removed, in 
-(c) the transition from state~5 to state~2 is removed, and in
-(d) states~2 and 5 are merged.}
+(a) shows the original EMM, in (b) cluster~3 is removed, in 
+(c) the transition from cluster~5 to cluster~2 is removed, and in
+(d) clusters~2 and 5 are merged.}
 \label{fig:Traffic_man}
 \end{figure}
 
-Note that a transition from the combined state~2 to itself is created which 
-represents the transition from state~5 to state~2 in the original EMM. 
+Note that a transition from the combined cluster~2 to itself is created which 
+represents the transition from cluster~5 to cluster~2 in the original EMM. 
 
 \subsection{Using cluster structure fading and pruning}
 
 EMMs can adapt to changes in data over time. This is achieved by fading 
-the cluster structure using a learning rate.
+the cluster structure using a decay rate.
 To show the effect,
-we train an EMM on the EMMTraffic data with a rather high learning
+we train an EMM on the EMMTraffic data with a rather high decay
 rate of $\lambda=1$. Since the weight is calculated by $w_t = 2^{-\lambda t}$,
 the observations are weighted $1, \frac{1}{2}, \frac{1}{4},\dots$.
 
 <<Traffic_l, fig=TRUE, include=FALSE>>=
-emm_fading <- EMM(measure="eJaccard", threshold=0.2, lambda = 1)
+emm_fading <- EMM(threshold=0.2, measure="eJaccard", lambda = 1)
 emm_fading <- build(emm_fading, EMMTraffic)
 plot(emm_fading, method = "graph")
 @
 
 The resulting graph is shown in Figure~\ref{fig:Traffic_learning}(b).
-The states which were created earlier on (states with lower index number)
+The clusters which were created earlier on (clusters with lower index number)
 are smaller (represent a lower weighted number of observations) 
 compared to the original
 EMM without fading
 displayed in Figure~\ref{fig:Traffic_learning}(a).
 
-Over time states in an EMM can become obsolete and no new observations
+Over time clusters in an EMM can become obsolete and no new observations
 are assigned to them. Similarly transitions might become obsolete over time.
-To simplify the model and improve efficiency, such obsolete states and
-transitions can be pruned. For the example here, we prune all states 
+To simplify the model and improve efficiency, such obsolete clusters and
+transitions can be pruned. For the example here, we prune all clusters 
 and transitions which have a weighted count of less than $0.1$ and
 show the resulting model in Figure~\ref{fig:Traffic_learning}(c).
 
@@ -1103,17 +1109,17 @@ We create an EMM by clustering using Euclidean distance and a threshold of
 0.1.
 
 <<sim_graph, fig=TRUE, include=FALSE>>=
-emm <- EMM(measure="euclidean", threshold=0.1)
+emm <- EMM(threshold=0.1, measure="euclidean")
 emm <- build(emm, EMMsim_train)
 plot(emm, method="graph")
 @
 
 The EMM visualized as a graph is shown in Figure~\ref{fig:sim_graph}(a).
-The positions of the vertices of the graph (states) 
+The positions of the vertices of the graph (states/clusters) 
 are solely chosen to optimize the
 layout which results in a not very informative visualization. 
 The next visualization method 
-uses the relative position of the states
+uses the relative position of the clusters
 to represent the proximity between the cluster centers.
 
 <<sim_MDS, fig=TRUE, include=FALSE>>=
@@ -1121,7 +1127,8 @@ plot(emm, method="MDS")
 @
 
 This results in the visualization in Figure~\ref{fig:sim_graph}(b) which shows
-the same EMM graph but the relative position of the states is determined
+the same EMM graph but the relative position of the clusters/states 
+is determined
 by the proximity of the cluster centers. 
 If the data space has more than two dimensions or a non-Euclidean
 distance measure is used, the position of the states
@@ -1132,11 +1139,11 @@ in the two dimensional representation as much as possible.
 Since the data set in this example is already in two-dimensional 
 Euclidean space, the original coordinates of the centers are 
 directly used.
-The size of the states and the width of
-the arrows represent again state and transition counts.
+The size of the clusters and the width of
+the arrows represent again cluster and transition counts.
 
 We can also project the points in the data set 
-into $2$-dimensional space and then add the centers of the states 
+into $2$-dimensional space and then add the centers of the clusters 
 (see Figure~\ref{fig:sim_graph}(c)).
 
 <<sim_MDS2, fig=TRUE, include=FALSE>>=
@@ -1171,12 +1178,12 @@ plot(emm, method = "MDS", data=EMMsim_train)
 The simple graph representation in Figure~\ref{fig:sim_graph}(a) shows a rather
 complicated graph for the EMM. However, 
 Figure~\ref{fig:sim_graph}(b) with the vertices positioned
-to represent dissimilarities between state centers shows more structure.
-The states clearly fall into four groups.
-The projection of the state centers onto the data set in
+to represent similarities between cluster centers shows more structure.
+The clusters clearly fall into four groups.
+The projection of the cluster centers onto the data set in
 Figure~\ref{fig:sim_graph}(c) shows that the four groups represent the four
 clusters in the data where the larger clusters are split into
-more states (micro-clusters). We will introduce reclustering to simplify
+several micro-clusters. We will introduce reclustering to simplify
 the structure in a later section.
 
 %\marginpar{add plot with state\_counts and trans\_counts}
@@ -1214,9 +1221,9 @@ fits the EMM created
 for the EMMsim data in the section above. The test data is 
 supplied together with the training set in \pkg{rEMM}.
 <<>>=
-score(emm, EMMsim_test, method="prod", match_state="exact", plus_one=FALSE,
+score(emm, EMMsim_test, method="prod", match_cluster="exact", plus_one=FALSE,
 initial_transition = FALSE)
-score(emm, EMMsim_test, method="sum", match_state="exact", plus_one=FALSE,
+score(emm, EMMsim_test, method="sum", match_cluster="exact", plus_one=FALSE,
 initial_transition = FALSE)
 @
 
@@ -1232,12 +1239,12 @@ The transition table is computed by \func{transition\_table}.
 
 %\marginpar{Problem with plus\_one and age!}
 <<>>=
-transition_table(emm, EMMsim_test, match_state="exact", plus_one=FALSE)
+transition_table(emm, EMMsim_test, match_cluster="exact", plus_one=FALSE)
 @
 
 The low score is caused by data points that do not fall within the threshold
 for any cluster (\code{<NA>} above) and by missing transitions in the matching
-sequence of states (counts and probabilities of zero above).  These missing
+sequence of clusters (counts and probabilities of zero above).  These missing
 transitions are the result of the fragmentation of the real clusters into
 many micro-clusters (see Figures~\ref{fig:sim_graph}(b) and (c)). Suppose we
 have two clusters called cluster~A and cluster~B and after an observation
@@ -1249,7 +1256,7 @@ transition count/probability of zero.
 
 To reduce the problem of not being able to match a data point to a 
 cluster we can use a nearest neighbor approach instead of exact matching
-(\code{match\_state="nn"} is the default for \func{score}).
+(\code{match\_cluster="nn"} is the default for \func{score}).
 Here a new data point is assigned to the closest cluster even if it falls 
 outside the threshold. The problem with missing transitions can be reduced by
 starting with a prior distribution of transition probabilities. In the 
@@ -1396,25 +1403,25 @@ experimentally found a distance threshold of 3 (just above the
 3rd quartile of the distance distribution between all scaled observations) 
 to give useful results.
 
-<<Derwent_state_counts, fig=TRUE, include=FALSE, width=10>>=
+<<Derwent_cluster_counts, fig=TRUE, include=FALSE, width=10>>=
 Derwent_scaled <- scale(Derwent)
 emm <- EMM(measure="euclidean", threshold=3)
 emm <- build(emm, Derwent_scaled)
-#state_counts(emm)
+#cluster_counts(emm)
 #state_centers(emm)
-plot(emm, method = "state_counts", log="y")
+plot(emm, method = "cluster_counts", log="y")
 @
 \begin{figure}
 \centering
-\includegraphics[width=.8\linewidth]{rEMM-Derwent_state_counts}
+\includegraphics[width=.8\linewidth]{rEMM-Derwent_cluster_counts}
 \caption{Distribution of state counts of the EMM for the Derwent data.} 
-\label{fig:Derwent_state_counts}
+\label{fig:Derwent_cluster_counts}
 \end{figure}
 
-The resulting EMM has \Sexpr{size(emm)} states. In
-Figure~\ref{fig:Derwent_state_counts} shows that the counts for the states have
-a very skewed distribution with states~1 and 2 representing most observations
-and states~5, 9, 10, 11, 12, 17, 19 and 20 being extremely rare.
+The resulting EMM has \Sexpr{size(emm)} clusters/states. In
+Figure~\ref{fig:Derwent_cluster_counts} shows that the cluster counts have
+a very skewed distribution with clusters~1 and 2 representing most observations
+and clusters~5, 9, 10, 11, 12, 17, 19 and 20 being extremely rare.
 
 <<Derwent_EMM1, fig=TRUE, include=FALSE>>=
 plot(emm)
@@ -1430,43 +1437,45 @@ plot(emm)
 \includegraphics[width=\linewidth]{rEMM-Derwent_EMM2}
 \\(b)
 \end{minipage}
-\caption{State centers of the EMM for the Derwent data set projected
+\caption{Cluster centers of the EMM for the Derwent data set projected
 on $2$-dimensional space.
 (a) shows the full EMM and (b) shows a pruned EMM (only the most 
 frequently used states)}
 \label{fig:Derwent_EMM}
 \end{figure}
 
-The projection of the state centers into $2$-dimensional space in
-Figure~\ref{fig:Derwent_EMM}(a) reveals that all states except state~11 and 12
+The projection of the cluster centers into $2$-dimensional space in
+Figure~\ref{fig:Derwent_EMM}(a) reveals that all but
+clusters~11 and 12
 are placed closely together.
 
-Next we look at frequent states and transitions. 
+Next we look at frequent clusters and transitions. 
 We define rare here as all 
-states/transitions that represent less than 0.5\% of the observations. 
+clusters/transitions that represent less than 0.5\% of the observations. 
 On average this translates into less than two daily observation per year.
 We calculate a count threshold,
-use \func{prune} to remove rare states/transitions
+use \func{prune} to remove rare clusters/transitions
 and then we plot the pruned EMM.
 
 <<Derwent_EMM2, fig=TRUE, include=FALSE>>=
-rare_threshold <- sum(state_counts(emm))*0.005
+rare_threshold <- sum(cluster_counts(emm))*0.005
 rare_threshold
 plot(prune(emm, rare_threshold))
 @
 
 The pruned model depicted in Figure~\ref{fig:Derwent_EMM}(b) shows that 5
-states represent approximately 99.5\% of the river's behavior. 
-All five states come from the lower half of the large cluster in 
+clusters represent approximately 99.5\% of the river's behavior. 
+All five clusters come from the lower half of the large group of clusters in 
 Figure~\ref{fig:Derwent_EMM}(a).
-States~1 and 2 are the most frequently used states and the wide bidirectional
+Clusters~1 and 2 are the most frequently occuring clusters and 
+the wide bidirectional
 arrow connecting them means that observing transitions between these 
-two states are common.
+two clusters are common.
 %<<>>=
-%rare <- names(which(state_counts(emm)<rare_threshold))
+%rare <- names(which(cluster_counts(emm)<rare_threshold))
 %rare
 %@
-To analyze the meaning of the two outlier states (11 and 12) 
+To analyze the meaning of the two outlier clusters (11 and 12) 
 identified in Figure~\ref{fig:Derwent_EMM}(a) above, we plot the flows at a 
 catchment and mark the observations for these states. 
 
@@ -1474,7 +1483,7 @@ catchment and mark the observations for these states.
 catchment <- 1 
 plot(Derwent[,catchment], type="l", ylab="Gauged flows", 
 main=colnames(Derwent)[catchment])
-state_sequence <- find_states(emm, Derwent_scaled)
+state_sequence <- find_clusters(emm, Derwent_scaled)
 
 mark_states <- function(states, state_sequence, ys, col=0, label=NULL, ...) {
     x <- which(state_sequence %in% states)
@@ -1504,12 +1513,12 @@ Wind Field Park catchment. Outliers (states~11 and 12) are marked.}
 \label{fig:Derwent2}
 \end{figure}
 
-In Figure~\ref{fig:Derwent2}(a) we see that state~12 has a 
+In Figure~\ref{fig:Derwent2}(a) we see that cluster~12 has a 
 river flow in excess of
-$100 m^3/s$ which only happened once in the observation period. State~11
+$100 m^3/s$ which only happened once in the observation period. Cluster~11
 seems to be a regular observation with medium flow around $20 m^3/s$ and it
-needs more analysis to find out why this state is also an outlier directly
-leading to state~12.
+needs more analysis to find out why this cluster is also an outlier directly
+leading to cluster~12.
 
 <<Derwent3, fig=TRUE, include=FALSE>>=
 catchment <- 6 
@@ -1524,7 +1533,8 @@ mark_states("12", state_sequence, Derwent[,catchment], col="red", label="12")
 
 The catchment at Wind Field Park is at the Amber river which is a tributary of
 the Derwent and we see in Figure~\ref{fig:Derwent2}(b) that the day before the
-flood occurs, the flow shoots up to $4 m^3/s$ which is caught by state~11.  The
+flood occurs, the flow shoots up to $4 m^3/s$ which is caught by cluster~11.  
+The
 temporal structure clearly indicated that a flood is imminent the next day.
  
 %Next we look at the probability of going from state~1 (normal condition)
@@ -1547,7 +1557,7 @@ temporal structure clearly indicated that a flood is imminent the next day.
 %plot(hc)
 %@
 %<<fig=TRUE>>=
-% emm20 <- merge_states(emm, cutree(hc, h=20), clustering=TRUE)
+% emm20 <- merge_clusters(emm, cutree(hc, h=20), clustering=TRUE)
 % state_centers(emm20)
 % plot(remove_selftransitions(emm20))
 %@
@@ -1601,7 +1611,7 @@ We use an experimentally found threshold of 0.1.
 <<>>=
 data("16S")
 
-emm <- EMM("Kullback", threshold=0.1)
+emm <- EMM(threshold=0.1, "Kullback")
 emm <- build(emm, Mollicutes16S+1)
 @
 
@@ -1621,13 +1631,14 @@ represented as a graph.}
 \end{figure}
 
 The graph representation of the EMM is shown in
-Figure~\ref{fig:Mollicutes_graph}. Note that each state in the EMM corresponds
-to one or more windows of the rRNA sequence (the size of the state indicates
+Figure~\ref{fig:Mollicutes_graph}. Note that each cluster/state 
+in the EMM corresponds
+to one or more windows of the rRNA sequence (the size of the cluster indicates
 the number of windows). The initial transition probabilities show that most
-sequences start the first count window in state~1.  Several interesting
+sequences start the first count window in cluster~1.  Several interesting
 observations can be made from this representation.
 \begin{itemize}
-\item There exists a path through the graph using only the largest states
+\item There exists a path through the graph using only the largest clusters
 	and widest arrows
     which represents the most common sequence of windows.
 \item There are several places in the EMM where almost 

@@ -1,6 +1,3 @@
-setGeneric("cluster", function(x, newdata,...) standardGeneric("cluster"))
-
-
 ## make  newdata a matrix (with a single row)
 setMethod("cluster", signature(x = "tNN", newdata = "numeric"),
 	function(x, newdata, verbose = FALSE) cluster(x, 
@@ -26,7 +23,8 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 
 		nd <- newdata[i,, drop = FALSE]
 		if(verbose && i%%50==0) 
-		    cat("Added", i, "observations -",size(x), "states.\n")
+		    cat("Added", i, "observations -",nrow(centers), "states.\n")
+		    #cat("Added", i, "observations -",size(x), "states.\n")
 
 		## reset on all NAs
 		if(all(is.na(nd))) {
@@ -54,7 +52,7 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 
 		}else{
 		    ## find a matching state
-		    #sel <- find_states(x, nd, match_state="exact")
+		    #sel <- find_clusters(x, nd, match_cluster="exact")
 		    inside <- dist(nd, centers, method=x@measure) - var_thresholds
 		    min <- which.min(inside)
 		    if(inside[min]<=0) sel <- rownames(centers)[min]

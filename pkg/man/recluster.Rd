@@ -51,7 +51,7 @@ in the clustering algorithm (see \code{hclust}, \code{kmeans} and \code{pam}).
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
-\seealso{\code{\link{merge_states}}, \code{\link{prune}}, 
+\seealso{\code{\link{merge_clusters}}, \code{\link{prune}}, 
 	\code{\link[stats]{kmeans}}, \code{\link[stats]{hclust}},
 	\code{\link[cluster]{pam}}}
 \examples{

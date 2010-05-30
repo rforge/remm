@@ -1,5 +1,5 @@
 
-setMethod("transition", signature(x = "EMMLayer", 
+setMethod("transition", signature(x = "TRACDS", 
 		from = "matrix", to = "missing"),
 	function(x, from, to, 
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
@@ -12,7 +12,7 @@ setMethod("transition", signature(x = "EMMLayer",
 )
 		
 
-setMethod("transition", signature(x = "EMMLayer", from = "character", to =
+setMethod("transition", signature(x = "TRACDS", from = "character", to =
                 "character"), function(x, from, to, type=c("probability",
                         "counts", "log_odds"), plus_one = FALSE){ 
             type <- match.arg(type)
@@ -30,7 +30,7 @@ setMethod("transition", signature(x = "EMMLayer", from = "character", to =
 
 
 
-setMethod("transition_matrix", signature(x = "EMMLayer"),
+setMethod("transition_matrix", signature(x = "TRACDS"),
 	function(x,
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 		type <- match.arg(type)
@@ -58,7 +58,7 @@ setMethod("transition_matrix", signature(x = "EMMLayer"),
 )
 
 
-setMethod("initial_transition", signature(x = "EMMLayer"),
+setMethod("initial_transition", signature(x = "TRACDS"),
 	function(x, 
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 		type <- match.arg(type)
@@ -77,23 +77,23 @@ setMethod("initial_transition", signature(x = "EMMLayer"),
 
 setMethod("transition_table", signature(x = "EMM", newdata = "numeric"),
 	function(x, newdata, method = c("prob", "counts", "log_odds"), 
-		match_state="nn", plus_one = TRUE, 
+		match_cluster="nn", plus_one = TRUE, 
 		initial_transition = FALSE) 
 	transition_table(x, as.matrix(rbind(newdata)), method, 
-		match_state, plus_one, initial_transition)
+		match_cluster, plus_one, initial_transition)
 )
 
 setMethod("transition_table", signature(x = "EMM", newdata = "data.frame"),
 	function(x, newdata, method = c("prob", "counts", "log_odds"), 
-		match_state="nn", plus_one = TRUE, 
+		match_cluster="nn", plus_one = TRUE, 
 		initial_transition = FALSE) 
 	transition_table(x, as.matrix(newdata), method, 
-		match_state, plus_one, initial_transition)
+		match_cluster, plus_one, initial_transition)
 )
 
 setMethod("transition_table", signature(x = "EMM", newdata = "matrix"),
         function(x, newdata, method = c("prob", "counts", "log_odds"), 
-                match_state="nn", plus_one = TRUE, 
+                match_cluster="nn", plus_one = TRUE, 
                 initial_transition = FALSE) {
 
             method <- match.arg(method)
@@ -110,7 +110,7 @@ setMethod("transition_table", signature(x = "EMM", newdata = "matrix"),
             }
 
             ## get sequence
-            ssequence <- find_states(x, newdata, match_state=match_state, 
+            ssequence <- find_clusters(x, newdata, match_cluster=match_cluster, 
                     dist=FALSE)
             from <- ssequence[1:(n-1)]
             to <- ssequence[2:n]

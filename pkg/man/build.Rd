@@ -10,7 +10,7 @@
 %\alias{update,EMM-method}
 %\alias{update}
 \alias{reset}
-\alias{reset,EMMLayer-method}
+\alias{reset,TRACDS-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Building an EMM using New Data}
 \description{

@@ -1,4 +1,7 @@
+setClass("StreamClustering")
+
 setClass("tNN",
+	contains = ("StreamClustering"),
 	representation(
 		measure		= "character",
 		centroids	= "logical",
@@ -19,7 +22,6 @@ setClass("tNN",
 		counts		= numeric(),
 		var_thresholds  = numeric(),
 		lambda		= 0,
-		lambda_factor	= 1,
 		lambda_factor	= 1,
 		last		= as.character(NA)
 	)
@@ -50,7 +52,7 @@ setClass("SimpleMC",
 	#}
 	)
 
-setClass("EMMLayer",
+setClass("TRACDS",
 	representation(
 		mm		= "SimpleMC", 
 		current_state	= "character"
@@ -67,5 +69,5 @@ setClass("EMMLayer",
 	)
 
 
-setClass("EMM", contains = c("tNN", "EMMLayer"))
+setClass("EMM", contains = c("tNN", "TRACDS"))
 

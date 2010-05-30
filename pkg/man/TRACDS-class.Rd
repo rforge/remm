@@ -1,22 +1,22 @@
-\name{EMMLayer-class}
+\name{TRACDS-class}
 \Rdversion{1.1}
 \docType{class}
-\alias{EMMLayer-class}
+\alias{TRACDS-class}
 \alias{current_state}
-\alias{current_state,EMMLayer-method}
+\alias{current_state,TRACDS-method}
 \alias{size}
-\alias{size,EMMLayer-method}
+\alias{size,TRACDS-method}
 \alias{states}
-\alias{states,EMMLayer-method}
+\alias{states,TRACDS-method}
 \alias{transitions}
-\alias{transitions,EMMLayer-method}
-%\alias{initial_transition,EMMLayer-method}
-%\alias{transition_matrix,EMMLayer-method}
-%\alias{transition,EMMLayer,data.frame,missing-method}
-%\alias{transition,EMMLayer,character,character-method}
-%\alias{predict,EMMLayer-method}
+\alias{transitions,TRACDS-method}
+%\alias{initial_transition,TRACDS-method}
+%\alias{transition_matrix,TRACDS-method}
+%\alias{transition,TRACDS,data.frame,missing-method}
+%\alias{transition,TRACDS,character,character-method}
+%\alias{predict,TRACDS-method}
 
-\title{Class "EMMLayer"}
+\title{Class "TRACDS"}
 \description{Representation of the temporal structure of a data stream clustering using a extensible Markov model.}
 \section{Objects from the Class}{
 No objects are created from this class. It is extended by the class \code{"EMM"}
@@ -36,18 +36,18 @@ to build the Extensible Markov Model.
 }
 \section{Methods}{
   \describe{
-    \item{current_state}{\code{signature(x = "EMMLayer")}: returns the name of 
+    \item{current_state}{\code{signature(x = "TRACDS")}: returns the name of 
 		the current state. }
-%    \item{initial_transition}{\code{signature(x = "EMMLayer")}: ...}
-%    \item{predict}{\code{signature(object = "EMMLayer")}: ... }
-    \item{size}{\code{signature(x = "EMMLayer")}: returns the number of states 
+%    \item{initial_transition}{\code{signature(x = "TRACDS")}: ...}
+%    \item{predict}{\code{signature(object = "TRACDS")}: ... }
+    \item{size}{\code{signature(x = "TRACDS")}: returns the number of states 
 		in the EMM.}
-    \item{states}{\code{signature(x = "EMMLayer")}: returns the names of the
+    \item{states}{\code{signature(x = "TRACDS")}: returns the names of the
 		states in the EMM.}
-%    \item{transition_matrix}{\code{signature(x = "EMMLayer")}: ... }
-%    \item{transition}{\code{signature(x = "EMMLayer", from = "data.frame", to = "missing")}: ... }
-%    \item{transition}{\code{signature(x = "EMMLayer", from = "character", to = "character")}: ... }
-    \item{transitions}{\code{signature(x = "EMMLayer")}: returns all transitions		as a matrix of state names with a from and a to column. }
+%    \item{transition_matrix}{\code{signature(x = "TRACDS")}: ... }
+%    \item{transition}{\code{signature(x = "TRACDS", from = "data.frame", to = "missing")}: ... }
+%    \item{transition}{\code{signature(x = "TRACDS", from = "character", to = "character")}: ... }
+    \item{transitions}{\code{signature(x = "TRACDS")}: returns all transitions		as a matrix of state names with a from and a to column. }
 	 }
 }
 \references{ 
@@ -64,9 +64,9 @@ Conference on Data Mining,} pp. 371--374.
 	\code{\link{initial_transition}} to access the transition information in
 	the EMM.
 	\code{\link{predict}} is used to predict future states of an EMM.
-	\code{\linkS4class{EMM}} extends \code{"EMMLayer"}.
+	\code{\linkS4class{EMM}} extends \code{"TRACDS"}.
 }
 %\examples{
-%showClass("EMMLayer")
+%showClass("TRACDS")
 %}
 \keyword{classes}
