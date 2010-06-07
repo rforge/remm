@@ -239,16 +239,15 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
                         ## add ellipses
                         ## FIXME: does not work with d>2
-                        if(p$draw_ellipses) {
-                            library(sfsmisc)
-                            tmp <- lapply(1:size(x),
-                                    FUN = function (i) {
-                                        thr <- x@var_thresholds[i]
-                                        loc <- cluster_centers(x)[i,]
-                                        lines(ellipsePoints(thr, thr, loc=loc), 
-                                                col = "black", lty=2)
-                                    })
-                            }
+			if(p$draw_ellipses) {
+			    library(sfsmisc)
+			    for (i in 1:size(x)) {
+				thr <- x@var_thresholds[i]
+				loc <- cluster_centers(x)[i,]
+				lines(ellipsePoints(thr, thr, loc=loc), 
+					col = "black", lty=2)
+			    }
+			}
 
 
                     }else{

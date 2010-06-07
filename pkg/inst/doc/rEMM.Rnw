@@ -348,14 +348,14 @@ Since it only uses information (assignment of a data point to a
 cluster) which is created by the clustering algorithm anyway, the computational
 overhead is minimal.  When the clustering algorithm creates, merges or deletes
 clusters, the corresponding states in the MC are also created,
-merged or deleted resulting in the evolving MC, the EMM.
+merged or deleted resulting in the evolving MC.
 Note that $K$, the size of the
 set of clusters and of states $S$ is not
 fixed for EMMs and will change over time.
 
 In the following we look at the additional data structures and the operations
-on these structure which are necessary to add an EMM to an existing data stream 
-clustering algorithm. 
+on these structure which are necessary to extend an existing data stream 
+clustering algorithm for EMM. 
 
 \paragraph{Data Structures for the EMM.}
 Typically algorithms for data stream clustering use a very compact
@@ -363,11 +363,11 @@ representation for each cluster consisting of a description of the center
 and how many data points were assigned to the cluster so far.
 Some algorithms also keep summary information of the dispersion of the
 data points assigned to each cluster.
-Since the cluster represents a state in the EMM we need to
+Since the cluster also represents a state in the EMM we need to
 add a data structure to store the outgoing edges and their counts.
 For each cluster $i$ representing state $s_i$ we need to store a 
 transition count vector~$\vect{c}_{i}$.
-Conceptually, all transition counts in an EMM can be seen as a 
+All transition counts in an EMM can be seen as a 
 transition $K \times K$ count matrix~$\mat{C}$ composed 
 of all transition count vectors. 
 It is easy to 
@@ -378,12 +378,12 @@ transition count matrix (see Equation~(\ref{eqn:estim})).
 %$\mat{A} = \mat{C} / \vect{n},$
 %\end{equation}
 %where $\vect{n} = (n_1, n_2,\dots,n_K)$ is the vector of row sums of $\mat{C}$.
-Note that $n_i$ normally is the same as the 
+Note that $n_i$ in Equation~(\ref{eqn:estim}) normally is the same as the 
 number of data points assigned to cluster $i$ maintained by 
 the clustering algorithm. If we manipulate the
 clustering using certain operations, e.g., by deleting clusters or
 fading the cluster structure (see below),
-the values of $\vect{n}$ calculated from $\mat{C}$ will diverge from the
+the values of $n_i$ calculated from $\mat{C}$ will diverge from the
 number of assigned data points maintained by the clustering algorithm.
 However, this is desirable since it ensures that the probabilities
 calculated for the transition probability matrix $\mat{A}$ 
@@ -446,8 +446,8 @@ by adding a new \mbox{(micro-)cluster.}
 To store the transition counts from/to this new cluster, 
 we enlarge the transition count matrix $\mat{C}$ by a row and a 
 column which are initialized to zero. 
-If the matrix is stored in a sparse data structure, 
-this modification incurs only minimal overhead. 
+%If the matrix is stored in a sparse data structure, 
+%this modification incurs only minimal overhead. 
 
 \item[Deleting clusters.]
 When a cluster $i$ (typically an outlier cluster) is deleted by 
@@ -461,8 +461,8 @@ we need to:
 
 \begin{enumerate}
 \item Create new state $s_m$ in $\mat{C}$ (see creating a new cluster above).
-\item Merge the outgoing edges for $s_m$  by $c_{mk} = c_{ik} +c_{jk},\;k=1,2,\ldots K$.
-\item Merge the incoming edges for $s_m$ by $c_{km} = c_{ki} + c_{kj},\;k=1,2,\ldots K$.
+\item Compute the outgoing edges for $s_m$  by $c_{mk} = c_{ik} +c_{jk},\;k=1,2,\ldots K$.
+\item Compute the incoming edges for $s_m$ by $c_{km} = c_{ki} + c_{kj},\;k=1,2,\ldots K$.
 \item Delete columns and rows for the old states $s_i$ and $s_j$ 
     from $\mat{C}$ (see deleting clusters above).
 \end{enumerate}
@@ -576,14 +576,14 @@ where $\vect{z}_t$ is the old centroid for a cluster containing
 $n$ points, $\vect{y}$ is the new data point and $\vect{z}_{t+1}$ is
 the updated centroid for $n+1$ data points 
 (see, e.g., BIRCH by \cite{stream_clust:Zhang:1996}).
-However, finding canonical centroids 
+Finding canonical centroids 
 in non-Euclidean space typically has no closed form and is a
 computationally expensive optimization problem which needs access to all 
 data points belonging
 to the cluster~\citep{misc:Leisch:2006}.
-However, since we do not store the data points for our clusters,
+Since we do not store the data points for our clusters,
 even exact medoids cannot be found and we have to resort to
-{\em fixed pseudo medoids} and {\em moving pseudo centroids.}
+{\em fixed pseudo medoids} or {\em moving pseudo centroids.}
 We define fixed pseudo medoids
 as the first data point which creates a 
 new cluster. The idea is that since we use a fixed 
@@ -604,7 +604,8 @@ adjustments made for centroids in Euclidean space.
 Note, that we do not store the sums and sum of squares of observations 
 like BIRCH~\citep{stream_clust:Zhang:1996} and similar micro-cluster based 
 algorithms since this only helps with calculating measures 
-meaningful in Euclidean space and the clustering algorithm here is independent
+meaningful in Euclidean space and the clustering algorithm here is 
+intended to be independent
 from the chosen proximity measure.
 
 %For the EMM we store a data structure for the transition counts
@@ -642,7 +643,7 @@ the flexibility to accommodate
 apriori knowledge about the data and the shape of expected clusters.
 For example for spherical clusters $k$-means or $k$-medoids can be used
 and if clusters of arbitrary shape are expected, hierarchical clustering 
-with single linkage make sense. Clustering micro-clusters results in
+with single linkage make sense. Reclustering micro-clusters results in
 merging the corresponding states in the MC.
 
 
@@ -681,7 +682,7 @@ or perform changes on the temporal layer without breaking the whole system.
 \end{figure}
 
 
-Class~\class{tNN} contains fields for all the clustering information
+Class~\class{tNN} contains slots for all the clustering information
 used by threshold NN:
 \begin{itemize}
 \item Used dissimilarity measure
@@ -691,7 +692,7 @@ used by threshold NN:
 the centers ($d$-dimensional 
 vectors) for the $K$ clusters currently used. Note that $K$ changes
 over time when clusters are added or deleted.
-\item The state count vector $\vect{n}$ with the number of data points
+\item The cluster count vector $\vect{n}= (n_1,n_2,\ldots,n_K$) with the number of data points
 currently assigned to each cluster.
 \end{itemize}
 
@@ -715,16 +716,16 @@ no state~($\epsilon$).
 An \class{EMM}~object is created by function \func{EMM} which
 initializes an empty clustering with a temporal layer. 
 Several methods are defined
-for the classes~\class{tNN} and \class{TRACDS} and only methods which need
+for either classe~\class{tNN} or \class{TRACDS}. Only methods which need
 clustering and temporal information together (e.g., building a new EMM or
 plotting an EMM) are directly defined for \class{EMM}.  Since \class{EMM}
 contains \class{tNN} and \class{TRACDS}, all methods can directly be used
-for \class{EMM} objects. The reason of separation is again flexibility for
+for \class{EMM} objects. The reason of separation is flexibility for
 future development.
 
-The EMM layer information can be accessed using
-\func{size} (number of states/clusters), 
-\func{states}/\func{clusters}(name of states/clusters),
+The temporal layer information can be accessed using
+\func{size} (number of states), 
+\func{states} (names of states),
 \func{current\_state} (get current state),
 \func{transition} (access count or probability of a certain transition),
 \func{transition\_matrix} (compute a transition count or probability
@@ -732,6 +733,7 @@ The EMM layer information can be accessed using
 \func{initial\_transition} (get initial transition count vector).
 To access information about the clustering,
 we provide the functions 
+\func{clusters} (names of clusters),
 \func{cluster\_counts} (number of observations assigned to each cluster) 
 and \func{cluster\_centers} (centroids/medoids of clusters). 
 
@@ -755,7 +757,7 @@ internally the data points (rows) are processed sequentially.
 To process multiple sequences, \func{reset} is provided. It sets the 
 current state to no state~($\gamma=\epsilon$). The next observation
 will start a new sequence and the initial transition count vector will
-be updated. For convenience, a row of all \code{NA} in a sequence of
+be updated. For convenience, a row of all \code{NAs} in a sequence of
 data points supplied to \func{build} as a matrix also works as a reset.
 
 \pkg{rEMM} implements cluster structure fading by two  mechanisms. First, 
@@ -804,7 +806,7 @@ the probability of a new sequence are implemented as \func{predict}
 and \func{score}, respectively.
 
 The helper function \func{find\_clusters} returns the
-cluster sequence for given data points. The matching can be
+cluster/state sequence for given data points. The matching can be
 nearest neighbor or exact. 
 Nearest neighbor always returns a matching cluster, while exact will return no 
 cluster (\code{NA}) if a data point does not fall within the threshold of any
@@ -845,7 +847,7 @@ data set at once, but this is only for convenience. Internally the data
 points are processed 
 as a data stream, strictly one after the other in a single pass.
 <<>>=
-emm <- EMM(measure="eJaccard", threshold=0.2)
+emm <- EMM(threshold=0.2, measure="eJaccard")
 emm <- build(emm, EMMTraffic)
 size(emm)
 @
@@ -857,7 +859,7 @@ via \func{cluster\_counts}.
 cluster_counts(emm)
 @
 
-State~2 has with a count of three the most assigned data points.
+Cluster~2 has with a count of three the most assigned data points.
 The cluster centers can be inspected using \func{cluster\_centers}. 
 <<>>=
 cluster_centers(emm)
@@ -874,7 +876,7 @@ plot(emm, method="graph")
 The resulting graph is presented in Figure~\ref{fig:Traffic_graph}. In this 
 representation the vertex size and the arrow width code for the number of 
 observations represented by each state and the transition counts, i.e., 
-more popular states and transitions are more prominently displayed.
+more popular clusters and transitions are more prominently displayed.
 
 
 \begin{figure}
@@ -912,26 +914,25 @@ transition(emm, "1", "2", type="probability")
 @
 
 
-Using the EMM model, we can predict a future state given a current state. 
-For example, we can predict the most likely state two time steps away from 
-state~2. 
+Using the EMM model, we can predict a future cluster given a current cluster 
+For example, we can predict the most likely cluster two time steps away from 
+cluster~2. 
 <<>>=
 predict(emm, n=2, current="2")
 @
 
 \func{predict} with \code{probabilities=TRUE} produced the
-probability distribution over all states.
+probability distribution over all clusters.
 <<>>=
 predict(emm, n=2, current="2", probabilities=TRUE)
 @
 
-In this example
-cluster~4 was predicted since it has the highest probability. If several clusters
-have the same probability the tie is randomly broken.
+In this example cluster~4 was predicted since it has the highest probability.
+If several clusters have the same probability the tie is randomly broken.
 
 \subsection{Manipulating EMMs}
-EMMs can be manipulated by removing clusters (and states) or transitions and 
-by merging clusters/states.
+EMMs can be manipulated by removing clusters or transitions and 
+by merging clusters.
 Figure~\ref{fig:Traffic_man}(a) shows 
 again the EMM for the EMMTraffic data set created above. 
 We can remove a cluster
@@ -944,7 +945,7 @@ plot(emm_3removed, method = "graph")
 @
 
 Removing transitions is done with \func{remove\_transitions}.
-In the following example we remove the transition from state~5 to state~2
+In the following example we remove the transition from cluster~5 to cluster~2
 from the original EMM for EMMTraffic in Figure~\ref{fig:Traffic_man}(a).
 The resulting graph is shown in Fig~\ref{fig:Traffic_man}(c).
 
@@ -964,7 +965,7 @@ emm_25merged <- merge_clusters(emm, c("2","5"))
 plot(emm_25merged, method = "graph")
 @
 
-\begin{figure}
+\begin{figure}[t]
 \begin{minipage}[b]{.49\linewidth}
 \centering
 \includegraphics[width=.7\linewidth]{rEMM-Traffic_graph}
@@ -1030,7 +1031,7 @@ plot(emm_pruned, method = "graph")
 @
 
 
-\begin{figure}
+\begin{figure}[t]
 \begin{minipage}[b]{.49\linewidth}
 \centering
 \includegraphics[width=.7\linewidth]{rEMM-Traffic_graph}
@@ -1151,7 +1152,7 @@ plot(emm, method = "MDS", data=EMMsim_train)
 @
 
 
-\begin{figure}[tbp]
+\begin{figure}[tp]
 \begin{minipage}[b]{.49\linewidth}
 \centering
 \includegraphics[width=.9\linewidth]{rEMM-sim_graph}
@@ -1467,7 +1468,7 @@ The pruned model depicted in Figure~\ref{fig:Derwent_EMM}(b) shows that 5
 clusters represent approximately 99.5\% of the river's behavior. 
 All five clusters come from the lower half of the large group of clusters in 
 Figure~\ref{fig:Derwent_EMM}(a).
-Clusters~1 and 2 are the most frequently occuring clusters and 
+Clusters~1 and 2 are the most frequently occurring clusters and 
 the wide bidirectional
 arrow connecting them means that observing transitions between these 
 two clusters are common.
@@ -1676,7 +1677,7 @@ reading data directly from data stream sources.
 The authors would like to thank the anonymous reviewers for their valuable
 comments.
 Part of the research presented in this paper was supported by
-by NSF-IIS grant 0948893.
+by NSF IIS-0948893.
 
 
 \bibliographystyle{abbrvnat}
