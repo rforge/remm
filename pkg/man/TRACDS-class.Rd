@@ -54,6 +54,10 @@ to build the Extensible Markov Model.
 M.H. Dunham, Y. Meng, J. Huang (2004): Extensible Markov Model, In:
 \emph{ICDM '04: Proceedings of the Fourth IEEE International
 Conference on Data Mining,} pp. 371--374.
+
+M. Hahsler, M. H. Dunham (2010): rEMM: Extensible Markov Model for 
+Data Stream Clustering in R, Journal of Statistical Software, 35(5), 1-31,
+URL \url{http://www.jstatsoft.org/v35/i05/}
 }
 %\author{ ~~who you are~~ }
 %\note{ ~~further notes~~ }

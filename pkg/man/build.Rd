@@ -60,7 +60,7 @@ A new EMM object with the data added.
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
 \seealso{ 
-	Class \code{"\linkS4class{EMM}"}, 
+	Class \code{\linkS4class{TRACDS}}, 
 	\code{\link{fade}} and \code{\link[proxy]{dist}} 
 	in \pkg{proxy}.}
 \examples{
