@@ -83,17 +83,20 @@ setMethod("build", signature(x = "EMM", newdata = "matrix"),
 	    unused <- x@mm@unused
 	    top <- x@mm@top
 	    counts <- x@mm@counts
+	    initial_counts <- x@mm@initial_counts
+	    mm <- x@mm
 	    x@mm <- SimpleMC(0) ## otherwise cluster will copy it x times
+	    
+	    ## get position of current date in matrix
+	    pos_current <- which(names(initial_counts) == x@current_state)
 
 	    ## cluster all the data
 	    x <- cluster(x, newdata)
 
-	    pos_current <- which(names(x@mm@initial_counts) == x@current_state)
-	    
-	    ## iterate over cluster assignments
+	    ## now do the EMM layer (iterate over cluster assignments)
 	    for(sel in x@last) {
 
-		## reset?
+		## cluster returns NA if we start a new sequence.
 		if(is.na(sel)) {
 		    pos_current <- numeric(0)
 		    next
@@ -128,6 +131,7 @@ setMethod("build", signature(x = "EMM", newdata = "matrix"),
 	    }
 
 	    ## put elements back in
+	    x@mm <- mm
 	    x@mm@initial_counts <- initial_counts
 	    x@mm@unused <- unused
 	    x@mm@top <- top
