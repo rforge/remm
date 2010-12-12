@@ -13,6 +13,4 @@
 	    abcd = FALSE,
 	    description="Euclidean Squared Distance."
 	    )
-
-    cat("test")
 }
