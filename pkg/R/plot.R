@@ -21,6 +21,11 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             eAttrs = list()
                             ), parameter)
 
+	    if(size(x)<1) {
+		warning("Empty EMM. No plot produced!")
+		return(invisible(NULL))
+	    }
+
             emm_centers <- cluster_centers(x)
 
             if(method=="cluster_counts") {
@@ -64,11 +69,11 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
                 ## vertex size
                 if(p$cluster_counts){
-                    nAttrs$width <- .5 +
-                    x@counts/max(x@counts)*p$state_size_multiplier
+                    nAttrs$width <- (.5 +
+                    x@counts/max(x@counts)) * p$state_size_multiplier * .75
                 }
 
-		if(p$arrow_width) {
+		if(p$arrow_width && numEdges(g)>0) {
 		    ## this should work but the order in graph
 		    ## lwd ordering seems to be broken in graph
 		    #edges <- transitions(x)
@@ -85,8 +90,8 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		    
 		    ## normalize 
 		    lwd <- lwd-min(lwd)
-		    lwd <- lwd/max(lwd)
-		    lwd <- 1 + lwd * 4 * p$arrow_width_multiplier
+		    if(max(lwd)>0) lwd <- lwd/max(lwd)
+		    lwd <- (1 + lwd * 4 ) * p$arrow_width_multiplier
 
 		    names(lwd) <- apply(edges, 
 		    	    MARGIN=1, FUN = function(z) paste(z, collapse="~"))
@@ -96,7 +101,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                 pl <- plot(g, recipEdges="distinct",
                         nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
             } else {
-                if(nrow(emm_centers)<3) stop('Less than 3 centers! Use plot_type="graph".')
+                if(nrow(emm_centers)<3) stop('Less than 3 centers! Use method="graph".')
 
                 ## self transitions are not visible for these plots
                 x <- remove_selftransitions(x)
@@ -124,7 +129,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     ## use cex for point size
                     cex <- 2
                     if(p$cluster_counts) cex <- 
-                    2+x@counts/max(x@counts) * p$state_size_multiplier*5
+                    (2+x@counts/max(x@counts) * 5 ) * p$state_size_multiplier
 
                     ## arrows
                     edges <- transitions(x)
@@ -166,7 +171,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                         ## normalize 
                         lwd <- lwd-min(lwd)
                         lwd <- lwd/max(lwd)
-                        lwd <- 1 + lwd * 4 * p$arrow_width_multiplier
+                        lwd <- (1 + lwd * 4) * p$arrow_width_multiplier
                     }
 
                     ## arrows whines about zero length arrows
