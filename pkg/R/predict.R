@@ -10,13 +10,12 @@ setMethod("predict", signature(object = "TRACDS"),
 			m
 		}
 
-		emm <- object
 		
-		if(is.null(current_state)) current_state <- emm@current_state
+		if(is.null(current_state)) current_state <- current_state(object)
 		else current_state <- as.character(current_state)
 
 
-		P <- transition_matrix(emm)
+		P <- transition_matrix(object)
 		## calculate P^n
 		if(n>1) for(i in 1:(n-1)) P <- P%*%P
 
@@ -24,6 +23,6 @@ setMethod("predict", signature(object = "TRACDS"),
 		if(probabilities) return(prob)
 
 		## we need random-tie breaking
-		return(states(emm)[.prob_max(prob)])
+		return(states(object)[.prob_max(prob)])
 	}
 )

@@ -670,7 +670,7 @@ or perform changes on the temporal layer without breaking the whole system.
 \end{figure}
 
 
-Class~\class{tNN} contains slots for all the clustering information
+Class~\class{tNN} contains the clustering information
 used by threshold NN:
 \begin{itemize}
 \item Used dissimilarity measure
@@ -683,6 +683,12 @@ over time when clusters are added or deleted.
 \item The cluster count vector $\vect{n}= (n_1,n_2,\ldots,n_K$) with the number of data points
 currently assigned to each cluster.
 \end{itemize}
+
+For performance reasons all information that changes during clustering
+is stored in an environment enabling us to update the clustering
+ without copying the whole object. 
+However, this means that \class{tNN} objects
+have to be explicitely copied with a provided \func{copy} method.
 
 Class~\class{TRACDS} contains exclusively temporal information:
 \begin{itemize}
@@ -701,6 +707,10 @@ vector $\vect{c^\epsilon}$.
 no state~($\epsilon$).
 \end{itemize}
 
+Again, all variable information is stored in an environment which is not 
+copied by regular assignments.
+
+
 An \class{EMM}~object is created by function \func{EMM} which
 initializes an empty clustering with a temporal layer. 
 Several methods are defined
@@ -709,21 +719,35 @@ clustering and temporal information together (e.g., building a new EMM or
 plotting an EMM) are directly defined for \class{EMM}.  Since \class{EMM}
 contains \class{tNN} and \class{TRACDS}, all methods can directly be used
 for \class{EMM} objects. The reason of separation is flexibility for
-future development.
+future development. Note that \class{EMM} object contain environments
+inherited for \class{tNN} and \class{TRACDS} and thus 
+simple assignemnt will not create a copy of the object. The
+method \func{copy} needs to be used to create two independent copies
+of the object.
 
-The temporal layer information can be accessed using
-\func{size} (number of states), 
-\func{states} (names of states),
-\func{current\_state} (get current state),
-\func{transition} (access count or probability of a certain transition),
-\func{transition\_matrix} (compute a transition count or probability
+The temporal layer information from class \class{TRACDS} can be accessed using
+\begin{itemize}
+\item \func{nstates} (number of states), 
+\item \func{states} (names of states),
+\item \func{current\_state} (get current state),
+\item \func{transition} (access count or probability of a certain transition),
+\item \func{transition\_matrix} (compute a transition count or probability
     matrix),
-\func{initial\_transition} (get initial transition count vector).
-To access information about the clustering,
+\item \func{initial\_transition} (get initial transition count vector).
+\end{itemize}
+
+To access information about the clustering from class \class{tNN},
 we provide the functions 
-\func{clusters} (names of clusters),
-\func{cluster\_counts} (number of observations assigned to each cluster) 
-and \func{cluster\_centers} (centroids/medoids of clusters). 
+\begin{itemize}
+\item \func{nclusters} (number of clusters),
+\item \func{clusters} (names of clusters),
+\item \func{cluster\_counts} (number of observations assigned to each cluster),
+\item \func{cluster\_centers} (centroids/medoids of clusters). 
+\end{itemize}
+
+For convenience, a method \func{size} is provides for \class{EMM} which
+uses \func{nclusters} in \class{tNN} to return the number of clusters/states
+in the model.
 
 Clustering and building the EMM is integrated in the 
 function~\func{build}. It adds new data points by first 
@@ -928,9 +952,13 @@ with \func{remove\_clusters}. For example, we remove cluster~3 and
 display the resulting EMM in Fig~\ref{fig:Traffic_man}(b).
 
 <<Traffic_r3, fig=TRUE, include=FALSE>>=
-emm_3removed <- remove_clusters(emm, "3")
+emm_3removed <- remove_clusters(copy(emm), "3")
 plot(emm_3removed, method = "graph")
 @
+
+Note that a copy of emm explicitely created here. This is important
+since we do not want to modify emm. If we would ommit \func{copy} here
+then emm would also lose cluster~3. 
 
 Removing transitions is done with \func{remove\_transitions}.
 In the following example we remove the transition from cluster~5 to cluster~2
@@ -938,7 +966,7 @@ from the original EMM for EMMTraffic in Figure~\ref{fig:Traffic_man}(a).
 The resulting graph is shown in Fig~\ref{fig:Traffic_man}(c).
 
 <<Traffic_rt52, fig=TRUE, include=FALSE>>=
-emm_52removed <- remove_transitions(emm, "5", "2")
+emm_52removed <- remove_transitions(copy(emm), "5", "2")
 plot(emm_52removed, method = "graph")
 @
 
@@ -949,7 +977,7 @@ merge vector. The resulting EMM is shown in Fig~\ref{fig:Traffic_man}(d).
 
 
 <<Traffic_m25, fig=TRUE, include=FALSE>>=
-emm_25merged <- merge_clusters(emm, c("2","5"))
+emm_25merged <- merge_clusters(copy(emm), c("2","5"))
 plot(emm_25merged, method = "graph")
 @
 
@@ -1014,8 +1042,8 @@ and transitions which have a weighted count of less than $0.1$ and
 show the resulting model in Figure~\ref{fig:Traffic_learning}(c).
 
 <<Traffic_lp, fig=TRUE, include=FALSE>>=
-emm_pruned <- prune(emm_fading, count_threshold=0.1)
-plot(emm_pruned, method = "graph")
+emm_fading <- prune(emm_fading, count_threshold=0.1)
+plot(emm_fading, method = "graph")
 @
 
 
@@ -1287,7 +1315,7 @@ Here we plot the dendrogram which is shown in Fig~\ref{fig:sim_hc}.
 <<sim_hc, fig=TRUE, include=FALSE>>=
 ## find best predicting model (clustering)
 k <- 2:10
-emmc <- recluster_hclust(emm, k=k, method ="average") 
+emmc <- recluster_hclust(copy(emm), k=k, method ="average") 
 plot(attr(emmc, "cluster_info")$dendrogram)
 @
 
@@ -1449,7 +1477,7 @@ and then we plot the pruned EMM.
 <<Derwent_EMM2, fig=TRUE, include=FALSE>>=
 rare_threshold <- sum(cluster_counts(emm))*0.005
 rare_threshold
-plot(prune(emm, rare_threshold))
+plot(prune(copy(emm), rare_threshold))
 @
 
 The pruned model depicted in Figure~\ref{fig:Derwent_EMM}(b) shows that 5

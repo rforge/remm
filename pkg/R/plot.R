@@ -43,7 +43,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
             }else if(method=="graph") {
                 if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
-                g <- smc_as.graph(x@mm)
+                g <- smc_as.graph(x@tracds_d$mm)
 		
 		nAttrs <- p$nAttrs
                 eAttrs <- p$eAttrs
@@ -70,7 +70,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                 ## vertex size
                 if(p$cluster_counts){
                     nAttrs$width <- (.5 +
-                    x@counts/max(x@counts)) * p$state_size_multiplier * .75
+                    cluster_counts(x)/max(cluster_counts(x))) * p$state_size_multiplier * .75
                 }
 
 		if(p$arrow_width && numEdges(g)>0) {
@@ -129,7 +129,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     ## use cex for point size
                     cex <- 2
                     if(p$cluster_counts) cex <- 
-                    (2+x@counts/max(x@counts) * 5 ) * p$state_size_multiplier
+                    (2+cluster_counts(x)/max(cluster_counts(x)) * 5 ) * p$state_size_multiplier
 
                     ## arrows
                     edges <- transitions(x)
@@ -266,7 +266,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     cex <- 1
 
                     ## use cex for point size (scale: 1...3)
-                    if(p$cluster_counts) cex <- 1+x@counts/max(x@counts)*2
+                    if(p$cluster_counts) cex <- 1+cluster_counts(x)/max(cluster_counts(x))*2
 
                     ## centers
                     if(p$mark_clusters) points(centers, 
@@ -279,3 +279,21 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
             }
         }
         )
+
+
+
+setMethod("plot", signature(x = "TRACDS", y = "missing"),
+        function(x, y, ...){ 
+                
+	    if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
+
+                g <- smc_as.graph(x@tracds_d$mm)
+		plot(g, recipEdges="distinct")	
+	})
+
+
+setMethod("plot", signature(x = "tNN", y = "missing"),
+        function(x, y, ...){ 
+		
+	    pairs(cluster_centers(x))
+	})

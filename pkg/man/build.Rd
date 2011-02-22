@@ -55,7 +55,10 @@ reset(x)
     also resets the current state.
 }
 \value{
-A new EMM object with the data added.
+A reference to the changed EMM object with the data added. 
+Note: EMM objects store all variable data in an environment which 
+enables us to update partial data without copying the whole object. Assignment
+will not create a copy! Use the provided method \code{copy()}. 
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
@@ -72,11 +75,18 @@ EMMTraffic
 ## create EMM
 emm <- EMM(measure="eJaccard", threshold=0.2)
 
-## build model using EMMTraffic data
-emm <- build(emm, EMMTraffic)
+## build model using EMMTraffic data (note that the EMM object is 
+## changed without assignment!)
+build(emm, EMMTraffic)
+## same as: emm <- build(emm, EMMTraffic)
 
 size(emm)
 plot(emm, method = "graph") ## plot needs Rgraphviz installed
+
+## emm2 <- emm does not create a copy (just a reference)
+## a copy is created using copy()
+emm2<- copy(emm) 
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -6,29 +6,60 @@ setClass("tNN",
 		measure		= "character",
 		centroids	= "logical",
 		threshold	= "numeric",
-		centers		= "matrix",	## row names are cluster names
-		counts		= "numeric",
-		var_thresholds	= "numeric",
 		lambda		= "numeric",
 		lambda_factor	= "numeric",
-		last		= "character"
+	        ### this is all in an environment now	
+		#centers		= "matrix",	## row names are cluster names
+		#counts		= "numeric",
+		#var_thresholds	= "numeric",
+		#last		= "character"
+		tnn_d		= "environment"
 	),
 
 	prototype(
 		measure		= "euclidean", 
 		centroids	= TRUE,
 		threshold	= 0.2,
-		centers		= matrix(nrow=0, ncol=0),
-		counts		= numeric(),
-		var_thresholds  = numeric(),
 		lambda		= 0,
 		lambda_factor	= 1,
-		last		= as.character(NA)
+		tnn_d		= emptyenv()
+		### these are in data as a reference
+		#centers		= matrix(nrow=0, ncol=0),
+		#counts		= numeric(),
+		#var_thresholds  = numeric(),
+		#last		= as.character(NA)
 	)
 
 	## FIXME: Implement check
 	#validity= function(object) {}
 )
+
+setMethod("initialize", "tNN", function(.Object, 
+		threshold = 0.2, 
+		measure = "euclidean", 
+		centroids = identical(tolower(measure), "euclidean"), 
+		lambda=0, ...){
+	    
+	    .Object@threshold <- threshold
+	    .Object@measure <- measure
+	    .Object@centroids <- centroids
+	    .Object@lambda <- lambda
+	    .Object@lambda_factor <- 2^(-lambda)
+		
+	    .Object@tnn_d <- new.env()
+	    assign("centers", matrix(nrow=0, ncol=0), envir = .Object@tnn_d)
+	    assign("counts", numeric(), envir = .Object@tnn_d)
+	    assign("var_thresholds", numeric(), envir = .Object@tnn_d)
+	    assign("last", as.character(NA), envir = .Object@tnn_d)
+	    
+	    #cat("tNN initializes.\n")
+	    #validObject(.Object)
+	    #.Object <- callNextMethod(.Object, ...)
+	    
+	    .Object
+	})
+
+
 
 .smc_size <- 10L
 setClass("SimpleMC",
@@ -54,13 +85,19 @@ setClass("SimpleMC",
 
 setClass("TRACDS",
 	representation(
-		mm		= "SimpleMC", 
-		current_state	= "character"
+		lambda		= "numeric",
+		lambda_factor	= "numeric",
+		tracds_d    	= "environment"
+		#mm		= "SimpleMC", 
+		#current_state	= "character"
 		),
 
 	prototype(
-		mm		= new("SimpleMC"),
-		current_state	= as.character(NA)
+		lambda		= 0,
+		lambda_factor	= 1,
+		tracds_d    	= emptyenv()
+		#mm		= new("SimpleMC"),
+		#current_state	= as.character(NA)
 		),
 
 	## FIXME: Implement check
@@ -68,6 +105,44 @@ setClass("TRACDS",
 	#}
 	)
 
+setMethod("initialize", "TRACDS", function(.Object, lambda=0, ...){
+	    
+	    .Object@lambda <- lambda
+	    .Object@lambda_factor <- 2^(-lambda)
 
-setClass("EMM", contains = c("tNN", "TRACDS"))
+	    .Object@tracds_d <-  new.env()
+	    assign("mm", new("SimpleMC"), envir = .Object@tracds_d)
+	    assign("current_state", as.character(NA), envir = .Object@tracds_d)
+	    
+	    #cat("TRACDS initializes.\n")
+	    #validObject(.Object)
+	    
+	    #.Object <- callNextMethod(.Object, ...)
+	    
+	    .Object
+	})
 
+
+### EMM is a subclass of tNN and TRACDS
+setClass("EMM", contains = c("TRACDS", "tNN"))
+
+## S4 BUG!!! R seems to only call initialize for the first class in contains
+setMethod("initialize", "EMM", function(.Object, ...){
+	    #threshold, measure, lambda,
+	    #	centroids, ...){
+	    
+	    #.Object <- callNextMethod(.Object, ...)
+	    
+	    #.Object@threshold <- threshold
+	    #.Object@measure <- measure
+	    #.Object@centroids <- centroids
+	    #.Object@lambda <- lambda
+	    #.Object@lambda_factor <- 2^(-lambda)
+
+	    .Object <- getMethod("initialize", "TRACDS")(.Object, ...)	 
+	    .Object <- getMethod("initialize", "tNN")(.Object, ...)	 
+
+	    validObject(.Object)
+	    
+	    .Object
+	})

@@ -36,7 +36,7 @@ setMethod("transition_matrix", signature(x = "TRACDS"),
 		type <- match.arg(type)
 
 		## get transition count matrix
-		m <- smc_countMatrix(x@mm)
+		m <- smc_countMatrix(x@tracds_d$mm)
 		
 		if(plus_one) m <- m+1
 
@@ -63,7 +63,7 @@ setMethod("initial_transition", signature(x = "TRACDS"),
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 		type <- match.arg(type)
 
-		ic <- smc_initialCounts(x@mm)
+		ic <- smc_initialCounts(x@tracds_d$mm)
 		if(plus_one) ic <- ic+1
 
 		switch(type,

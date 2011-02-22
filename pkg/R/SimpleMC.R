@@ -1,4 +1,5 @@
 ## Simple Markov Chain for EMM
+## to make it fast we don't use generics but use a smc_prefix
 
 ## Creator
 SimpleMC <- function(size = 10L) {
@@ -11,8 +12,6 @@ SimpleMC <- function(size = 10L) {
 	    initial_counts = structure(rep(0, size),
 		    names=rep(NA, size)))
 }
-
-## to make it fast we don't use generics but use a smc_prefix
 
 smc_size <- function(x) {
     length(x@unused) - x@top
@@ -160,6 +159,7 @@ smc_mergeStates <- function(x, state) {
 smc_fade <- function(x, f) {
     x@counts <- x@counts * f
     x@initial_counts <- x@initial_counts * f
+    x
 }
 
 smc_countMatrix <- function(x) {
