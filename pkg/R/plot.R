@@ -112,19 +112,23 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             tolower(x@measure)=="euclidean" ) {
                         ## we need no MDS
                         mds <- list(points = emm_centers, GOF=c(0,1))
-                    }else{
+			pts <- mds$points
+			rownames(pts) <- states(x)
+			sub <- ''
+
+		    }else{
                         d <- dist(emm_centers, method=x@measure)
                         mds <- cmdscale(d, eig=TRUE, add=TRUE)
-                    }
-                    pts <- mds$points
-                    dimnames(pts) <- list(states(x), NULL)
+			pts <- mds$points
+			dimnames(pts) <- list(states(x), 
+				c("Dimension 1", "Dimension 2"))
+			sub <- paste("These two dimensions explain",
+				round(100 * mds$GOF[2], digits = 2),
+				"% of the point variability.")
+		    }
 
-                    ## start plotting
-                    plot(pts, xlab="Dimension 1", ylab="Dimension 2", type="n", ...,
-                            sub= paste("These two dimensions explain",
-                                    round(100 * mds$GOF[2], digits = 2), 
-                                    "% of the point variability."))
-
+		    ## start plotting
+		    plot(pts, type="n", ..., sub=sub)
 
                     ## use cex for point size
                     cex <- 2
@@ -198,20 +202,29 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
                 } else {
                     ## project state centers onto dataset
-                    if(ncol(emm_centers)==2 && 
+                    
+		    ## remove NA rows (resets)
+		    data <- data[!apply(data, FUN=function(x) all(is.na(x)), MARGIN=1),]
+		    
+		    if(ncol(emm_centers)==2 && 
                             tolower(x@measure)=="euclidean" ) {
                         ## we need no MDS
                         mds <- list(points = emm_centers, GOF=c(0,1))
                         centers <- emm_centers
                         allpoints <- data
+			sub <- ''
                     
                     }else{
 
                         d <- dist(rbind(emm_centers, data), method=x@measure)
                         mds <- cmdscale(d, eig=TRUE, add=TRUE)
-                        centers <- mds$points[1:nrow(emm_centers),]
-                        allpoints <- mds$points[-c(1:nrow(emm_centers)),]
-                    }
+                        centers <- mds$points[1:nrow(emm_centers),1:2]
+                        allpoints <- mds$points[-c(1:nrow(emm_centers)),1:2]
+			colnames(allpoints) <- c("Dimension 1", "Dimension 2")
+			sub <- paste("These two dimensions explain",
+				round(100 * mds$GOF[2], digits = 2),
+				"% of the point variability.")
+		    }
                     ## points
                     if(p$mark_clusters){
                         point_center <- find_clusters(x, data, 
@@ -231,11 +244,8 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             pch_center[pch_center>25] -25
 
 
-                        plot(allpoints, xlab="Dimension 1", ylab="Dimension 2", 
-                                col="grey", pch=pch, ...,
-                                sub= paste("These two dimensions explain",
-                                        round(100 * mds$GOF[2], digits = 2),
-                                        "% of the point variability."))
+                        plot(allpoints, col="grey", pch=pch, ...,
+                                sub=sub)
 
                         ## plot points which do not belong to any state
                         if(any(is.na(point_center)))

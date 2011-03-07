@@ -16,7 +16,8 @@ Visualize EMM objects.}
   \item{y}{ unused (just for compatibility with the generic for plot in
    \pkg{graphics}) }
   \item{method}{ see details section.}
-  \item{data}{ Project the state centers onto these data. }
+  \item{data}{ Project the state centers onto these data. Points which do
+    not belong to any cluster are shown in blue.}
   \item{parameter}{ a list of parameters for plotting. }
   \item{\dots}{ further arguments passed on to \code{plot.default}. }
 }

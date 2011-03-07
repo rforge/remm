@@ -12,6 +12,7 @@ exportClasses(EMM, TRACDS, StreamClustering, tNN)
 
 export(
     EMM,
+    TRAC,
     build,
     copy,
     fade,

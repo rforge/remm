@@ -15,15 +15,14 @@
 \alias{clusters,tNN-method}
 \alias{nclusters}
 \alias{nclusters,tNN-method}
-\alias{plot,tNN-method}
+\alias{plot,tNN,missing-method}
 
 \title{Class "tNN"}
 \description{Implements the threshold Nearest Neighbor clustering algorithm
 used by EMM.}
 \section{Objects from the Class}{
 Objects can be created with \code{new()} or by the creator function 
-\code{tNN()}. It is extended by the class \code{"EMM"}
-to build the Extensible Markov Model.}
+\code{tNN}.}
 \section{Slots}{
 	 \describe{
     \item{\code{measure}:}{Object of class \code{"character"} containing
@@ -85,20 +84,11 @@ Conference on Data Mining,} pp. 371--374.
 %\author{ ~~who you are~~ }
 %\note{ ~~further notes~~ }
 \seealso{
-	\code{\link{find_clusters}} to find the nearest neighbor state for given data
-	points.
+	\code{\link{cluster}} for adding new data to the clustering.
+	\code{\link{find_clusters}} to find the nearest neighbor cluster 
+	    for given data points.
 	\code{\linkS4class{EMM}} extends "tNN".
 }
-\examples{
-data(EMMTraffic)
-
-## create empty clustering
-tnn <- tNN(th=0.2, measure="eJaccard")
-tnn
-
-cluster(tnn, EMMTraffic)
-tnn
-
-plot(tnn)
-}
+%\examples{
+%}
 \keyword{classes}

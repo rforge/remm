@@ -1,4 +1,3 @@
-
 ## fixme: find medoids for hclust
 
 ## medoid is defined as the object of a cluster, whose average 

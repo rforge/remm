@@ -5,37 +5,38 @@ setMethod("update", signature(object = "TRACDS"),
 	function(object, newdata, ...) {
 
 	    x <- object
+	    tracds_d <- x@tracds_d
 
 	    ## inline function to increase performance
 	    .addState <- function(name) {
 		## expand?
-		if(x@tracds_d$mm@top < 1) {
+		if(tracds_d$mm@top < 1) {
 		    old_size <- nstates(x)
 
 		    new_size <- old_size*2L
 		    new_counts <- matrix(0, ncol=new_size, nrow=new_size)
-		    new_counts[1:old_size, 1:old_size] <- x@tracds_d$mm@counts
-		    x@tracds_d$mm@counts <- new_counts
+		    new_counts[1:old_size, 1:old_size] <- tracds_d$mm@counts
+		    tracds_d$mm@counts <- new_counts
 
 		    new_initial_counts <- numeric(new_size)
-		    new_initial_counts[1:old_size] <- x@tracds_d$mm@initial_counts
-		    names(new_initial_counts)[1:old_size] <- names(x@tracds_d$mm@initial_counts)
-		    x@tracds_d$mm@initial_counts <- new_initial_counts
+		    new_initial_counts[1:old_size] <- tracds_d$mm@initial_counts
+		    names(new_initial_counts)[1:old_size] <- names(tracds_d$mm@initial_counts)
+		    tracds_d$mm@initial_counts <- new_initial_counts
 
 		    new_unused <- new_size:1
-		    new_unused[(old_size+1):length(new_unused)] <- x@tracds_d$mm@unused
-		    x@tracds_d$mm@unused <- new_unused
+		    new_unused[(old_size+1):length(new_unused)] <- tracds_d$mm@unused
+		    tracds_d$mm@unused <- new_unused
 
-		    x@tracds_d$mm@top <- old_size+x@tracds_d$mm@top
+		    tracds_d$mm@top <- old_size+tracds_d$mm@top
 		}
 
 		## add node
-		pos <- x@tracds_d$mm@unused[x@tracds_d$mm@top]
-		x@tracds_d$mm@unused[x@tracds_d$mm@top] <- NA
-		x@tracds_d$mm@top <- x@tracds_d$mm@top-1L
-		names(x@tracds_d$mm@initial_counts)[pos] <- name
+		pos <- tracds_d$mm@unused[tracds_d$mm@top]
+		tracds_d$mm@unused[tracds_d$mm@top] <- NA
+		tracds_d$mm@top <- tracds_d$mm@top-1L
+		names(tracds_d$mm@initial_counts)[pos] <- name
 
-		x@tracds_d$mm@initial_counts[pos] <- 0 
+		tracds_d$mm@initial_counts[pos] <- 0 
 
 		pos
 	    }
@@ -54,7 +55,7 @@ setMethod("update", signature(object = "TRACDS"),
 		}
 
 		## fade TRACDS structure?
-		if(x@lambda>0) x@tracds_d$mm <- smc_fade(x@tracds_d$mm, 
+		if(x@lambda>0) tracds_d$mm <- smc_fade(tracds_d$mm, 
 			x@lambda_factor) 
 
 		## state exists?
@@ -66,9 +67,9 @@ setMethod("update", signature(object = "TRACDS"),
 		## add transition
 		## no current state?
 		if(!length(pos_current)) {
-		    x@tracds_d$mm@initial_counts[pos_new] <- x@tracds_d$mm@initial_counts[pos_new] + 1 
+		    tracds_d$mm@initial_counts[pos_new] <- tracds_d$mm@initial_counts[pos_new] + 1 
 		}else{
-		    x@tracds_d$mm@counts[pos_current, pos_new] <- x@tracds_d$mm@counts[pos_current, pos_new] + 1
+		    tracds_d$mm@counts[pos_current, pos_new] <- tracds_d$mm@counts[pos_current, pos_new] + 1
 		}
 
 		## update current_state
@@ -76,7 +77,7 @@ setMethod("update", signature(object = "TRACDS"),
 	    }
 
 	    ## save the last state as current
-	    x@tracds_d$current_state <- sel
+	    tracds_d$current_state <- sel
 
 	    invisible(x)
 	}

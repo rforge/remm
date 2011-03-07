@@ -2,6 +2,7 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{TRACDS-class}
+\alias{TRACDS}
 \alias{current_state}
 \alias{current_state,TRACDS-method}
 \alias{nstates}
@@ -10,7 +11,7 @@
 \alias{states}
 \alias{states,TRACDS-method}
 \alias{show,TRACDS-method}
-\alias{plot,TRACDS-method}
+\alias{plot,TRACDS,missing-method}
 \alias{transitions}
 \alias{transitions,TRACDS-method}
 %\alias{initial_transition,TRACDS-method}
@@ -22,12 +23,18 @@
 \title{Class "TRACDS"}
 \description{Representation of the temporal structure of a data stream clustering using a extensible Markov model.}
 \section{Objects from the Class}{
-No objects are created from this class. It is extended by the class \code{"EMM"}
-to build the Extensible Markov Model.
+Objects can be created using the creator function \code{TRACDS} or by
+directly calling \code{new("TRACDS", ...)}. Most slots for the extended
+classes can be used as parameters.
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{tracds_d}:}{An environment containing all the
+	\item{\code{lambda}:}{Object of class \code{"numeric"} specifying the
+		 rate for fading.}
+       \item{\code{lambda_factor}:}{Object of class \code{"numeric"} expressing
+		 the fading rate expressed as a factor.}
+
+   \item{\code{tracds_d}:}{An environment containing all the
     variable data of the TRACDS object:
       \describe{
       \item{\code{mm}:}{Object of class \code{"SimpleMC"} representing the 
@@ -83,15 +90,6 @@ URL \url{http://www.jstatsoft.org/v35/i05/}
 	\code{\link{predict}} is used to predict future states of an EMM.
 	\code{\linkS4class{EMM}} extends \code{"TRACDS"}.
 }
-\examples{
-## create an empty TRACDS object
-tracds <- TRACDS()
-tracds
-
-## update with an cluster assignemnt sequence
-update(tracds, c(1,2,5,5,2))
-tracds
-
-plot(tracds, method="graph")
-}
+%\examples{
+%}
 \keyword{classes}

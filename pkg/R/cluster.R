@@ -12,7 +12,9 @@ setMethod("cluster", signature(x = "tNN", newdata = "data.frame"),
 setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 	function(x, newdata, verbose = FALSE) {
 
-	    x@tnn_d$last <- character(nrow(newdata))
+	    tnn_d <- x@tnn_d
+	    
+	    tnn_d$last <- character(nrow(newdata))
 
 	    for(i in 1:nrow(newdata)) 
 	    {
@@ -25,32 +27,33 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 		## reset for rows with all NAs
 		if(all(is.na(nd))) {
 		    reset(x)
-		    x@tnn_d$last[i] <- as.character(NA)
+		    tnn_d$last[i] <- as.character(NA)
 		    next
 		}
 
 		## fade cluster structure?
 		if(x@lambda>0) 
-		    x@tnn_d$counts <- x@tnn_d$counts * x@lambda_factor
+		    tnn_d$counts <- tnn_d$counts * x@lambda_factor
 
 		## first cluster
 		if(nclusters(x)<1) {
 		    sel <- "1"
 		    rownames(nd) <- sel
-		    x@tnn_d$centers <- nd
-		    x@tnn_d$counts[sel] <- 1 
+		    tnn_d$centers <- nd
+		    tnn_d$counts[sel] <- 1 
 		    ## initialize variable threshold
-		    x@tnn_d$var_thresholds[sel] <- x@threshold
+		    tnn_d$var_thresholds[sel] <- x@threshold
 
 		}else{
 		    ## find a matching state
-		    sel <- find_clusters(x, nd, match_cluster="exact")
+		    #sel <- find_clusters(x, nd, match_cluster="exact")
 
-		    #inside <- dist(nd, x@tnn_d$centers, 
-		    #    method=x@measure) - x@tnn_d$var_thresholds
-		    #min <- which.min(inside)
-		    #if(inside[min]<=0) sel <- rownames(x@tnn_d$centers)[min]
-		    #else sel <- NA
+		    ## doing it inline is much faster
+		    inside <- dist(nd, tnn_d$centers, 
+		        method=x@measure) - tnn_d$var_thresholds
+		    min <- which.min(inside)
+		    if(inside[min]<=0) sel <- rownames(tnn_d$centers)[min]
+		    else sel <- NA
 
 		    ## NA means no match -> create a new node
 		    if(is.na(sel)) {
@@ -58,13 +61,13 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 			## get new node name (highest node 
 			## number is last entry in count)
 			sel <- as.character(as.integer(
-					tail(names(x@tnn_d$counts),1)) + 1)
+					tail(names(tnn_d$counts),1)) + 1)
 
 			rownames(nd) <- sel
-			x@tnn_d$centers <- rbind(x@tnn_d$centers, nd)
-			x@tnn_d$counts[sel] <- 1
+			tnn_d$centers <- rbind(tnn_d$centers, nd)
+			tnn_d$counts[sel] <- 1
 			## initialize threshold
-			x@tnn_d$var_thresholds[sel] <- x@threshold
+			tnn_d$var_thresholds[sel] <- x@threshold
 
 		    }else{ 
 			## assign observation to existing node
@@ -72,23 +75,22 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 			## update center (if we use centroids)
 			if(x@centroids) {
 
-
 			    nnas <- !is.na(nd)
-			    x@tnn_d$centers[sel,nnas] <- 
-			    (x@tnn_d$centers[sel,nnas] * 
-				    x@tnn_d$counts[sel] 
-				    + nd[nnas])/(x@tnn_d$counts[sel]+1)
-			    nas <- is.na(x@tnn_d$centers[sel,])
-			    x@tnn_d$centers[sel,nas] <- nd[nas]
+			    tnn_d$centers[sel,nnas] <- 
+			    (tnn_d$centers[sel,nnas] * 
+				    tnn_d$counts[sel] 
+				    + nd[nnas])/(tnn_d$counts[sel]+1)
+			    nas <- is.na(tnn_d$centers[sel,])
+			    tnn_d$centers[sel,nas] <- nd[nas]
 
 			}
 
 			## update counts 
-			x@tnn_d$counts[sel] <- x@tnn_d$counts[sel] + 1
+			tnn_d$counts[sel] <- tnn_d$counts[sel] + 1
 		    }
 		}
 
-		x@tnn_d$last[i] <- sel
+		tnn_d$last[i] <- sel
 
 	    }
 
