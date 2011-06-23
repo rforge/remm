@@ -20,13 +20,12 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 	    {
 
 		nd <- newdata[i,, drop = FALSE]
-		if(verbose && i%%50==0) 
+		if(verbose && i%%100==0) 
 		    cat("Added", i, "observations - ",
 			nclusters(x), "clusters.\n")
 
-		## reset for rows with all NAs
+		## cluster is NA for rows with all NAs
 		if(all(is.na(nd))) {
-		    reset(x)
 		    tnn_d$last[i] <- as.character(NA)
 		    next
 		}

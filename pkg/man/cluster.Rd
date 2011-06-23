@@ -16,7 +16,7 @@ cluster(x, newdata, ...)
   \item{x}{ a \code{tNN} object. }
   \item{newdata}{ a vector (one observation), or a matrix or data.frame
     (each row is an observation). }
-  \item{...}{ further arguments.}
+ \item{...}{ further arguments like \code{verbose}.}
 }
 \details{
 	\code{cluster()} implements tNN clustering The dissimilarity between

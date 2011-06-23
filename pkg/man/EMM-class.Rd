@@ -2,7 +2,6 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{EMM-class}
-\alias{EMM}
 \alias{show,EMM-method}
 \alias{size}
 \alias{size,EMM-method}

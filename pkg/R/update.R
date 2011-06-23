@@ -2,10 +2,17 @@
 
 ### alias update
 setMethod("update", signature(object = "TRACDS"),
-	function(object, newdata, ...) {
+	function(object, newdata, verbose = FALSE, ...) {
+		    
+	    if(verbose) cat("Update for", length(newdata),
+		    "assignments","\n")
 
 	    x <- object
-	    tracds_d <- x@tracds_d
+	    tracds_d <- x@tracds_d  ### get the environment
+	    
+	    counts <- tracds_d$mm@counts ### get matrix for performance
+					 ### otherwise R copies the matrix
+					 ### for each update
 
 	    ## inline function to increase performance
 	    .addState <- function(name) {
@@ -14,9 +21,15 @@ setMethod("update", signature(object = "TRACDS"),
 		    old_size <- nstates(x)
 
 		    new_size <- old_size*2L
+		    
+		    if(verbose) cat("Resizing matrix from", old_size ,"to",
+			    new_size,"\n")
+		    
 		    new_counts <- matrix(0, ncol=new_size, nrow=new_size)
-		    new_counts[1:old_size, 1:old_size] <- tracds_d$mm@counts
-		    tracds_d$mm@counts <- new_counts
+		    #new_counts[1:old_size, 1:old_size] <- tracds_d$mm@counts
+		    #tracds_d$mm@counts <- new_counts
+		    new_counts[1:old_size, 1:old_size] <- counts
+		    counts <<- new_counts
 
 		    new_initial_counts <- numeric(new_size)
 		    new_initial_counts[1:old_size] <- tracds_d$mm@initial_counts
@@ -41,12 +54,15 @@ setMethod("update", signature(object = "TRACDS"),
 		pos
 	    }
 
-
 	    ## get position of current date in matrix
 	    pos_current <- which(states(x) == current_state(x))
+	    i <- 1
 
 	    ## iterate over cluster assignments in newdata
 	    for(sel in newdata) {
+		
+		if(verbose && !(i%%100)) cat("Processing assignment", i, "\n")
+		i <- i+1
 
 		## cluster returns NA if we start a new sequence.
 		if(is.na(sel)) {
@@ -55,6 +71,7 @@ setMethod("update", signature(object = "TRACDS"),
 		}
 
 		## fade TRACDS structure?
+		### FIXME: counts!!!
 		if(x@lambda>0) tracds_d$mm <- smc_fade(tracds_d$mm, 
 			x@lambda_factor) 
 
@@ -69,7 +86,8 @@ setMethod("update", signature(object = "TRACDS"),
 		if(!length(pos_current)) {
 		    tracds_d$mm@initial_counts[pos_new] <- tracds_d$mm@initial_counts[pos_new] + 1 
 		}else{
-		    tracds_d$mm@counts[pos_current, pos_new] <- tracds_d$mm@counts[pos_current, pos_new] + 1
+		    ## tracds_d$mm@counts[pos_current, pos_new] <- tracds_d$mm@counts[pos_current, pos_new] + 1
+		    counts[pos_current, pos_new] <- counts[pos_current, pos_new] + 1
 		}
 
 		## update current_state
@@ -78,6 +96,11 @@ setMethod("update", signature(object = "TRACDS"),
 
 	    ## save the last state as current
 	    tracds_d$current_state <- sel
+		   
+	    ### return counts to object
+	    tracds_d$mm@counts <- counts 
+
+	    if(verbose) cat("Update done.", "\n")
 
 	    invisible(x)
 	}

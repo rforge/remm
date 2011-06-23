@@ -9,7 +9,7 @@
 Add a sequence of new state assignments to a TRACDS object.
 }
 \usage{
-\S4method{update}{TRACDS}(object, newdata, ...)
+\S4method{update}{TRACDS}(object, newdata, verbose=FALSE, ...)
 reset(x)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -17,6 +17,7 @@ reset(x)
   \item{x,object}{ a \code{TRACDS} object. }
   \item{newdata}{ a vector with a state assignemnt sequence (typically 
   produced by clustering). }
+  \item{verbose}{ logical; verbose output? }
   \item{...}{ further arguments.}
 }
 \details{
