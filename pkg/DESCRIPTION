@@ -13,7 +13,7 @@ Description: This package implements TRACDS (Temporal Relationships
     package was supported in part by NSF IIS-0948893.
 Classification/ACM: G.4, H.2.8, I.5.1
 URL: http://R-Forge.R-project.org/projects/remm/, http://lyle.smu.edu/IDA/TRACDS/
-Depends: R (>= 2.10.0), methods, stats, proxy, cluster, MASS, clusterGeneration
+Depends: R (>= 2.10.0), methods, stats, proxy, cluster, MASS, clusterGeneration, igraph
 Imports: stats
-Suggests: graph, Rgraphviz, RBGL
+Suggests: graph, Rgraphviz
 License: GPL-2

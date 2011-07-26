@@ -6,8 +6,8 @@
 \description{
 Visualize EMM objects.}
 \usage{
-\S4method{plot}{EMM,missing}(x, y, method=c("MDS", "graph", "cluster_counts", 
-    "transition_counts"), data = NULL, 
+\S4method{plot}{EMM,missing}(x, y, method=c("MDS", "igraph", "interactive", 
+    "graph", "cluster_counts", "transition_counts"), data = NULL, 
     parameter=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -24,7 +24,11 @@ Visualize EMM objects.}
 \details{
 \code{"MDS"} projects the cluster centers into 2-dimensional space.
 
-\code{"graph"} produces a graph representation of the EMM.
+\code{"igraph"} produces a graph representation of the EMM (using \pkg{igraph}).
+
+\code{"interactive"} produces an interactive graph representation of the EMM (using \pkg{igraph}).
+
+\code{"graph"} produces a graph representation of the EMM (using \pkg{Rgraphviz}).
 
 \code{"cluster_counts"} produces a barplot for cluster counts.
 

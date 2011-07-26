@@ -1,3 +1,22 @@
+#######################################################################
+# rEMM - Extensible Markov Model (EMM) for Data Stream Clustering in R
+# Copyrigth (C) 2011 Michael Hahsler
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
 ## Simple Markov Chain for EMM
 ## to make it fast we don't use generics but use a smc_prefix
 
@@ -182,8 +201,13 @@ smc_containsState <- function(x, state) {
     !is.na(match(state, names(x@initial_counts)))
 }
 
-## convert to graph for 
+smc_as.igraph <- function(x) {
+    graph.adjacency(smc_countMatrix(x), weighted=TRUE)
+}
+
+## convert to graph (needs package graph!) 
 smc_as.graph <- function(x) {
+    if(!require("graph")) stop ("Package graph needed!")
     new("graphAM", adjMat=smc_countMatrix(x), edgemode= "directed", 
 	    values=list(weight=1))
 }

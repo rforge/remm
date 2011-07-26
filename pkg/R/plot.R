@@ -1,6 +1,25 @@
+#######################################################################
+# rEMM - Extensible Markov Model (EMM) for Data Stream Clustering in R
+# Copyrigth (C) 2011 Michael Hahsler
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 ## the generic with x, y, ... comes from graphics
 setMethod("plot", signature(x = "EMM", y = "missing"),
-        function(x, y, method = c("MDS", "graph", "cluster_counts",
+        function(x, y, method = c("MDS", "igraph", "interactive", 
+			"graph", "cluster_counts",
                         "transition_counts"), data = NULL, 
                 parameter=NULL, ...){ 
 
@@ -39,6 +58,54 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                         function(x) paste(x, collapse="->"))
                 barplot(sort(cnt, decreasing=TRUE), 
                         ylab="Transition counts", ...)
+
+            }else if(method=="igraph" || method=="interactive") {
+                g <- smc_as.igraph(x@tracds_d$mm)
+		
+		if(method=="interactive") plot_fun <- tkplot
+		else plot_fun <- plot
+		
+
+		if(p$arrow_width) {
+		    e.width <- map(get.edge.attribute(g, "weight"),c(.1,4))
+		}else{
+		    e.width <- 1
+		}
+
+		if(p$cluster_counts) {
+		    v.size <- map(cluster_counts(x), 
+			    c(5,20)) * p$state_size_multiplier
+		}else{
+		    v.size <- 10
+		}
+
+		if(is.null(p$cluster_labels)) {
+		    v.labels <- states(x)
+		}else{
+		    v.labels <- ""
+		}
+		
+		plot_fun(g, 
+			#layout=layout.fruchterman.reingold,
+			layout=layout.reingold.tilford(g, root=0)*-1,
+			vertex.label.family="Helvetica",
+			edge.label.family="Helvetica",
+			#vertex.shape=v.shape,
+			vertex.label=v.labels,
+			vertex.size=v.size,
+			#vertex.label.cex=p$cex,
+			#vertex.label.color="black",
+			#vertex.color = v.color,
+			#vertex.size=v.size,
+			edge.width=e.width,
+			#edge.label=e.label,
+			#edge.label.cex=p$cex*.6,
+			#edge.color=e.color,
+			edge.arrow.size=p$arrow_width_multiplier*.5,
+			#edge.arrow.size=p$arrowSize,
+			...
+			)
+
 
             }else if(method=="graph") {
                 if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
