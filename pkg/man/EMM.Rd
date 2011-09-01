@@ -7,7 +7,7 @@ Creator for Class "EMM"
 Create a new object of class \code{"EMM"}.
 }
 \usage{
-EMM(threshold = 0.2, measure = "euclidean", 
+EMM(threshold = 0.2, measure = "euclidean", distFun = NULL, 
     centroids = identical(tolower(measure), "euclidean"), lambda = 0)
 }
 \arguments{
@@ -17,7 +17,13 @@ clustering algorithm for assigning a new observation to existing clusters.
 }
   \item{measure}{
 Object of class \code{"character"} containing the name of the dissimilarity
-measure used (see \code{dist} in \pkg{proxy} for available measures)
+measure used (see \code{dist} in \pkg{proxy} for available measures).
+}
+  \item{distFun}{
+Specify a function passed on as method to \code{dist} in \pkg{proxy} 
+(see \code{dist} in \pkg{proxy}).
+The character string passed on as \code{measure} will be used as the 
+measure's name.
 }
   \item{centroids}{
 Object of class \code{"logical"} indicating if centroids are used for clusters.

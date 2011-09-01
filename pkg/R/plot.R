@@ -1,11 +1,3 @@
-#######################################################################
-# rEMM - Extensible Markov Model (EMM) for Data Stream Clustering in R
-# Copyrigth (C) 2011 Michael Hahsler
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -184,7 +176,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			sub <- ''
 
 		    }else{
-                        d <- dist(emm_centers, method=x@measure)
+                        d <- dist(emm_centers, method=x@distFun)
                         mds <- cmdscale(d, eig=TRUE, add=TRUE)
 			pts <- mds$points
 			dimnames(pts) <- list(states(x), 
@@ -283,7 +275,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     
                     }else{
 
-                        d <- dist(rbind(emm_centers, data), method=x@measure)
+                        d <- dist(rbind(emm_centers, data), method=x@distFun)
                         mds <- cmdscale(d, eig=TRUE, add=TRUE)
                         centers <- mds$points[1:nrow(emm_centers),1:2]
                         allpoints <- mds$points[-c(1:nrow(emm_centers)),1:2]

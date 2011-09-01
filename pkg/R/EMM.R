@@ -18,10 +18,10 @@
 
 
 ## constructor
-EMM <- function(threshold=0.2, measure="euclidean", 
+EMM <- function(threshold=0.2, measure="euclidean", distFun = NULL, 
 	centroids=identical(tolower(measure), "euclidean"), lambda=0) {
 
-	new("EMM", measure=measure, threshold=threshold, 
+	new("EMM", measure=measure, distFun = distFun, threshold=threshold, 
 		centroids=centroids, lambda=lambda)
 }
 
@@ -32,6 +32,7 @@ setMethod("copy", signature(x = "EMM"),
 	    r <- new("EMM",
 		    threshold = x@threshold,
 		    measure = x@measure,
+		    distFun = x@distFun,
 		    centroids = x@centroids,
 		    lambda = x@lambda,
 		    lambda_factor = x@lambda_factor)

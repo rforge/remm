@@ -43,6 +43,7 @@ setMethod("copy", signature(x = "tNN"),
 	    r <- new("tNN", 
 		    threshold = x@threshold, 
 		    measure = x@measure, 
+		    distFun = x@distFun, 
 		    centroids = x@centroids,
 		    lambda = x@lambda, 
 		    lambda_factor = x@lambda_factor)
@@ -125,7 +126,7 @@ setMethod("find_clusters", signature(x = "tNN", newdata = "matrix"),
                 }
                 
                 ## do it in one run 
-                d <- dist(newdata, cluster_centers(x), method=x@measure)
+                d <- dist(newdata, cluster_centers(x), method=x@distFun)
 
                 .which.min_NA <- function(x) {
 			m <- which.min(x)

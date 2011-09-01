@@ -38,7 +38,7 @@ setMethod("recluster_hclust", signature(x = "EMM"),
 		if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
 			transitions = FALSE)
 
-		d <- dist(cluster_centers(x), method = x@measure)
+		d <- dist(cluster_centers(x), method = x@distFun)
 		hc <- hclust(d, method=method)
 		cl <- cutree(hc, k=k, h=h)
 
@@ -94,7 +94,7 @@ setMethod("recluster_pam", signature(x = "EMM"),
 		if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
 			transitions = FALSE)
 
-		d <- dist(cluster_centers(x), method = x@measure)
+		d <- dist(cluster_centers(x), method = x@distFun)
 		cl <- pam(d, k=k, ...)
 
 		medoids <- cluster_centers(x)[cl$medoids,]
@@ -113,7 +113,7 @@ setMethod("recluster_reachability", signature(x = "EMM"),
 			transitions = FALSE)
 
 		
-                d <- as.matrix(dist(cluster_centers(x), method = x@measure))
+                d <- as.matrix(dist(cluster_centers(x), method = x@distFun))
 
                 # get adjecency matrix and find all paths 
                 a_mat <- d < h

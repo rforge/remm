@@ -67,8 +67,10 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 		    #sel <- find_clusters(x, nd, match_cluster="exact")
 
 		    ## doing it inline is much faster
+		    #inside <- dist(nd, tnn_d$centers, 
+		    #    method=x@measure) - tnn_d$var_thresholds
 		    inside <- dist(nd, tnn_d$centers, 
-		        method=x@measure) - tnn_d$var_thresholds
+		        method=x@distFun) - tnn_d$var_thresholds
 		    min <- which.min(inside)
 		    if(inside[min]<=0) sel <- rownames(tnn_d$centers)[min]
 		    else sel <- NA
