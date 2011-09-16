@@ -31,6 +31,9 @@ cluster(x, newdata, ...)
 	dimensions if the data for dissimilarity computation
 	(see package~\pkg{proxy}).
 
+	The clusters which the data points in the last \code{cluster()}
+	operation where assigned to can be retrieved using the method 
+	\code{last_clustering()}.
 
 }
 \value{
@@ -53,9 +56,14 @@ data(EMMTraffic)
 tnn <- tNN(th=0.2, measure="eJaccard")
 tnn
 
+## cluster some data
 cluster(tnn, EMMTraffic)
 tnn
 
+## what clusters were the data points assigned to?
+last_clustering(tnn)
+
+## plot the clustering as a scatterplot matrix of the cluster centers
 plot(tnn)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

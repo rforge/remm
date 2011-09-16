@@ -1,0 +1,8 @@
+CHANGES
+
+Pending changes:
+* transition_table() now has for consitency also the default of add_one set to FALSE.
+
+
+rEMM 1.0-3
+* service release

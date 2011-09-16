@@ -31,6 +31,7 @@ export(
     cluster_counts,
     cluster_centers,
     find_clusters,
+    last_clustering,
     nclusters,
     rare_clusters,
     update,

@@ -3,7 +3,6 @@
 \alias{build,EMM,data.frame-method}
 \alias{build,EMM,matrix-method}
 \alias{build,EMM,numeric-method}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Building an EMM using New Data}
 \description{
 Add new data to an EMM.
@@ -12,7 +11,6 @@ Add new data to an EMM.
 build(x, newdata, ...)
 %\S4method{update}{EMM}(object, newdata, verbose=FALSE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an \code{EMM} object. }
   \item{newdata}{ a vector (one observation), or a matrix or data.frame

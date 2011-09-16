@@ -54,6 +54,8 @@ setMethod("copy", signature(x = "tNN"),
 	    r
 	})
 
+## accessors
+
 setMethod("cluster_counts", signature(x = "tNN"),
 	function(x) x@tnn_d$counts)
 
@@ -65,6 +67,9 @@ setMethod("nclusters", signature(x = "tNN"),
 
 setMethod("clusters", signature(x = "tNN"),
 	function(x) rownames(x@tnn_d$centers))
+
+setMethod("last_clustering", signature(x = "tNN"), 
+	function(x) x@tnn_d$last)
 
 setMethod("rare_clusters", signature(x = "tNN"),
 	function(x, count_threshold)
