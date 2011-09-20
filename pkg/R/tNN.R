@@ -65,6 +65,7 @@ setMethod("cluster_centers", signature(x = "tNN"),
 setMethod("nclusters", signature(x = "tNN"),
 	function(x) nrow(x@tnn_d$centers))
 
+## names are stored as the rownames of the centers
 setMethod("clusters", signature(x = "tNN"),
 	function(x) rownames(x@tnn_d$centers))
 

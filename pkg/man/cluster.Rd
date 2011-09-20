@@ -13,7 +13,7 @@ cluster(x, newdata, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ a \code{tNN} object. }
+  \item{x}{ a \code{tNN} object. Note that this function canges the original object!}
   \item{newdata}{ a vector (one observation), or a matrix or data.frame
     (each row is an observation). }
  \item{...}{ further arguments like \code{verbose}.}

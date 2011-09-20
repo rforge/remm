@@ -14,7 +14,7 @@ reset(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x,object}{ a \code{TRACDS} object. }
+  \item{x,object}{ a \code{TRACDS} object. Note that this function changes the original object! }
   \item{newdata}{ a vector with a state assignemnt sequence (typically 
   produced by clustering). }
   \item{verbose}{ logical; verbose output? }

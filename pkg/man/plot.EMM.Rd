@@ -1,16 +1,14 @@
 \name{plot}
 \alias{plot,EMM,missing-method}
 \alias{plot}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Visualize EMM Objects }
 \description{
 Visualize EMM objects.}
 \usage{
-\S4method{plot}{EMM,missing}(x, y, method=c("MDS", "igraph", "interactive", 
-    "graph", "cluster_counts", "transition_counts"), data = NULL, 
+\S4method{plot}{EMM,missing}(x, y, method=c("igraph", "interactive", 
+    "graph", "MDS", "cluster_counts", "transition_counts"), data = NULL, 
     parameter=NULL, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an \code{EMM} object. }
   \item{y}{ unused (just for compatibility with the generic for plot in
@@ -22,13 +20,14 @@ Visualize EMM objects.}
   \item{\dots}{ further arguments passed on to \code{plot.default}. }
 }
 \details{
-\code{"MDS"} projects the cluster centers into 2-dimensional space.
 
 \code{"igraph"} produces a graph representation of the EMM (using \pkg{igraph}).
 
 \code{"interactive"} produces an interactive graph representation of the EMM (using \pkg{igraph}).
 
 \code{"graph"} produces a graph representation of the EMM (using \pkg{Rgraphviz}).
+
+\code{"MDS"} projects the cluster centers into 2-dimensional space.
 
 \code{"cluster_counts"} produces a barplot for cluster counts.
 
@@ -62,9 +61,9 @@ emm <- EMM(threshold=0.2, measure="eJaccard")
 emm <- build(emm, EMMTraffic)
 
 op <- par(mfrow = c(2, 2), pty = "s")
-plot(emm, method="graph", main="Graph (plain)", 
+plot(emm, method="igraph", main="Graph (plain)", 
     parameter=list(cluster_counts=FALSE, arrow_width=FALSE))
-plot(emm, method="graph", main="Graph")
+plot(emm, method="igraph", main="Graph")
 plot(emm, method="MDS", main="MDS projection", 
     xlim=c(-0.5,0.5), ylim= c(-0.5,0.5))
 plot(emm, method="MDS", data = EMMTraffic, 

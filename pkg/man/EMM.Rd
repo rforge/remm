@@ -8,7 +8,8 @@ Create a new object of class \code{"EMM"}.
 }
 \usage{
 EMM(threshold = 0.2, measure = "euclidean", distFun = NULL, 
-    centroids = identical(tolower(measure), "euclidean"), lambda = 0)
+    centroids = identical(tolower(measure), "euclidean"), 
+    lambda = 0, data = NULL)
 }
 \arguments{
   \item{threshold}{
@@ -32,7 +33,11 @@ represent a cluster.
 }
   \item{lambda}{Object of class \code{"numeric"} specifying the
                  rate for fading.
-}
+		 }
+  \item{data}{Initial data to build the EMM. 
+    This just calls \code{build} on the new EMM.
+		 }
+
 }
 %\details{
 %}

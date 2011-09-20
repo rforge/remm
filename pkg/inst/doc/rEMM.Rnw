@@ -1047,12 +1047,12 @@ Over time clusters in an EMM can become obsolete and no new observations
 are assigned to them. Similarly transitions might become obsolete over time.
 To simplify the model and improve efficiency, such obsolete clusters and
 transitions can be pruned. For the example here, we prune all clusters 
-and transitions which have a weighted count of less than $0.1$ and
+which have a weighted count of less than $0.1$ and
 show the resulting model in Figure~\ref{fig:Traffic_learning}(c).
 
 <<Traffic_lp, fig=TRUE, include=FALSE>>=
 prune(emm_fading, count_threshold=0.1)
-plot(emm_fading, method = "graph")
+plot(emm_fading, method = "graph", clusters=TRUE, transitions=TRUE)
 @
 
 
@@ -1480,7 +1480,7 @@ We define rare here as all
 clusters/transitions that represent less than 0.5\% of the observations. 
 On average this translates into less than two daily observation per year.
 We calculate a count threshold,
-use \func{prune} to remove rare clusters/transitions
+use \func{prune} to remove rare clusters
 (we use copy to retain the original model in 
 \code{emm}) and then we plot the pruned EMM.
 

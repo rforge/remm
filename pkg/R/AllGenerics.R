@@ -70,7 +70,7 @@ setGeneric("remove_clusters", function(x, to_remove)
 	standardGeneric("remove_clusters"))
 
 
-## fixme: make it one recluster method
+## FIXME: make it one recluster method
 setGeneric("recluster_hclust", function(x, ...) 
 	standardGeneric("recluster_hclust"))
 setGeneric("recluster_kmeans", function(x, ...) 
@@ -79,4 +79,6 @@ setGeneric("recluster_pam", function(x, ...)
 	standardGeneric("recluster_pam"))
 setGeneric("recluster_reachability", function(x, ...) 
 	standardGeneric("recluster_reachability"))
+setGeneric("recluster_tNN", function(x, ...) 
+	standardGeneric("recluster_tNN"))
 

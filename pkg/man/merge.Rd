@@ -11,7 +11,7 @@ Merge several clusters/states of an EMM into a single cluster/state.}
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ an \code{"EMM"} object. }
+  \item{x}{ an \code{"EMM"} object. Note that the function will change this EMM!}
   \item{to_merge}{ vector of names of the states/clusters to merge. The
       name of the first state in \code{to_merge}
       is used as the name for the new state representing the merged states.}
@@ -27,7 +27,7 @@ Merge several clusters/states of an EMM into a single cluster/state.}
 %\details{
 %}
 \value{
-A new EMM with the states/clusters merged.
+Returns the changed EMM with the states/clusters merged invisibly.
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
@@ -35,11 +35,12 @@ A new EMM with the states/clusters merged.
 \examples{
 data("EMMTraffic")
 emm <- EMM(measure="eJaccard", threshold=0.2)
-emm <- build(emm, EMMTraffic)
+build(emm, EMMTraffic)
 states(emm)
 
 ## merge states 1-3 and create a new emm called emm_m123 (note the copy)
-emm_m123 <- merge_clusters(copy(emm), c("1", "2", "3"))
+emm_m123 <- copy(emm)
+merge_clusters(emm_m123, c("1", "2", "3"))
 states(emm_m123)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

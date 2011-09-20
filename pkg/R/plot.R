@@ -10,8 +10,8 @@
 
 ## the generic with x, y, ... comes from graphics
 setMethod("plot", signature(x = "EMM", y = "missing"),
-        function(x, y, method = c("MDS", "igraph", "interactive", 
-			"graph", "cluster_counts",
+        function(x, y, method = c("igraph", "interactive", 
+			"graph", "MDS", "cluster_counts",
                         "transition_counts"), data = NULL, 
                 parameter=NULL, ...){ 
 
@@ -59,17 +59,18 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		
 
 		if(p$arrow_width) {
-		    e.width <- map(get.edge.attribute(g, "weight"),c(.1,4))
+		    e.width <- map(get.edge.attribute(g, "weight"),c(.5,3))
 		}else{
 		    e.width <- 1
 		}
 
 		if(p$cluster_counts) {
 		    v.size <- map(cluster_counts(x), 
-			    c(5,20)) * p$state_size_multiplier
+			    c(8,30)) * p$state_size_multiplier
 		}else{
 		    v.size <- 10
 		}
+		v.cex <- v.size/10
 
 		if(is.null(p$cluster_labels)) {
 		    v.labels <- states(x)
@@ -85,16 +86,17 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			#vertex.shape=v.shape,
 			vertex.label=v.labels,
 			vertex.size=v.size,
-			#vertex.label.cex=p$cex,
-			#vertex.label.color="black",
-			#vertex.color = v.color,
+			vertex.label.cex=v.cex,
+			vertex.label.color="black",
+			vertex.color = "white",
 			#vertex.size=v.size,
 			edge.width=e.width,
 			#edge.label=e.label,
 			#edge.label.cex=p$cex*.6,
-			#edge.color=e.color,
-			edge.arrow.size=p$arrow_width_multiplier*.5,
-			#edge.arrow.size=p$arrowSize,
+			edge.color = "black",
+			## only accepts a single value for now!
+			#edge.arrow.size=(e.width-.5)*.3,
+			edge.arrow.size=1,
 			...
 			)
 

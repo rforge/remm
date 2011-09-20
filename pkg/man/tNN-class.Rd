@@ -15,6 +15,7 @@
 \alias{clusters,tNN-method}
 \alias{nclusters}
 \alias{nclusters,tNN-method}
+\alias{last_clustering}
 \alias{last_clustering,tNN-method}
 \alias{plot,tNN,missing-method}
 

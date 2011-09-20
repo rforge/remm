@@ -56,6 +56,7 @@ export(
     recluster_kmeans,
     recluster_pam,
     recluster_reachability,
+    recluster_tNN,
     
     synthetic_stream
 )

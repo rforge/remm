@@ -19,11 +19,16 @@
 
 ## constructor
 EMM <- function(threshold=0.2, measure="euclidean", distFun = NULL, 
-	centroids=identical(tolower(measure), "euclidean"), lambda=0) {
+	centroids=identical(tolower(measure), "euclidean"), 
+	lambda=0, data=NULL) {
 
-	new("EMM", measure=measure, distFun = distFun, threshold=threshold, 
-		centroids=centroids, lambda=lambda)
-}
+	emm <- new("EMM", measure=measure, distFun = distFun, 
+		threshold=threshold, centroids=centroids, lambda=lambda)
+
+	if(!is.null(data)) build(emm, data)
+	emm
+
+    }
 
 ### deep copy
 setMethod("copy", signature(x = "EMM"),
