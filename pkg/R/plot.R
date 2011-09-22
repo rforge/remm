@@ -79,8 +79,8 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		}
 		
 		plot_fun(g, 
-			#layout=layout.fruchterman.reingold,
-			layout=layout.reingold.tilford(g, root=0)*-1,
+			layout=layout.fruchterman.reingold,
+			#layout=layout.reingold.tilford(g, root=0)*-1,
 			vertex.label.family="Helvetica",
 			edge.label.family="Helvetica",
 			#vertex.shape=v.shape,
@@ -93,7 +93,6 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			vertex.label.color="black",
 			vertex.color = "white",
 			
-			#vertex.size=v.size,
 			edge.width=e.width,
 			#edge.label=e.label,
 			#edge.label.cex=p$cex*.6,
@@ -103,7 +102,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			## only accepts a single value for now!
 			#edge.arrow.size=(e.width-.5)*.3,
 			edge.arrow.size=1,
-			asp=0,
+			asp=0, ## fill whole plot
 			...
 			)
 

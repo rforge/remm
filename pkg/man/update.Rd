@@ -3,7 +3,6 @@
 \alias{update}
 \alias{reset}
 \alias{reset,TRACDS-method}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Update a TRACDS temporal structure with new state assignements}
 \description{
 Add a sequence of new state assignments to a TRACDS object.
@@ -12,7 +11,6 @@ Add a sequence of new state assignments to a TRACDS object.
 \S4method{update}{TRACDS}(object, newdata, verbose=FALSE, ...)
 reset(x)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x,object}{ a \code{TRACDS} object. Note that this function changes the original object! }
   \item{newdata}{ a vector with a state assignemnt sequence (typically 

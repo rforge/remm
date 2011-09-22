@@ -19,7 +19,8 @@
 
 ## clustering = TRUE gets integer in to_merge
 setMethod("merge_clusters", signature(x = "EMM", to_merge = "integer"),
-	function(x, to_merge, clustering = FALSE, new_center = NULL, copy=TRUE) {
+	function(x, to_merge, clustering = FALSE, new_center = NULL, 
+		copy=TRUE) {
 
 	    if(copy) x <- copy(x)
 
@@ -34,7 +35,7 @@ setMethod("merge_clusters", signature(x = "EMM", to_merge = "integer"),
 	    orig_states <- clusters(x)
 	    for(i in 1:k) {
 		merge_clusters(x, orig_states[to_merge==i],
-		    clustering = FALSE, new_center[i,])
+		    clustering = FALSE, new_center[i,], copy = FALSE)
 	    }
 
 	    invisible(x)

@@ -47,22 +47,26 @@ setMethod("recluster_hclust", signature(x = "EMM"),
 	    ## if only h was given
 	    if(is.null(k)) k <- max(cl)
 
-	    if(is(cl, "matrix")) x <- lapply(1:ncol(cl), 
-		    FUN=function(i){
-			if(!x@centroids) 
-			    new_center <- cluster_centers(x)[.find_medoids(d, k, cl[,i]),]
-			## centroids are handled by merge_clusters!
-			else new_center <- NULL
+	    if(is(cl, "matrix")){ 
+		x <- lapply(1:ncol(cl), FUN=function(i){
+			    if(!x@centroids) 
+				new_center <- cluster_centers(x)[.find_medoids(d, k, cl[,i]),]
+			    ## centroids are handled by merge_clusters!
+			    else 
+				new_center <- NULL
+				
 			    merge_clusters(x, cl[,i], 
-				clustering=TRUE, 
-				new_center = new_center, 
-				copy=TRUE)
-		    })
-	    else{ 
+				    clustering=TRUE, 
+				    new_center = new_center, 
+				    copy=FALSE)
+			})
+	    }else{ 
 		if(!x@centroids) 
 		    new_center <- cluster_centers(x)[.find_medoids(d, k, cl),]
-		else new_center <- NULL
-		    x <- merge_clusters(x, cl, 
+		else 
+		    new_center <- NULL
+		    
+		merge_clusters(x, cl, 
 			clustering=TRUE,  
 			new_center = new_center,
 			copy=FALSE)
@@ -88,7 +92,7 @@ setMethod("recluster_kmeans", signature(x = "EMM"),
 
 	    cl <- kmeans(cluster_centers(x), centers = k, ...)
 
-	    x <- merge_clusters(x, cl$cluster, 
+	    merge_clusters(x, cl$cluster, 
 		    clustering=TRUE, 
 		    new_center=cl$centers,
 		    copy=FALSE)
@@ -110,7 +114,8 @@ setMethod("recluster_pam", signature(x = "EMM"),
 	    cl <- pam(d, k=k, ...)
 
 	    medoids <- cluster_centers(x)[cl$medoids,]
-	    x <- merge_clusters(x, cl$clustering, 
+	    
+	    merge_clusters(x, cl$clustering, 
 		    clustering=TRUE, 
 		    new_center=medoids,
 		    copy=FALSE)
@@ -143,7 +148,7 @@ setMethod("recluster_reachability", signature(x = "EMM"),
 	    for(i in 1:length(to_merge)) {
 		m <- to_merge[[i]]
 		if(length(m)>1) {
-		    x <- merge_clusters(x, to_merge = m, copy=FALSE)
+		    merge_clusters(x, to_merge = m, copy=FALSE)
 		}
 	    }
 
@@ -168,7 +173,8 @@ setMethod("recluster_tNN", signature(x = "EMM"),
 	    cluster(cl, cluster_centers(x))
 	    assignments <- last_clustering(cl)
 	    
-	    merge_clusters(x, as.integer(assignments), clustering=TRUE)
+	    merge_clusters(x, as.integer(assignments), clustering=TRUE, 
+		    copy=FALSE)
 
 	    invisible(x)
 	})

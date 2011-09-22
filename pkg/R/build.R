@@ -19,11 +19,6 @@
 
 ## build for EMM
 
-### alias update
-#setMethod("update", signature(object = "EMM"),
-#	function(object, newdata, verbose = FALSE) build(object, 
-#		newdata, verbose)
-#)
 
 ## make  newdata a matrix (with a single row)
 setMethod("build", signature(x = "EMM", newdata = "numeric"),
