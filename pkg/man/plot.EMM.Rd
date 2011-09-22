@@ -23,7 +23,8 @@ Visualize EMM objects.}
 
 \code{"igraph"} produces a graph representation of the EMM (using \pkg{igraph}).
 
-\code{"interactive"} produces an interactive graph representation of the EMM (using \pkg{igraph}).
+\code{"interactive"} produces an interactive graph representation of the EMM (using \pkg{igraph}). Arguments suitable for \code{plot} in \pkg{igraph} can be
+passed on as \code{...}.
 
 \code{"graph"} produces a graph representation of the EMM (using \pkg{Rgraphviz}).
 
@@ -57,8 +58,7 @@ The following plotting parameters are currently supported:
 \seealso{\code{\linkS4class{EMM}}}
 \examples{
 data("EMMTraffic")
-emm <- EMM(threshold=0.2, measure="eJaccard")
-emm <- build(emm, EMMTraffic)
+emm <- EMM(threshold=0.2, measure="eJaccard", data=EMMTraffic)
 
 op <- par(mfrow = c(2, 2), pty = "s")
 plot(emm, method="igraph", main="Graph (plain)", 

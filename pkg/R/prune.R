@@ -18,7 +18,10 @@
 
 
 setMethod("prune", signature(x = "EMM"),
-	function(x, count_threshold, clusters = TRUE, transitions = FALSE){
+	function(x, count_threshold, clusters = TRUE, 
+		transitions = FALSE, copy = TRUE){
+
+		if(copy) x <- copy(x)
 
 		if(clusters) x <- 
 		remove_clusters(x, rare_clusters(x, 

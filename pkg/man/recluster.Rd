@@ -18,17 +18,15 @@ data points by the reclustering algorithm. States/centers put by reclustering
 into the same cluster are merged to produce a new reclustered EMM.
 }
 \usage{
-\S4method{recluster_hclust}{EMM}(x, k=NULL, h=NULL, method="average", prune=NULL)
-\S4method{recluster_kmeans}{EMM}(x, k, ..., prune=NULL)
-\S4method{recluster_pam}{EMM}(x, k, ..., prune=NULL)
-\S4method{recluster_reachability}{EMM}(x, h, ..., prune=NULL)
-\S4method{recluster_tNN}{EMM}(x, threshold=NULL, ..., prune=NULL)
+\S4method{recluster_hclust}{EMM}(x, k=NULL, h=NULL, method="average", 
+    ...,prune=NULL, copy=TRUE)
+\S4method{recluster_kmeans}{EMM}(x, k, ..., prune=NULL, copy=TRUE)
+\S4method{recluster_pam}{EMM}(x, k, ..., prune=NULL, copy=TRUE)
+\S4method{recluster_reachability}{EMM}(x, h, ..., prune=NULL, copy=TRUE)
+\S4method{recluster_tNN}{EMM}(x, threshold=NULL, ..., prune=NULL, copy=TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ an \code{"EMM"} object. Note that the function will change this EMM!}
-  \item{prune}{ prune states with less 
-	than \code{prune} counts before reclustering. }
+  \item{x}{ an \code{"EMM"} object.}
   \item{k}{ number of clusters. }
   \item{h}{ heights where the dendrogram tree should be cut.}
   \item{threshold}{ threshold used on the dissimilarity to join 
@@ -36,6 +34,9 @@ into the same cluster are merged to produce a new reclustered EMM.
     stored in the EMM is used. }
   \item{method}{ clustering method used by \code{hclust}. }
   \item{...}{ additional arguments passed on to the clustering algorithm. }
+  \item{prune}{ logical; prune states with less 
+	than \code{prune} counts before reclustering. }
+  \item{copy}{ logical; make a copy of x before reclustering? Otherwise the function will change \code{x}! }
 }
 \details{
 For \code{recluster_kmeans} \code{k} can also be a set of initial cluster 
@@ -50,10 +51,15 @@ from each other. A cluster \eqn{j} is reachable from \eqn{i} if
 reachable by any cluster reachable by \eqn{i}.
 }
 \value{
-An object of class \code{"EMM"}. Clustering information is available
-as the attribute \code{"cluster_info"} (to use this you have to reassign the result by calling something like \code{emm <- recluster_hclust(emm, k=3)}). 
+An object of class \code{"EMM"} or, if \code{copy=FALSE} a refernece 
+to the changed object passed as \code{x}. 
+
+Clustering information is available
+as the attribute \code{"cluster_info"}.
 The information provided depends
 in the clustering algorithm (see \code{hclust}, \code{kmeans} and \code{pam}).
+
+
 }
 %\references{ ~put references to the literature/web site here ~ }
 %\author{ ~~who you are~~ }
@@ -66,8 +72,7 @@ emm <- EMM(measure="eJaccard", threshold=0.2)
 build(emm, EMMTraffic)
 
 ## do reclustering on a copy of the emm and plot dendrogram
-emm_hc <- copy(emm)
-emm_hc <- recluster_hclust(emm_hc, h=0.5)
+emm_hc <- recluster_hclust(emm, h=0.5)
 
 attr(emm_hc, "cluster_info")
 

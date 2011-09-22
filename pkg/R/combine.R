@@ -18,8 +18,10 @@
 
 
 setMethod("c", signature(x = "EMM"),
-	function(x, ..., recursive = FALSE) {
+	function(x, ..., copy=TRUE, recursive = FALSE) {
 	    args <- list(...)
+
+	    if(copy) x <- copy(x)
 
 	    if (recursive)
 		args <- unlist(args)
@@ -34,6 +36,7 @@ setMethod("c", signature(x = "EMM"),
 		n <- nx + ny
 		
 		new_labels <- as.character(1:n)
+		#new_labels <- c(clusters(x), paste("A", clusters(y)))
 
 		x@tracds_d$mm <- new("SimpleMC",
 			unused = rep(as.integer(NA), n),

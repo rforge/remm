@@ -33,13 +33,15 @@
 ## hierarchical clustering
 setMethod("recluster_hclust", signature(x = "EMM"),
 	function(x, k=NULL, h=NULL,  method="average", 
-		prune=NULL) {
+		..., prune=NULL, copy=TRUE) {
+
+	    if(copy) x <- copy(x)
 
 	    if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
-		    transitions = FALSE)
+		    transitions = FALSE, copy = FALSE)
 
 	    d <- dist(cluster_centers(x), method = x@distFun)
-	    hc <- hclust(d, method=method)
+	    hc <- hclust(d, method=method, ...)
 	    cl <- cutree(hc, k=k, h=h)
 
 	    ## if only h was given
@@ -51,15 +53,19 @@ setMethod("recluster_hclust", signature(x = "EMM"),
 			    new_center <- cluster_centers(x)[.find_medoids(d, k, cl[,i]),]
 			## centroids are handled by merge_clusters!
 			else new_center <- NULL
-			    merge_clusters(copy(x), cl[,i], 
-				clustering=TRUE, new_center = new_center)
+			    merge_clusters(x, cl[,i], 
+				clustering=TRUE, 
+				new_center = new_center, 
+				copy=TRUE)
 		    })
 	    else{ 
 		if(!x@centroids) 
 		    new_center <- cluster_centers(x)[.find_medoids(d, k, cl),]
 		else new_center <- NULL
 		    x <- merge_clusters(x, cl, 
-			clustering=TRUE,  new_center = new_center)
+			clustering=TRUE,  
+			new_center = new_center,
+			copy=FALSE)
 	    }
 
 	    attr(x, "cluster_info") <- list(clustering=cl, dendrogram=hc)
@@ -69,10 +75,12 @@ setMethod("recluster_hclust", signature(x = "EMM"),
 
 ## k-means (euclidean)
 setMethod("recluster_kmeans", signature(x = "EMM"),
-	function(x, k, ..., prune=NULL) {
+	function(x, k, ..., prune=NULL, copy=TRUE) {
+	    
+	    if(copy) x <- copy(x)
 
 	    if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
-		    transitions = FALSE)
+		    transitions = FALSE, copy = FALSE)
 
 	    if(!identical(tolower(x@measure), "euclidean")) warning(
 		    paste("Using k-means implies Euclidean distances but the EMM uses:", 
@@ -80,7 +88,10 @@ setMethod("recluster_kmeans", signature(x = "EMM"),
 
 	    cl <- kmeans(cluster_centers(x), centers = k, ...)
 
-	    x <- merge_clusters(x, cl$cluster, clustering=TRUE, new_center=cl$centers)
+	    x <- merge_clusters(x, cl$cluster, 
+		    clustering=TRUE, 
+		    new_center=cl$centers,
+		    copy=FALSE)
 
 	    attr(x, "cluster_info") <- cl
 	    invisible(x)
@@ -89,16 +100,20 @@ setMethod("recluster_kmeans", signature(x = "EMM"),
 
 ## Partitioning around medoids (k-medians)
 setMethod("recluster_pam", signature(x = "EMM"),
-	function(x, k, ..., prune=NULL) {
+	function(x, k, ..., prune=NULL, copy=TRUE) {
 
+	    if(copy) x <- copy(x)
 	    if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
-		    transitions = FALSE)
+		    transitions = FALSE, copy = FALSE)
 
 	    d <- dist(cluster_centers(x), method = x@distFun)
 	    cl <- pam(d, k=k, ...)
 
 	    medoids <- cluster_centers(x)[cl$medoids,]
-	    x <- merge_clusters(x, cl$clustering, clustering=TRUE, new_center=medoids)
+	    x <- merge_clusters(x, cl$clustering, 
+		    clustering=TRUE, 
+		    new_center=medoids,
+		    copy=FALSE)
 
 	    attr(x, "cluster_info") <- cl
 	    invisible(x)
@@ -107,9 +122,10 @@ setMethod("recluster_pam", signature(x = "EMM"),
 
 ## reachability
 setMethod("recluster_reachability", signature(x = "EMM"),
-	function(x, h, ..., prune=NULL) {
+	function(x, h, ..., prune=NULL, copy=TRUE) {
 
 
+	    if(copy) x <- copy(x)
 
 	    d <- as.matrix(dist(cluster_centers(x), method = x@distFun))
 
@@ -127,7 +143,7 @@ setMethod("recluster_reachability", signature(x = "EMM"),
 	    for(i in 1:length(to_merge)) {
 		m <- to_merge[[i]]
 		if(length(m)>1) {
-		    x <- merge_clusters(x, to_merge = m)
+		    x <- merge_clusters(x, to_merge = m, copy=FALSE)
 		}
 	    }
 
@@ -137,10 +153,12 @@ setMethod("recluster_reachability", signature(x = "EMM"),
 
 ## tNN
 setMethod("recluster_tNN", signature(x = "EMM"),
-	function(x, threshold=NULL, ..., prune=NULL) {
+	function(x, threshold=NULL, ..., prune=NULL, copy=TRUE) {
+	    
+	    if(copy) x <- copy(x)
 
 	    if(!is.null(prune)) x <- prune(x, count_threshold = prune, 
-		    transitions = FALSE)
+		    transitions = FALSE, copy = FALSE)
 	    
 	    if(is.null(threshold)) threshold <- x@threshold
 

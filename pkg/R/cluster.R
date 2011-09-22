@@ -31,6 +31,7 @@ setMethod("cluster", signature(x = "tNN", newdata = "data.frame"),
 setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 	function(x, newdata, verbose = FALSE) {
 
+	    ## get a reference to the environment
 	    tnn_d <- x@tnn_d
 	    
 	    tnn_d$last <- character(nrow(newdata))

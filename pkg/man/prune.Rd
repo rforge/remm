@@ -12,23 +12,27 @@ clusters/states and/or transitions
 which have a count smaller than a given threshold.
 }
 \usage{
-\S4method{prune}{EMM}(x, count_threshold, clusters = TRUE, transitions = FALSE)
+\S4method{prune}{EMM}(x, count_threshold, clusters = TRUE, transitions = FALSE,
+    copy = TRUE)
 
 rare_clusters(x, count_threshold, ...)
 rare_transitions(x, count_threshold, ...)
 }
 \arguments{
-  \item{x}{ an object of class \code{"EMM"}. Note that this function changes the original object!}
+  \item{x}{ an object of class \code{"EMM"}}
   \item{count_threshold}{ all states/edges with a count below the
   threshold are removed from the model.}
-  \item{clusters}{ prune clusters?}
-  \item{transitions}{ prune transitions?}
+  \item{clusters}{ logical; prune clusters?}
+  \item{transitions}{ logical; prune transitions?}
+  \item{copy}{ logical; make a copy of x before reclustering? Otherwise the function will change \code{x}!}
   \item{...}{ further arguments (currently not used).}
 }
 %\details{
 %}
 \value{
     \code{prune} returns invisibly an object of class \code{EMM}.
+    If \code{copy=FALSE} then it returns a reference to the changes
+    object passed as \code{x}.
     
     \code{rare_clusters} returns a vector of names of rare clusters.
     
@@ -50,17 +54,17 @@ build(emm_l, EMMTraffic)
 cluster_counts(emm_l)
 transition_matrix(emm_l, type="counts")
 
-## remove all states and edges with a threshold of 0.1
+## rare state/transitions
 rare_clusters(emm_l, count_threshold=0.1)
 rare_transitions(emm_l, count_threshold=0.1)
 
-emm_lr <- copy(emm_l)  ### make a copy
-prune(emm_lr, count_threshold=0.1)
+## remove all states with a threshold of 0.1
+emm_lr <- prune(emm_l, count_threshold=0.1)
 
 ## compare graphs
 op <- par(mfrow = c(1, 2), pty = "m")
-plot(emm_l, method = "igraph", main = "EMM with high learning rate")
-plot(emm_lr, method = "igraph", main = "Simplified EMM")
+plot(emm_l, main = "EMM with high learning rate")
+plot(emm_lr, main = "Simplified EMM")
 par(op)
 
 }

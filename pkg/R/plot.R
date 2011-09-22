@@ -70,7 +70,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		}else{
 		    v.size <- 10
 		}
-		v.cex <- v.size/10
+		#v.cex <- v.size/10
 
 		if(is.null(p$cluster_labels)) {
 		    v.labels <- states(x)
@@ -86,17 +86,24 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			#vertex.shape=v.shape,
 			vertex.label=v.labels,
 			vertex.size=v.size,
-			vertex.label.cex=v.cex,
+			
+			## this does not work for interactive
+			#vertex.label.cex=v.cex,
+			
 			vertex.label.color="black",
 			vertex.color = "white",
+			
 			#vertex.size=v.size,
 			edge.width=e.width,
 			#edge.label=e.label,
 			#edge.label.cex=p$cex*.6,
+			
 			edge.color = "black",
+			
 			## only accepts a single value for now!
 			#edge.arrow.size=(e.width-.5)*.3,
 			edge.arrow.size=1,
+			asp=0,
 			...
 			)
 

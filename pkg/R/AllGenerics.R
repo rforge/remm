@@ -41,9 +41,9 @@ setGeneric("initial_transition", function(x, ...)
 	standardGeneric("initial_transition"))
 setGeneric("rare_transitions", function(x, count_threshold, ...) 
 	standardGeneric("rare_transitions"))
-setGeneric("remove_transitions", function(x, from, to) 
+setGeneric("remove_transitions", function(x, from, to, copy=TRUE) 
 	standardGeneric("remove_transitions"))
-setGeneric("remove_selftransitions", function(x) 
+setGeneric("remove_selftransitions", function(x, copy=TRUE) 
 	standardGeneric("remove_selftransitions"))
 
 ## tNN
@@ -66,7 +66,7 @@ setGeneric("prune", function(x, ...)
 	standardGeneric("prune"))
 setGeneric("merge_clusters", function(x, to_merge, ...) 
 	standardGeneric("merge_clusters"))
-setGeneric("remove_clusters", function(x, to_remove) 
+setGeneric("remove_clusters", function(x, to_remove, copy=TRUE) 
 	standardGeneric("remove_clusters"))
 
 

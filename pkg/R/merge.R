@@ -19,7 +19,9 @@
 
 ## clustering = TRUE gets integer in to_merge
 setMethod("merge_clusters", signature(x = "EMM", to_merge = "integer"),
-	function(x, to_merge, clustering = FALSE, new_center = NULL) {
+	function(x, to_merge, clustering = FALSE, new_center = NULL, copy=TRUE) {
+
+	    if(copy) x <- copy(x)
 
 	    ## handle a clustering
 	    if(!clustering) stop("to_merge needs to be all character!")
@@ -40,8 +42,11 @@ setMethod("merge_clusters", signature(x = "EMM", to_merge = "integer"),
 
 ## clustering = FALSE gets character
 setMethod("merge_clusters", signature(x = "EMM", to_merge = "character"),
-	function(x, to_merge, clustering = FALSE, new_center = NULL) {
+	function(x, to_merge, clustering = FALSE, new_center = NULL, 
+		copy = TRUE) {
 
+	    if(copy) x <- copy(x)
+	    
 	    if(clustering) stop("to_merge has the wrong format for clustering!")
 
 	    ## nothing to do

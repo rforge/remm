@@ -18,7 +18,9 @@
 
 
 setMethod("remove_clusters", signature(x = "EMM", to_remove = "character"),
-	function(x, to_remove) {
+	function(x, to_remove, copy=TRUE) {
+
+		if(copy) x <- copy(x)
 
 		if(length(to_remove)==0) return(x)
 		
@@ -40,12 +42,15 @@ setMethod("remove_clusters", signature(x = "EMM", to_remove = "character"),
 
 setMethod("remove_transitions", signature(x = "EMM", 
 		from ="matrix", to="missing"),
-	function(x, from, to) remove_transitions(x, from[,1], from[,2])
+	function(x, from, to, copy=TRUE) 
+	remove_transitions(x, from[,1], from[,2], copy)
 )
 
 setMethod("remove_transitions", signature(x = "EMM", 
 		from ="character", to="character"),
-	function(x, from, to) {
+	function(x, from, to, copy=TRUE) {
+
+		if(copy) x <- copy(x)
 
 		if(length(from) != length(to)) 
 		    stop("length of from and to do not match!")
@@ -57,8 +62,11 @@ setMethod("remove_transitions", signature(x = "EMM",
 )
 
 setMethod("remove_selftransitions", signature(x = "EMM"),
-	function(x) {
-	   x@tracds_d$mm <- smc_removeSelfTransition(x@tracds_d$mm)	
-	   x
+	function(x, copy=TRUE) {
+
+	    if(copy) x <- copy(x)
+
+	    x@tracds_d$mm <- smc_removeSelfTransition(x@tracds_d$mm)	
+	    x
 	}
 )
