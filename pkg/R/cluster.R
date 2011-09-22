@@ -81,8 +81,10 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 			## New node
 			## get new node name (highest node 
 			## number is last entry in count)
-			sel <- as.character(as.integer(
-					tail(names(tnn_d$counts),1)) + 1)
+			sel <- as.character(
+				max(suppressWarnings(
+						as.integer(names(tnn_d$counts))
+						), na.rm=TRUE) + 1L)
 
 			rownames(nd) <- sel
 			tnn_d$centers <- rbind(tnn_d$centers, nd)

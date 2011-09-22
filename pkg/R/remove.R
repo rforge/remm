@@ -36,7 +36,7 @@ setMethod("remove_clusters", signature(x = "EMM", to_remove = "character"),
 		x@tnn_d$counts <- x@tnn_d$counts[!to_remove_pos]
 		x@tnn_d$var_thresholds <- x@tnn_d$var_thresholds[!to_remove_pos]
 
-		x
+		invisible(x)
 	}
 )
 
@@ -57,7 +57,7 @@ setMethod("remove_transitions", signature(x = "EMM",
 		if(length(from)==0) return(x)
 
 		x@tracds_d$mm <- smc_removeTransition(x@tracds_d$mm,from, to)
-		x
+		invisible(x)
 	}
 )
 
@@ -67,6 +67,6 @@ setMethod("remove_selftransitions", signature(x = "EMM"),
 	    if(copy) x <- copy(x)
 
 	    x@tracds_d$mm <- smc_removeSelfTransition(x@tracds_d$mm)	
-	    x
+	    invisible(x)
 	}
 )

@@ -31,11 +31,13 @@ setMethod("merge_clusters", signature(x = "EMM", to_merge = "integer"),
 	    if(!is.null(new_center) && nrow(new_center) != k) 
 		stop("new_center has not the right number of rows.")
 
-	    ## FIXME: check if we need to merge first!
 	    orig_states <- clusters(x)
+	    
 	    for(i in 1:k) {
-		merge_clusters(x, orig_states[to_merge==i],
-		    clustering = FALSE, new_center[i,], copy = FALSE)
+		m <- orig_states[to_merge==i]
+		if(length(m)>1)
+		    merge_clusters(x, m, clustering = FALSE, 
+			new_center[i,], copy = FALSE)
 	    }
 
 	    invisible(x)
@@ -48,8 +50,12 @@ setMethod("merge_clusters", signature(x = "EMM", to_merge = "character"),
 
 	    if(copy) x <- copy(x)
 	    
-	    if(clustering) stop("to_merge has the wrong format for clustering!")
+	    if(clustering) 
+		stop("to_merge has the wrong format for clustering!")
 
+	    if(!all(is.element(to_merge, clusters(x)))) 
+		stop("not all clusters in to_merge exist in x!")
+	    
 	    ## nothing to do
 	    if(length(to_merge) < 2) return(x)
 

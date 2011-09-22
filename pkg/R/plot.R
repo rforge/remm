@@ -25,10 +25,14 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             state_size_multiplier=1,
                             add_labels = TRUE,
                             cluster_labels = NULL,
-                            mark_clusters = TRUE,
+                            
+			    ## MDS
+			    mark_clusters = TRUE,
                             mark_states = NULL,
                             draw_ellipses = FALSE,
-                            nAttrs = list(),
+                            
+			    ## graph
+			    nAttrs = list(),
                             eAttrs = list()
                             ), parameter)
 
@@ -56,19 +60,19 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		
 		if(method=="interactive") plot_fun <- tkplot
 		else plot_fun <- plot
-		
 
 		if(p$arrow_width) {
-		    e.width <- map(get.edge.attribute(g, "weight"),c(.5,3))
+		    e.width <- map(get.edge.attribute(g, "weight"),
+			    c(.5,3))*p$arrow_width_multiplier
 		}else{
-		    e.width <- 1
+		    e.width <- 1*p$arrow_width_multiplier
 		}
 
 		if(p$cluster_counts) {
 		    v.size <- map(cluster_counts(x), 
 			    c(8,30)) * p$state_size_multiplier
 		}else{
-		    v.size <- 10
+		    v.size <- 10*p$state_size_multiplier
 		}
 		#v.cex <- v.size/10
 
@@ -79,6 +83,9 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		}
 		
 		plot_fun(g, 
+			...,
+			
+			## our default values
 			layout=layout.fruchterman.reingold,
 			#layout=layout.reingold.tilford(g, root=0)*-1,
 			vertex.label.family="Helvetica",
@@ -90,20 +97,20 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			## this does not work for interactive
 			#vertex.label.cex=v.cex,
 			
+			## b/w
 			vertex.label.color="black",
 			vertex.color = "white",
+			edge.color = "black",
 			
 			edge.width=e.width,
 			#edge.label=e.label,
 			#edge.label.cex=p$cex*.6,
 			
-			edge.color = "black",
 			
 			## only accepts a single value for now!
 			#edge.arrow.size=(e.width-.5)*.3,
 			edge.arrow.size=1,
-			asp=0, ## fill whole plot
-			...
+			asp=0 ## fill whole plot
 			)
 
 

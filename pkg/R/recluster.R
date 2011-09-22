@@ -58,7 +58,7 @@ setMethod("recluster_hclust", signature(x = "EMM"),
 			    merge_clusters(x, cl[,i], 
 				    clustering=TRUE, 
 				    new_center = new_center, 
-				    copy=FALSE)
+				    copy=TRUE)
 			})
 	    }else{ 
 		if(!x@centroids) 

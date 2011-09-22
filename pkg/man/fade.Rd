@@ -1,6 +1,7 @@
 \name{fade}
 \alias{fade}
 \alias{fade,EMM,numeric,numeric-method}
+\alias{fade,EMM,missing,numeric-method}
 \alias{fade,EMM,missing,missing-method}
 \alias{fade,EMM,numeric,missing-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
