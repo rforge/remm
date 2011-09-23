@@ -28,10 +28,12 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             
 			    ## MDS
 			    mark_clusters = TRUE,
-                            mark_states = NULL,
                             draw_ellipses = FALSE,
                             
-			    ## graph
+			    ## graph, igraph
+                            mark_states = NULL,
+			    ## may be a vector of same length as mark_state
+			    mark_color = "red", 
 			    nAttrs = list(),
                             eAttrs = list()
                             ), parameter)
@@ -76,12 +78,23 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		}
 		#v.cex <- v.size/10
 
-		if(is.null(p$cluster_labels)) {
-		    v.labels <- states(x)
-		}else{
+		## cluster labels
+		v.labels <- states(x)
+		if(!is.null(p$cluster_labels)) 
+		    v.labels <- p$cluster_labels
+		if(!p$add_labels) 
 		    v.labels <- ""
-		}
-		
+
+	
+		## mark_states
+		v.label.color="black"
+		v.color = "white"
+		e.color = "black"
+                if(!is.null(p$mark_states)) {
+                    v.color <- rep("white", nstates(x))
+		    v.color[states(x) %in% p$mark_states] <- p$mark_color
+                }
+
 		plot_fun(g, 
 			...,
 			
@@ -98,9 +111,12 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			#vertex.label.cex=v.cex,
 			
 			## b/w
-			vertex.label.color="black",
-			vertex.color = "white",
-			edge.color = "black",
+			#vertex.label.color="black",
+			#vertex.color = "white",
+			#edge.color = "black",
+			vertex.label.color=v.label.color,
+			vertex.color = v.color,
+			edge.color = e.color,
 			
 			edge.width=e.width,
 			#edge.label=e.label,
@@ -123,10 +139,8 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                 eAttrs <- p$eAttrs
 
                 if(!is.null(p$mark_states)) {
-                    nAttrs$color <- rep("red", length(p$mark_states))
-                    names(nAttrs$color) <- p$mark_states
-                    nAttrs$fontcolor <- rep("red", length(p$mark_states))
-                    names(nAttrs$fontcolor) <- p$mark_states
+                    nAttrs$fillcolor <- rep(p$mark_color, length(p$mark_states))
+                    names(nAttrs$fillcolor) <- p$mark_states
                 }
 
                 ## vertex labels
@@ -260,7 +274,14 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             )
 
                     ## overplot points and text
-                    points(pts, cex=cex,...)
+		    if(!is.null(p$mark_states)) {
+			s <- states(x) %in% p$mark_states
+			points(pts[s,,drop=FALSE], cex=cex[s], 
+				col=p$mark_color, pch=19)
+			#points(pts[!s,,drop=FALSE], cex=cex[!s])
+		    } 
+		    
+		    points(pts, cex=cex,...)
 
                     if(p$add_labels) {
                         ## plot labels
@@ -275,6 +296,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     }
 
                 } else {
+		    ### MDS + data
                     ## project state centers onto dataset
                     
 		    ## remove NA rows (resets)
@@ -331,10 +353,10 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			if(p$draw_ellipses) {
 			    library(sfsmisc)
 			    for (i in 1:size(x)) {
-				thr <- x@var_thresholds[i]
+				thr <- x@tnn_d$var_thresholds[i]
 				loc <- cluster_centers(x)[i,]
 				lines(ellipsePoints(thr, thr, loc=loc), 
-					col = "black", lty=2)
+					col = "gray", lty=2)
 			    }
 			}
 

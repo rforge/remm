@@ -34,7 +34,7 @@ passed on as \code{...}.
 
 \code{"transition_counts"} produces a barplot for transition counts.
 
-The following plotting parameters are currently supported:
+The following plotting parameters are currently supported (by some of the visualizations):
 \describe{
 \item{state_counts}{represent state counts by vertex size? 
 	(default: \code{TRUE})}
@@ -47,9 +47,19 @@ The following plotting parameters are currently supported:
 \item{add_labels}{add labels for centers (n/a for \code{type="graph"}).}
 \item{cluster_labels}{cluster labels to use instead of 1,2,....}
 \item{mark_clusters}{Use different markers for points depending on the
-    state they belong to (only available when \code{data} is specified).}
+    state they belong to (only available for MDS when 
+    \code{data} is specified).}
+\item{draw_ellipse}{draw an ellipse around state centers to indicate the area in which points are assigned to the cluster (experimental, only available for 
+MDS when \code{data} is specified). }
 \item{mark_states}{a vector of state names to be marked.}
+\item{mark_color}{color used for marking (can be a vector of the same length as \code{mark_states}).}
 }
+
+For some plots (e.g., \code{"igraph"}) \code{...} is passed on to the 
+primitive plotting function and can be used to change the plot (colors, etc.).
+For \code{"graph"} the two special parameters "nAttrs" and "eAttrs" 
+for node and edge attributes can be used. 
+
 }
 %\value{
 %}
