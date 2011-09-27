@@ -51,8 +51,11 @@ The following plotting parameters are currently supported (by some of the visual
     \code{data} is specified).}
 \item{draw_ellipse}{draw an ellipse around state centers to indicate the area in which points are assigned to the cluster (experimental, only available for 
 MDS when \code{data} is specified). }
-\item{mark_states}{a vector of state names to be marked.}
-\item{mark_color}{color used for marking (can be a vector of the same length as \code{mark_states}).}
+\item{mark_states, mark_state_color}{a vector of state names to be marked 
+and the color(s) used for marking (default: red).}
+\item{mark_transitions, mark_transitions_color}{a vector of transition names 
+in the format "3->2" to be marked and the color(s) 
+used for marking (default: red).}
 }
 
 For some plots (e.g., \code{"igraph"}) \code{...} is passed on to the 

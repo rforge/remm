@@ -33,7 +33,11 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			    ## graph, igraph
                             mark_states = NULL,
 			    ## may be a vector of same length as mark_state
-			    mark_color = "red", 
+			    mark_states_color = "red", 
+			    mark_transitions = NULL,
+			    mark_transitions_color = "red",
+			    
+			    
 			    nAttrs = list(),
                             eAttrs = list()
                             ), parameter)
@@ -87,13 +91,27 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
 	
 		## mark_states
-		v.label.color="black"
-		v.color = "white"
-		e.color = "black"
+		v.label.color <- "black"
+                V(g)$color <- "white"
                 if(!is.null(p$mark_states)) {
-                    v.color <- rep("white", nstates(x))
-		    v.color[states(x) %in% p$mark_states] <- p$mark_color
+		    V(g)[p$mark_states]$color <- p$mark_states_color
                 }
+
+		## mark_transitions
+		E(g)$color <- "black"
+		if(!is.null(p$mark_transitions)) {
+		E(g)$color <- "grey"
+		    if(length(p$mark_transitions_color)==1) 
+			p$mark_transitions_color <- rep(
+			    p$mark_transitions_color, 
+			    length(p$mark_transitions))
+		    for(i in 1:length(p$mark_transitions)) {
+			x <- strsplit(p$mark_transitions[i], "->")[[1]]
+			E(g)[V(g)[x[1]] %->% V(g)[x[2]]]$color <- p$mark_transitions_color[i]
+		    }
+		}
+
+
 
 		plot_fun(g, 
 			...,
@@ -115,9 +133,9 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			#vertex.color = "white",
 			#edge.color = "black",
 			vertex.label.color=v.label.color,
-			vertex.color = v.color,
-			edge.color = e.color,
+			#vertex.color = v.color,
 			
+			#edge.color = e.color,
 			edge.width=e.width,
 			#edge.label=e.label,
 			#edge.label.cex=p$cex*.6,
@@ -125,7 +143,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 			
 			## only accepts a single value for now!
 			#edge.arrow.size=(e.width-.5)*.3,
-			edge.arrow.size=1,
+			edge.arrow.size=.5,
 			asp=0 ## fill whole plot
 			)
 
@@ -138,8 +156,10 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		nAttrs <- p$nAttrs
                 eAttrs <- p$eAttrs
 
-                if(!is.null(p$mark_states)) {
-                    nAttrs$fillcolor <- rep(p$mark_color, length(p$mark_states))
+		## vertex colors
+		if(!is.null(p$mark_states)) {
+                    nAttrs$fillcolor <- rep(p$mark_states_color, 
+			    length(p$mark_states))
                     names(nAttrs$fillcolor) <- p$mark_states
                 }
 
@@ -186,6 +206,18 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		    eAttrs$lwd <- lwd
 		}
 
+		## edge color
+		if(!is.null(p$mark_transitions)) {
+		    e.cols <- p$mark_transitions_color
+
+		    if(length(e.cols)==1)
+			e.cols <- rep(e.cols, length(p$mark_transitions))
+		    names(e.cols) <- sapply(strsplit(p$mark_transitions, 
+				    "->"), paste, collapse="~")
+		
+		    eAttrs$color <- e.cols
+		}
+
                 pl <- plot(g, recipEdges="distinct",
                         nodeAttrs = nAttrs, edgeAttrs = eAttrs, ...)
             } else {
@@ -225,10 +257,27 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
                     ## arrows
                     edges <- transitions(x)
-                    arrows_fromto <- cbind(
+		    arrows_fromto <- cbind(
                             from_x = pts[edges[,1],1], from_y = pts[edges[,1],2],
                             to_x = pts[edges[,2],1],to_y = pts[edges[,2],2]
                             )
+                    
+		    ## edge colors
+		    edge_colors <- "grey"
+		    if(!is.null(p$mark_transitions)) {
+			edge_colors <- rep("grey", nrow(edges))
+			if(length(p$mark_transitions_color)==1)
+			    p$mark_transitions_color <- rep(
+				p$mark_transitions_color,
+				length(p$mark_transitions))
+			
+			sl <- strsplit(p$mark_transitions, "->")
+			for(i in 1:length(sl)) {
+			    edge_colors[apply(edges == sl[[i]], MARGIN=1, 
+				    all)] <- p$mark_transitions_color[i]
+			}
+		    }
+
 
                     ## make arrows shorter so they do not cover the nodes 
                     nodeRad2 <- cbind(
@@ -270,14 +319,14 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     suppressWarnings(
                             arrows(arrows_fromto[,1], arrows_fromto[,2], 
                                     arrows_fromto[,3],arrows_fromto[,4],
-                                    length=0.15, col="grey", angle=20, lwd=lwd)
+                                    length=0.15, col=edge_colors, angle=20, lwd=lwd)
                             )
 
                     ## overplot points and text
 		    if(!is.null(p$mark_states)) {
 			s <- states(x) %in% p$mark_states
 			points(pts[s,,drop=FALSE], cex=cex[s], 
-				col=p$mark_color, pch=19)
+				col=p$mark_states_color, pch=19)
 			#points(pts[!s,,drop=FALSE], cex=cex[!s])
 		    } 
 		    
@@ -356,7 +405,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 				thr <- x@tnn_d$var_thresholds[i]
 				loc <- cluster_centers(x)[i,]
 				lines(ellipsePoints(thr, thr, loc=loc), 
-					col = "gray", lty=2)
+					col = "grey", lty=2)
 			    }
 			}
 
