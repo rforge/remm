@@ -48,7 +48,7 @@ tracds
 update(tracds, c(1,2,5,5,2))
 tracds
 
-plot(tracds, method="graph")
+plot(tracds)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

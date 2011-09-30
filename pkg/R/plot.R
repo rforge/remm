@@ -50,7 +50,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
             emm_centers <- cluster_centers(x)
 
             if(method=="cluster_counts") {
-                barplot(sort(cluster_counts(x), decreasing=TRUE), 
+                pl <- barplot(sort(cluster_counts(x), decreasing=TRUE), 
                         ylab="Count", xlab = "State", ...)
 
             }else if(method=="transition_counts") {
@@ -58,11 +58,11 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                 cnt <- transition(x, tr, type="counts")
                 names(cnt) <- apply(tr, MARGIN=1, FUN = 
                         function(x) paste(x, collapse="->"))
-                barplot(sort(cnt, decreasing=TRUE), 
+                pl <- barplot(sort(cnt, decreasing=TRUE), 
                         ylab="Transition counts", ...)
 
             }else if(method=="igraph" || method=="interactive") {
-                g <- smc_as.igraph(x@tracds_d$mm)
+                g <- as.igraph(x)
 		
 		if(method=="interactive") plot_fun <- tkplot
 		else plot_fun <- plot
@@ -113,7 +113,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
 
 
-		plot_fun(g, 
+		pl <- plot_fun(g, 
 			...,
 			
 			## our default values
@@ -151,7 +151,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
             }else if(method=="graph") {
                 if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
 
-                g <- smc_as.graph(x@tracds_d$mm)
+                g <- as.graph(x)
 		
 		nAttrs <- p$nAttrs
                 eAttrs <- p$eAttrs
@@ -343,6 +343,8 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                                         MARGIN=1, max))
                         text(pts, labels=labels, cex=cex)
                     }
+	
+		    pl <- mds
 
                 } else {
 		    ### MDS + data
@@ -430,20 +432,38 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                     #points(centers, col="red", pch=1:size(x), cex=cex)
                     if(p$add_labels) text(centers, labels=states(x), pos=3)
                 }
+		    pl <- mds
 
             }
-        }
+        
+	return(pl)
+	}
         )
 
 
 
 setMethod("plot", signature(x = "TRACDS", y = "missing"),
         function(x, y, ...){ 
-                
-	    if(!require("Rgraphviz")) stop ("Package Rgraphviz needed!")
+                g <- as.igraph(x)
+		plot(g, ...,
+			layout=layout.fruchterman.reingold,
+			#layout=layout.reingold.tilford(g, root=0)*-1,
+			vertex.label.family="Helvetica",
+			edge.label.family="Helvetica",
+			#vertex.shape=v.shape,
+			vertex.label=states(x),
+			#vertex.size=v.size,
 
-                g <- smc_as.graph(x@tracds_d$mm)
-		plot(g, recipEdges="distinct")	
+			## b/w
+			vertex.label.color="black",
+			vertex.color = "white",
+			edge.color = "black",
+
+			#edge.color = e.color,
+			#edge.width=e.width,
+			#edge.label=e.label,
+			#edge.label.cex=p$cex*.6,
+			)	
 	})
 
 

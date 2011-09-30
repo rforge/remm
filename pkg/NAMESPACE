@@ -11,6 +11,10 @@ importFrom(proxy, pr_DB, pr_dist2simil)
 exportClasses(EMM, TRACDS, StreamClustering, tNN)
 
 export(
+    as.igraph,
+    as.graph,
+    as.igraph.TRACDS,
+    as.graph.TRACDS,
     EMM,
     TRAC,
     build,
