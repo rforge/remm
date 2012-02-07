@@ -38,10 +38,6 @@ The following object(s) are masked from 'package:igraph':
 
     clusters
 
-The following object(s) are masked from 'package:stats':
-
-    update
-
 > data("16S")
 > 
 > data <- Mollicutes16S+1
