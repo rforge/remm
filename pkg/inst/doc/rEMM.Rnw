@@ -1359,7 +1359,7 @@ plot(emmc[[which.max(sc)]], method="MDS", data=EMMsim_train)
 \begin{figure}[tbp]
 \begin{minipage}[b]{.49\linewidth}
 \centering
-\includegraphics[width=.7\linewidth]{rEMM-sim_optc_graph}\\
+\includegraphics[width=\linewidth]{rEMM-sim_optc_graph}\\
 (a)
 \end{minipage}
 \begin{minipage}[b]{.49\linewidth}
