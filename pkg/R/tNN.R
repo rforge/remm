@@ -92,7 +92,6 @@ setMethod("find_clusters", signature(x = "tNN", newdata = "matrix"),
 
 		match_cluster <- match.arg(match_cluster)
 
-		browser()
 		## cross-dissimilarities
                 ## matrix can become too large for main memory
                 ## estimate block size with 64 bit per distance entry
