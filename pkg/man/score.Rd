@@ -41,16 +41,16 @@ by the following methods:
     Product of transition probabilities along the path of \eqn{x} in the 
     model. A single missing transition (transition probability of zero) 
     will result in
-    a score of 0. Use \code{plus\_one} to avoid this.
-    \deqn{S_\mathrm{prod} = \sqrt[l-1]{\prod_{i=1}^{l-1}{a_{s(i),s(i+1)}}}}{
-	P_prod = prod(a_s(i),s(i+1))^(1/(l-1))}
+    a score of 0. Use \code{plus_one} to avoid this.
+    \deqn{S_\mathrm{product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{a_{s(i),s(i+1)}}}}{
+	S_product = prod(a_s(i),s(i+1))^(1/(l-1))}
 }
 
 \item{"sum"}{
     Sum of transition probabilities along the path of \eqn{x} in the
     model.
     \deqn{S_\mathrm{sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{a_{s(i),s(i+1)}}}{
-	P_sum = 1/(l-1) sum(a_s(i),s(i+1))}
+	S_sum = 1/(l-1) sum(a_s(i),s(i+1))}
 }
 \item{"log_sum"}{
     Sum of the log of the transition probabilities along the path of 
@@ -60,10 +60,10 @@ by the following methods:
 
     A single missing transition (transition probability of zero)
     will result in a score of neg. infinity. 
-    Use \code{plus\_one} to avoid this. 
+    Use \code{plus_one} to avoid this. 
     
     \deqn{S_\mathrm{log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(a_{s(i),s(i+1)})}}{
-	P_sum = 1/(l-1) sum(log(a_s(i),s(i+1)))}
+	S_sum = 1/(l-1) sum(log(a_s(i),s(i+1)))}
 }
 
 
@@ -71,26 +71,26 @@ by the following methods:
     Weighted version of the product of probabilities. The weight is
     the  similarity between a new data point and the state in the model
     it is assigned to.
-    \deqn{S_\mathrm{prod} = \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)}}}}{
-	P_prod = prod(simil(x_i,s(i)) a_s(i),s(i+1))^(1/(l-1))}
+    \deqn{S_\mathrm{weighted\_product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)}}}}{
+	P_weighted_product = prod(simil(x_i,s(i)) a_s(i),s(i+1))^(1/(l-1))}
 }
 \item{"weighted_sum"}{
     Weighted version of the sum of probabilities.
-    \deqn{S_\mathrm{sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)}}}{
-	P_sum = 1/(l-1) sum(simil(x_i,s(i))  a_s(i),s(i+1))}
+    \deqn{S_\mathrm{weighted\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)}}}{
+	S_weighted_sum = 1/(l-1) sum(simil(x_i,s(i))  a_s(i),s(i+1))}
 }
 \item{"weighted_log_sum"}{
 Weighted version of the sum of the log of probabilities.
-\deqn{S_\mathrm{log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)})}}{
-	P_sum = 1/(l-1) sum(simil(x_i,s(i))  a_s(i),s(i+1))}
+\deqn{S_\mathrm{weighted\_log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)})}}{
+	S_sum = 1/(l-1) sum(simil(x_i,s(i))  a_s(i),s(i+1))}
 }
 
 
 \item{"missing_transitions"}{The number of transitions in the new sequence \eqn{x} which
 are missing in the model after assigning each data point in eqn{x} to a state in
 the model.
-\deqn{S_\mathrm{missing\_transactions} = \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
-            S_\mathrm{missing\_transactions} = sum(I(a_s(i),s(i+1)))}
+\deqn{S_\mathrm{missing\_transitions} = \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
+            S_\mathrm{missing\_transitions} = sum(I(a_s(i),s(i+1)))}
 }
 }
 
@@ -105,7 +105,7 @@ and \eqn{\mathrm{simil}(\cdot)}{simil(.)} is a similarity function
 distances are converted into similarities using 
 \eqn{\mathrm{simil} = 1/(1+\mathrm{d})}{simil = 1/(1+d)}). 
 
-For missing transactions \eqn{\mathrm{I(v)}{I(v)}} is an indicator function which is 1 for \eqn{v=0} and 0 otherwise.
+For missing transitions \eqn{\mathrm{I(v)}{I(v)}} is an indicator function which is 1 for \eqn{v=0} and 0 otherwise.
 }
 \value{
     A scalar score value.

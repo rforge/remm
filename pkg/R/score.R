@@ -46,10 +46,10 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 			"log_odds", 
 			"missing_transitions"
 			), 
-		match_cluster="nn", plus_one = FALSE, 
+		match_cluster = "nn", plus_one = FALSE, 
 		initial_transition = FALSE) {
 
-	    method <- match.arg(method)
+	method <- match.arg(method)
 
 	    if(method == "product" 
 		    || method == "log_sum" 
@@ -60,7 +60,7 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		
 		if(method == "product")
 		    return(prod(prob)^(1/length(prob)))
-		if(method == "product_log")
+		if(method == "log_sum")
 		    return(sum(log(prob))/length(prob))
 		### must be sum
 		return(sum(prob)/length(prob))
@@ -83,7 +83,8 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 	    if(method == "weighted_product" 
 		    || method == "weighted_log_sum"
 		    || method == "weighted_sum") {
-	    
+	   
+
 		tTable <- transition_table(x, newdata, method="prob",
 			match_cluster, plus_one=plus_one,
 			initial_transition)
@@ -94,12 +95,12 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		S <- numeric(nrow(newdata)-1)
 		for(i in 1:(nrow(newdata)-1)) {
 		    S[i] <- as.numeric(pr_dist2simil(
-				    dist(
-					    newdata[i, , drop=FALSE],
-					    cluster_centers(x)[as.numeric(tTable[i,1]), , drop=FALSE],
-					    measure=x@measure)))
-		}
-		
+			dist(
+			    newdata[i, , drop=FALSE],
+			    cluster_centers(x)[as.numeric(tTable[i,1]), , drop=FALSE],
+			    measure=x@measure)))
+    }
+
 
 		### probabilities
 		P <- tTable[,3]

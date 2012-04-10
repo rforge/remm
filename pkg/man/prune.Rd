@@ -9,7 +9,7 @@
 \description{
 Simplifies an EMM and/or the clustering by removing all 
 clusters/states and/or transitions 
-which have a count smaller than a given threshold.
+which have a count of equal or smaller than a given threshold.
 }
 \usage{
 \S4method{prune}{EMM}(x, count_threshold, clusters = TRUE, transitions = FALSE,
@@ -20,7 +20,7 @@ rare_transitions(x, count_threshold, ...)
 }
 \arguments{
   \item{x}{ an object of class \code{"EMM"}}
-  \item{count_threshold}{ all states/edges with a count below the
+  \item{count_threshold}{ all states/edges with a count of less or equal to the
   threshold are removed from the model.}
   \item{clusters}{ logical; prune clusters?}
   \item{transitions}{ logical; prune transitions?}
