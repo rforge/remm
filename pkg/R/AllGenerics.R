@@ -25,6 +25,7 @@
 ## size is also used in package arules
 setGeneric("update", function(object, ...) standardGeneric("update"))
 setGeneric("copy", function(x) standardGeneric("copy"))
+setGeneric("compact", function(x) standardGeneric("compact"))
 setGeneric("size", function(x, ...) standardGeneric("size"))
 setGeneric("nclusters", function(x, ...) standardGeneric("nclusters"))
 setGeneric("nstates", function(x, ...) standardGeneric("nstates"))

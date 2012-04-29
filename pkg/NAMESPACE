@@ -1,3 +1,5 @@
+useDynLib(rEMM)
+
 #imports("gclus") ## we use :: for gclus in seriate.hclust
 #imports("cluster") ## we use :: for silhouette in dissplot
 
@@ -43,6 +45,7 @@ export(
     ## TRACDS
     TRACDS,
     update,
+    compact,
     nstates,
     reset,
     states,

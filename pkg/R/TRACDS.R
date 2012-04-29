@@ -64,4 +64,3 @@ setMethod("rare_transitions", signature(x = "TRACDS"),
 	transitions(x)[transition(x, transitions(x),
 		type="counts") <= count_threshold,]
 	)
-

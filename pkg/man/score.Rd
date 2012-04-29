@@ -3,6 +3,7 @@
 \alias{score,EMM,numeric-method}
 \alias{score,EMM,data.frame-method}
 \alias{score,EMM,matrix-method}
+\alias{score,EMM,EMM-method}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Score a New Sequence Given an EMM}
 \description{
@@ -11,13 +12,15 @@ by the same process as the sequences used to build the EMM.
 }
 \usage{
 \S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
-"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "missing_transitions"), 
+"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "supported_transitions"), 
+match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
+\S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", "supported_transitions"), 
 match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an \code{EMM} object. }
-  \item{newdata}{ sequence to score }
+  \item{newdata}{ sequenc or another \code{EMM} object to score. }
   \item{method}{ method to calculate the score (see details) }
   \item{match_cluster}{ do the new observations have to fall within
     the threshold of the cluster (\code{"exact"}) or is nearest neighbor 
@@ -86,11 +89,10 @@ Weighted version of the sum of the log of probabilities.
 }
 
 
-\item{"missing_transitions"}{The number of transitions in the new sequence \eqn{x} which
-are missing in the model after assigning each data point in eqn{x} to a state in
+\item{"supported_transitions"}{Fraction of transitions in the new sequence \eqn{x} supported (present) in the model after assigning each data point in eqn{x} to a state in
 the model.
-\deqn{S_\mathrm{missing\_transitions} = \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
-            S_\mathrm{missing\_transitions} = sum(I(a_s(i),s(i+1)))}
+\deqn{S_\mathrm{supported\_transitions} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
+            S_\mathrm{supported\_transitions} = 1/(l-1) sum(I(a_s(i),s(i+1)))}
 }
 }
 
@@ -105,7 +107,7 @@ and \eqn{\mathrm{simil}(\cdot)}{simil(.)} is a similarity function
 distances are converted into similarities using 
 \eqn{\mathrm{simil} = 1/(1+\mathrm{d})}{simil = 1/(1+d)}). 
 
-For missing transitions \eqn{\mathrm{I(v)}{I(v)}} is an indicator function which is 1 for \eqn{v=0} and 0 otherwise.
+For missing transitions \eqn{\mathrm{I(v)}{I(v)}} is an indicator function which is 0 for \eqn{v=0} and 1 otherwise.
 }
 \value{
     A scalar score value.
@@ -121,7 +123,7 @@ emm <- EMM(threshold=.5)
 emm <- build(emm, EMMsim_train)
 
 ### compute various scores
-score(emm, EMMsim_test, method="missing_transitions")
+score(emm, EMMsim_test, method="supported_transitions")
 score(emm, EMMsim_test) # default is "product"
 score(emm, EMMsim_test, method="sum")
 score(emm, EMMsim_test, method="log_sum")
@@ -131,7 +133,7 @@ score(emm, EMMsim_test, method="weighted_log_sum")
 
 ### shuffle the data and score again
 EMMsim_test <- EMMsim_test[sample(1:nrow(EMMsim_test)),]
-score(emm, EMMsim_test, method="missing_transitions")
+score(emm, EMMsim_test, method="supported_transitions")
 score(emm, EMMsim_test) # default is "product"
 score(emm, EMMsim_test, method="sum")
 score(emm, EMMsim_test, method="log_sum")

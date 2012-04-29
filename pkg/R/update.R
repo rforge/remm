@@ -129,3 +129,12 @@ setMethod("update", signature(object = "TRACDS"),
 	    invisible(x)
 	}
 	)
+
+setMethod("compact", signature(x = "TRACDS"),
+	function(x) {
+
+	    x@tracds_d$mm <- smc_compact(x@tracds_d$mm)
+	    invisible(x)
+
+	}
+	)

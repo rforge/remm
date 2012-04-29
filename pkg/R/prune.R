@@ -19,7 +19,7 @@
 
 setMethod("prune", signature(x = "EMM"),
 	function(x, count_threshold, clusters = TRUE, 
-		transitions = FALSE, copy = TRUE){
+		transitions = FALSE, copy = TRUE, compact = TRUE){
 
 	    if(copy) x <- copy(x)
 
@@ -33,6 +33,7 @@ setMethod("prune", signature(x = "EMM"),
 		    rare_transitions(x, count_threshold=count_threshold),
 		    copy=FALSE)
 
-	    if(copy) x
-	    else invisible(x)
+	    if(compact) x <- compact(x)
+
+	    if(copy) x else invisible(x)
 	})
