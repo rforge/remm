@@ -18,6 +18,8 @@
 \alias{last_clustering}
 \alias{last_clustering,tNN-method}
 \alias{plot,tNN,missing-method}
+\alias{object.size,tNN-method}
+
 
 \title{Class "tNN"}
 \description{Implements the threshold Nearest Neighbor clustering algorithm

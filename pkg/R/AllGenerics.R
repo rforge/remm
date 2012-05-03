@@ -70,6 +70,7 @@ setGeneric("merge_clusters", function(x, to_merge, ...)
 setGeneric("remove_clusters", function(x, to_remove, copy=TRUE) 
 	standardGeneric("remove_clusters"))
 
+setGeneric("object.size", function(x) standardGeneric("object.size"))
 
 ## FIXME: make it one recluster method
 setGeneric("recluster_hclust", function(x, ...) 
