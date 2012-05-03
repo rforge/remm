@@ -1,5 +1,9 @@
 CHANGES
 
+rEMM 1.0-6
+* Improved performance for prune()
+* Added object.size() which also reports memory used by the model 
+
 rEMM 1.0-5 (12-04-10)
 * Added several methods for score.
 * Threshold for pruning and finding rare clusters/transitions is now less or equal instead of just less

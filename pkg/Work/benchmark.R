@@ -17,3 +17,10 @@ emm <- EMM("Kullback", threshold=0.1)
 print("16S")
 print(system.time(build(emm, Mollicutes16S+1)))
 
+### reclustering
+
+data <- synthetic_stream(k=100, d=5, n_test=0)
+emm <- EMM(threshold=.01)
+ build(emm, data$train, verb=TRUE)
+
+

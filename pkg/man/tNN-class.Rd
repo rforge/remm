@@ -77,7 +77,9 @@ Objects can be created with \code{new()} or by the creator function
 	clusters.}
     \item{last_clustering}{\code{signature(x = "tNN")}: returns the 
 	indices of the clusters the data points in the last cluster 
-	operation where assigned to.}
+	operation where assigned to. To save memory the last clustering 
+	information can be removed by setting the formal parameter
+	\code{remove} to \code{TRUE}.}
     \item{nclusters}{\code{signature(x = "tNN")}: returns the number of clusters
 	in the clustering.}
     \item{plot}{\code{signature(x = "tNN", y = "missing")}: plots the cluster

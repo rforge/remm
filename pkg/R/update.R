@@ -127,14 +127,5 @@ setMethod("update", signature(object = "TRACDS"),
 	    if(verbose) cat("Update done.", "\n")
 
 	    invisible(x)
-	}
-	)
+	})
 
-setMethod("compact", signature(x = "TRACDS"),
-	function(x) {
-
-	    x@tracds_d$mm <- smc_compact(x@tracds_d$mm)
-	    invisible(x)
-
-	}
-	)

@@ -172,18 +172,15 @@ smc_mergeStates <- function(x, state) {
     }
     
     to <- pos[1]
-    from <- pos[-1]
-
-    ## update first state
-    for(i in 1:length(from)) {
-	x@counts[to,] <- x@counts[to,] + x@counts[from[i],]
-	x@counts[,to] <- x@counts[,to] + x@counts[,from[i]]
-    }
-
+    
     ## initial counts
-    x@initial_counts[from] <- sum(x@initial_counts[pos])
+    x@initial_counts[to] <- sum(x@initial_counts[pos])
 
-    ## remove all other states
+    ## update matrix
+    x@counts[to,] <- colSums(x@counts[pos,])
+    x@counts[,to] <- rowSums(x@counts[,pos])
+
+    ## remove additional states
     x <- smc_removeState(x, state[-1])
     x
 }
