@@ -20,7 +20,21 @@ print(system.time(build(emm, Mollicutes16S+1)))
 ### reclustering
 
 data <- synthetic_stream(k=100, d=5, n_test=0)
-emm <- EMM(threshold=.01)
- build(emm, data$train, verb=TRUE)
+emm <- EMM(threshold=.05)
+build(emm, data$train, verb=TRUE)
+
+
+system.time(r <- prune(emm, count=1, compact=FALSE))
+r
+object.size(r)
+
+system.time(r <- prune(emm, count=1))
+r
+object.size(r)
+
+emmr <- recluster_kmeans(emm, k=10)
+
+
+
 
 

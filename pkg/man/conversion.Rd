@@ -31,7 +31,7 @@ emm
 plot(emm, method = "MDS")
 
 ## using a cluster assignment vector (taken from the k-means clustering above)
-x <- cl$clustering
+x <- cl$cluster
 emm <- TRAC(x, data = EMMsim_train)
 emm
 plot(emm, method = "MDS")

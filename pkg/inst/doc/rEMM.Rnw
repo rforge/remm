@@ -1327,7 +1327,8 @@ and cluster B are represented by many micro-clusters each, it is
 likely that we find a pair of micro-clusters (one in A and one in B) for
 which we did not see a transition yet and thus will have a
 transition count/probability of zero. This is also shown by
-the ``supported transition'' score.
+the ``supported transition'' score which gives the
+proportion of transitions in the (test) data supported in the model.
 
 <<>>=
 score(emm, EMMsim_test, method="supported_transitions", match_cluster="exact")
@@ -1337,7 +1338,14 @@ To reduce the problem of not being able to match a data point to a
 cluster we can use a nearest neighbor approach instead of exact matching
 (\code{match\_cluster="nn"} is the default for \func{score}).
 Here a new data point is assigned to the closest cluster even if it falls 
-outside the threshold. The problem with missing transitions can be reduced by
+outside the threshold. 
+
+<<>>=
+score(emm, EMMsim_test, method="supported_transitions", match_cluster="nn")
+@
+
+
+The problem with missing transitions can be reduced by
 starting with a prior distribution of transition probabilities. In the 
 simplest case we start with a uniform transition probability distribution, 
 i.e., if no data is
