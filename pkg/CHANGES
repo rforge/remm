@@ -1,8 +1,11 @@
 CHANGES
 
-rEMM 1.0-6
+rEMM 1.0-7
+
+rEMM 1.0-6 (12-05-19)
 * Improved performance for prune()
 * Added object.size() which also reports memory used by the model 
+* Switched to igraph0
 
 rEMM 1.0-5 (12-04-10)
 * Added several methods for score.
