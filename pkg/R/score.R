@@ -74,7 +74,8 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 	    }
 
 	    if(method == "supported_transitions") {
-		if(plus_one) warning("plus_one has no effect on supported transitions!")
+		### We just ignore it
+		###if(plus_one) warning("plus_one has no effect on supported transitions!")
 		tTable <- transition_table(x, newdata, method="count",
 			match_cluster, plus_one=FALSE, initial_transition)
 		return((nrow(tTable)-sum(tTable[,3]==0))/nrow(tTable))
