@@ -1277,7 +1277,7 @@ $\mathrm{simil}(x_i,s(i)) = 1/(1+\mathrm{d}(x_i,s(i)))$ and
 $\mathrm{d}()$ is the distance function used to build the model.
 
 A final very rough score can be obtained by just counting the number of
-transitions in the new sequnce which are missing (not supported) in the
+transitions in the new sequnce which are also present (supported) in the
 model.
 
 \begin{equation}

@@ -98,7 +98,7 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		    S[i] <- as.numeric(pr_dist2simil(
 			dist(
 			    newdata[i, , drop=FALSE],
-			    cluster_centers(x)[as.numeric(tTable[i,1]), , drop=FALSE],
+			    cluster_centers(x)[tTable[i,1], , drop=FALSE],
 			    measure=x@measure)))
     }
 
