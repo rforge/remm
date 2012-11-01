@@ -72,6 +72,9 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 		    #    method=x@measure) - tnn_d$var_thresholds
 		    inside <- dist(nd, tnn_d$centers, 
 		        method=x@distFun) - tnn_d$var_thresholds
+		    
+		    all <- rownames(tnn_d$centers)[which(inside<0)]
+		
 		    min <- which.min(inside)
 		    if(inside[min]<=0) sel <- rownames(tnn_d$centers)[min]
 		    else sel <- NA
@@ -98,13 +101,30 @@ setMethod("cluster", signature(x = "tNN", newdata = "matrix"),
 			## update center (if we use centroids)
 			if(x@centroids) {
 
+			    ## try moving first
 			    nnas <- !is.na(nd)
-			    tnn_d$centers[sel,nnas] <- 
-			    (tnn_d$centers[sel,nnas] * 
-				    tnn_d$counts[sel] 
+			    new_center <- tnn_d$centers[sel,nnas,drop=FALSE]
+			    new_center[1,nnas] <-
+			    (new_center[1,nnas] *
+				    tnn_d$counts[sel]
 				    + nd[nnas])/(tnn_d$counts[sel]+1)
-			    nas <- is.na(tnn_d$centers[sel,])
-			    tnn_d$centers[sel,nas] <- nd[nas]
+
+			    nas <- is.na(new_center)
+			    if(any(nas)) new_center[1,nas] <- nd[1,nas]
+
+			    ## check if move is legal (does not enter 
+			    ## another cluster's threshold)
+			    if(length(all)>1) {
+			    
+			    violation <- dist(new_center, 
+				    tnn_d$centers[all,], 
+				method=x@distFun) - tnn_d$var_thresholds[all]
+			    if(sum(violation<0)<2) {
+				tnn_d$centers[sel,] <- new_center
+			    }
+			}else{
+				tnn_d$centers[sel,] <- new_center
+			}
 
 			}
 
