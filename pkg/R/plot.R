@@ -245,12 +245,14 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 		    }else{
                         d <- dist(emm_centers, method=x@distFun)
                         mds <- cmdscale(d, eig=TRUE, add=TRUE)
+                        #mds <- isoMDS(d, trace=FALSE)
 			pts <- mds$points
 			dimnames(pts) <- list(states(x), 
 				c("Dimension 1", "Dimension 2"))
 			sub <- paste("These two dimensions explain",
 				round(100 * mds$GOF[2], digits = 2),
 				"% of the point variability.")
+			#sub <- ""
 		    }
 
 		    ## start plotting
@@ -476,5 +478,10 @@ setMethod("plot", signature(x = "TRACDS", y = "missing"),
 setMethod("plot", signature(x = "tNN", y = "missing"),
         function(x, y, ...){ 
 		
+	    if(nclusters(x)<1) {
+		warning("No clusters. No plot produced!")
+		return(invisible(NULL))
+	    }
+                
 	    pairs(cluster_centers(x))
 	})

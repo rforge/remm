@@ -83,4 +83,6 @@ setGeneric("recluster_reachability", function(x, ...)
 	standardGeneric("recluster_reachability"))
 setGeneric("recluster_tNN", function(x, ...) 
 	standardGeneric("recluster_tNN"))
+setGeneric("recluster_transitions", function(x, ...) 
+	standardGeneric("recluster_transitions"))
 
