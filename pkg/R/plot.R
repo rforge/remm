@@ -28,7 +28,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
                             
 			    ## MDS
 			    mark_clusters = TRUE,
-                            draw_ellipses = FALSE,
+                            draw_threshold = FALSE,
                             
 			    ## graph, igraph
                             mark_states = NULL,
@@ -409,7 +409,7 @@ setMethod("plot", signature(x = "EMM", y = "missing"),
 
                         ## add ellipses
                         ## FIXME: does not work with d>2
-			if(p$draw_ellipses) {
+			if(p$draw_threshold) {
 			    library(sfsmisc)
 			    for (i in 1:size(x)) {
 				thr <- x@tnn_d$var_thresholds[i]
@@ -476,12 +476,30 @@ setMethod("plot", signature(x = "TRACDS", y = "missing"),
 
 
 setMethod("plot", signature(x = "tNN", y = "missing"),
-        function(x, y, ...){ 
+        function(x, y, data=NULL, draw_threshold=FALSE,...){ 
 		
 	    if(nclusters(x)<1) {
 		warning("No clusters. No plot produced!")
 		return(invisible(NULL))
 	    }
                 
-	    pairs(cluster_centers(x))
+	    if(is.null(data)) {
+	    plot(as.data.frame(cluster_centers(x)))
+	}else{
+	    plot(rbind(as.data.frame(data), as.data.frame(cluster_centers(x))),
+		    col=c(rep("gray", nrow(data)), rep(2, nrow(cluster_centers(x)))))
+	}
+
+
+	    ## add ellipses
+	    if(draw_threshold) {
+		library(sfsmisc)
+		for (i in 1:nclusters(x)) {
+		    thr <- x@tnn_d$var_thresholds[i]
+		    loc <- cluster_centers(x)[i,]
+		    lines(ellipsePoints(thr, thr, loc=loc), 
+			    col = 1, lty=2)
+		}
+	    }
+
 	})
