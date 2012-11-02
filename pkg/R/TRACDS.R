@@ -54,6 +54,9 @@ setMethod("transitions", signature(x = "TRACDS"),
 	    m <- smc_countMatrix(x@tracds_d$mm)
 	    edges <- apply(which(m>0, arr.ind=T), 
 		    MARGIN=2, FUN=function(x) colnames(m)[x])
+	    
+	    if(length(edges) < 1)  edges <- matrix(as.character(NA), nrow=0, ncol=2)
+
 	    colnames(edges) <- c("from", "to")
 	    edges
 	})

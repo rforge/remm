@@ -22,6 +22,8 @@ setMethod("transition", signature(x = "TRACDS",
 	function(x, from, to, 
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 
+		if(nrow(from)==0) return(numeric(0))
+
 		to <- from[,2]
 		from <- from[,1]
 
