@@ -22,8 +22,6 @@ setMethod("transition", signature(x = "TRACDS",
 	function(x, from, to, 
 		type=c("probability", "counts", "log_odds"), plus_one = FALSE){
 
-		if(nrow(from)==0) return(numeric(0))
-
 		to <- from[,2]
 		from <- from[,1]
 
@@ -36,6 +34,11 @@ setMethod("transition", signature(x = "TRACDS", from = "character", to =
                 "character"), function(x, from, to, type=c("probability",
                         "counts", "log_odds"), plus_one = FALSE){ 
             type <- match.arg(type)
+
+	    if(length(from) != length(to)) stop("vectors from and to are not of the same length!")
+	    
+	    ### deal with empty from/to
+	    if(length(from) <1) return(numeric(0))	
 
             tm <- transition_matrix(x, type, plus_one)
 

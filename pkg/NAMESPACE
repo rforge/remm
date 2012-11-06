@@ -47,6 +47,7 @@ export(
     update,
     compact,
     nstates,
+    ntransitions,
     reset,
     states,
     current_state,
