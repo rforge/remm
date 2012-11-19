@@ -84,11 +84,11 @@ examples and applications.
 %% in the following format:
 \Address{
     Michael Hahsler\\
-        Computer Science and Engineering\\
+        Engineering Management, Informartion, and Systems\\
         Lyle School of Engineering\\
         Southern Methodist University\\
-        P.O. Box 750122 \\
-        Dallas, TX 75275-0122\\
+        P.O. Box 750123 \\
+        Dallas, TX 75275-0123\\
         E-mail: \email{mhahsler@lyle.smu.edu}\\
         URL: \url{http://lyle.smu.edu/~mhahsler}
 
