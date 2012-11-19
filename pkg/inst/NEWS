@@ -1,3 +1,9 @@
+Changes in version 1.0-7
+    * improved plot for tNN
+    * tNN: centroids stop moving to prevent 2 clusters from colliding
+    * fixed bug with getting transitions from a tracds object with 0 transitions
+    * find_clusters also accepts now a threshold factor for match_clusters
+
 Changes in version 1.0-6
     * Improved performance for prune()
     * Added object.size() which also reports memory used by the model 
