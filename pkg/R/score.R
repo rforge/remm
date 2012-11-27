@@ -17,8 +17,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-## does newdata come from the EMM?
+.simil_weight <- function(d, th) {
+    w <- .5^(d/th - 1)
+    w[d<=th] <-1
+    w
+}
 
+## does newdata come from the EMM?
 setMethod("score", signature(x = "EMM", newdata = "numeric"),
 	function(x, newdata, method=NULL, 
 		match_cluster="nn", plus_one = FALSE, 
@@ -93,14 +98,38 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		### the assigned clusters
 		
 		### FIXME: from sequence state to cluster!
-		S <- numeric(nrow(newdata)-1)
-		for(i in 1:(nrow(newdata)-1)) {
-		    S[i] <- as.numeric(pr_dist2simil(
-			dist(
-			    newdata[i, , drop=FALSE],
-			    cluster_centers(x)[tTable[i,1], , drop=FALSE],
-			    measure=x@measure)))
-    }
+#		S <- numeric(nrow(newdata)-1)
+#		for(i in 1:(nrow(newdata)-1)) {
+#		    S[i] <- as.numeric(pr_dist2simil(
+#				    dist(
+#					    newdata[i, , drop=FALSE],
+#					    cluster_centers(x)[tTable[i,1], ,
+#					    drop=FALSE],
+#					    measure=x@measure)))
+#		}
+		
+	    
+## Note: the last start is in the last row of tTable in column 2!
+		n <- nrow(newdata)
+		S <- numeric(n)
+		for(i in 1:n) {
+		    S[i] <- as.numeric(.simil_weight(
+				    dist(
+					    newdata[i, , drop=FALSE],
+					    cluster_centers(x)[
+					    tTable[min(i, n-1), 
+					    if(i<n) 1 else 2], ,
+					    drop=FALSE],
+					    measure=x@measure),
+				    #x@threshold
+				    x@tnn_d$var_thresholds[
+				    tTable[min(i, n-1),
+				    if(i<n) 1 else 2]]
+				    ))
+		}
+
+		S <- S[-n] * S[-1]
+
 
 
 		### probabilities

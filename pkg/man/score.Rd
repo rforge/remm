@@ -71,18 +71,18 @@ by the following methods:
     Weighted version of the product of probabilities. The weight is
     the  similarity between a new data point and the state in the model
     it is assigned to.
-    \deqn{S_\mathrm{weighted\_product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)}}}}{
-	P_weighted_product = prod(simil(x_i,s(i)) a_s(i),s(i+1))^(1/(l-1))}
+    \deqn{S_\mathrm{weighted\_product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\mathrm{simil}(x_i,s(i+1))  a_{s(i),s(i+1)}}}}{
+	P_weighted_product = prod(simil(x_i,s(i))simil(x_i,s(i+1)) a_s(i),s(i+1))^(1/(l-1))}
 }
 \item{"weighted_sum"}{
     Weighted version of the sum of probabilities.
-    \deqn{S_\mathrm{weighted\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)}}}{
-	S_weighted_sum = 1/(l-1) sum(simil(x_i,s(i))  a_s(i),s(i+1))}
+    \deqn{S_\mathrm{weighted\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\mathrm{simil}(x_i,s(i+1))  a_{s(i),s(i+1)}}}{
+	S_weighted_sum = 1/(l-1) sum(simil(x_i,s(i))simil(x_i,s(i+1))  a_s(i),s(i+1))}
 }
 \item{"weighted_log_sum"}{
 Weighted version of the sum of the log of probabilities.
-\deqn{S_\mathrm{weighted\_log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))  a_{s(i),s(i+1)})}}{
-	S_sum = 1/(l-1) sum(simil(x_i,s(i))  a_s(i),s(i+1))}
+\deqn{S_\mathrm{weighted\_log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))\mathrm{simil}(x_i,s(i+1))  a_{s(i),s(i+1)})}}{
+	S_sum = 1/(l-1) sum(simil(x_i,s(i))simil(x_i,s(i+1))  a_s(i),s(i+1))}
 }
 
 
@@ -99,10 +99,10 @@ where
 to state \eqn{j} in the model,
 \eqn{s(i)} is the state the \eqn{i}-th data point (\eqn{x_i}) in
 the new sequence is assigned to,
-and \eqn{\mathrm{simil}(\cdot)}{simil(.)} is a similarity function 
-(uses the same similarity/distance measure that was used to create the model;
-distances are converted into similarities using 
-\eqn{\mathrm{simil} = 1/(1+\mathrm{d})}{simil = 1/(1+d)}). 
+and \eqn{\mathrm{simil}(\cdot)}{simil(.)} is a modified and normalized 
+similarity function.
+It is normalzed for the threshold such that it is \eqn{\mathrm{simil} = 1} for \eqn{d<=threshold} and \eqn{\mathrm{simil} = .5^(d/threshold -1)} otherwise.
+\eqn{d} is the same distance measure that was used to create the model.
 
 For missing transitions \eqn{\mathrm{I(v)}{I(v)}} is an indicator function which is 0 for \eqn{v=0} and 1 otherwise.
 }

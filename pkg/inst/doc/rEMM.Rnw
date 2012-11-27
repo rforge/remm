@@ -9,8 +9,8 @@
 %\SweaveOpts{strip.white=TRUE, eps=FALSE}
 %\AtBeginDocument{\setkeys{Gin}{width=0.6\textwidth}}
 
-
 \usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
 
 %% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{amsmath}
@@ -84,7 +84,7 @@ examples and applications.
 %% in the following format:
 \Address{
     Michael Hahsler\\
-        Engineering Management, Informartion, and Systems\\
+        Engineering Management, Information, and Systems\\
         Lyle School of Engineering\\
         Southern Methodist University\\
         P.O. Box 750123 \\
@@ -1267,13 +1267,16 @@ the new sequence to a state  $s(i)$ in the model is unlikely to not be perfect
 we can extend the scores above with weights representing  the  similarity between a new data point and the state in the model.
 
 \begin{align}
-S_\mathrm{weighted\_product} &= \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\,  a_{s(i),s(i+1)}}} \\
-S_\mathrm{weighted\_sum} &= \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\,  a_{s(i),s(i+1)}} \\
-S_\mathrm{weighted\_log\_sum} &= \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))\,  a_{s(i),s(i+1)})}
+S_\mathrm{weighted\_product} &= \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\,\mathrm{simil}(x_i,s(i+1))\,   a_{s(i),s(i+1)}}} \\
+S_\mathrm{weighted\_sum} &= \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\,\mathrm{simil}(x_i,s(i+1))\,   a_{s(i),s(i+1)}} \\
+S_\mathrm{weighted\_log\_sum} &= \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))\,\mathrm{simil}(x_i,s(i+1))\,   a_{s(i),s(i+1)})}
 \end{align}
 where 
 $x_i$ represents the $i$-th data point in the new sequence, 
-$\mathrm{simil}(x_i,s(i)) = 1/(1+\mathrm{d}(x_i,s(i)))$ and
+$\mathrm{simil}(x_i,s(i)) = 1$
+if $\mathrm{d}(x_i,s(i) \le \mathrm{threshold}$ and
+$\mathrm{simil}(x_i,s(i)) = \frac{1}{2^{\frac{\mathrm{d}(x_i,s(i))}{\mathrm{threshold}} -1}}$
+otherwise.
 $\mathrm{d}()$ is the distance function used to build the model.
 
 A final very rough score can be obtained by just counting the number of

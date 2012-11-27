@@ -3,6 +3,7 @@ Changes in version 1.0-7
     * tNN: centroids stop moving to prevent 2 clusters from colliding
     * fixed bug with getting transitions from a tracds object with 0 transitions
     * find_clusters also accepts now a threshold factor for match_clusters
+    * score: weights for scoring are now normalized for threshold
 
 Changes in version 1.0-6
     * Improved performance for prune()
