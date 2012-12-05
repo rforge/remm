@@ -12,7 +12,7 @@ by the same process as the sequences used to build the EMM.
 }
 \usage{
 \S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
-"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "supported_transitions"), 
+"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "supported_transitions", "supported_states", "weighted_supported_states"), 
 match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
 \S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", "supported_transitions"), 
 match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
@@ -91,6 +91,21 @@ the model.
 \deqn{S_\mathrm{supported\_transitions} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
             S_\mathrm{supported\_transitions} = 1/(l-1) sum(I(a_s(i),s(i+1)))}
 }
+
+
+\item{"supported_states"}{Fraction of points in the new sequence \eqn{x} 
+for which a state (cluster) exists in the model. \code{match_cluster}
+is always \code{"exact"} because for \code{"nn"} this measure would
+always give 1. Note that this measure ignors transition information.
+}
+
+\item{"weighted_supported_states"}{
+Same as \code{"supported_states"} but instead of counting the 
+supported states, the similarity \eqn{\mathrm{simil}(x_i,s(i))}{simil(x_i,s(i))}
+is used as a weight. \code{match_cluster}
+is always \code{"nn"}.
+}
+
 }
 
 where 
@@ -101,10 +116,14 @@ to state \eqn{j} in the model,
 the new sequence is assigned to,
 and \eqn{\mathrm{simil}(\cdot)}{simil(.)} is a modified and normalized 
 similarity function.
-It is normalzed for the threshold such that it is \eqn{\mathrm{simil} = 1} for \eqn{d<=threshold} and \eqn{\mathrm{simil} = .5^(d/threshold -1)} otherwise.
+It is normalzed for the threshold such that it is 
+\eqn{\mathrm{simil} = 1}{simil = 1} for 
+\eqn{d \le \mathrm{threshold}}{d<=threshold} and 
+\eqn{\mathrm{simil} = .5^{(d/threshold -1)}}{simil = .5^(d/threshold -1)}
+otherwise.
 \eqn{d} is the same distance measure that was used to create the model.
 
-For missing transitions \eqn{\mathrm{I(v)}{I(v)}} is an indicator function which is 0 for \eqn{v=0} and 1 otherwise.
+For missing transitions \eqn{\mathrm{I(v)}}{I(v)} is an indicator function which is 0 for \eqn{v=0} and 1 otherwise.
 }
 \value{
     A scalar score value.
@@ -127,6 +146,8 @@ score(emm, EMMsim_test, method="log_sum")
 score(emm, EMMsim_test, method="weighted_product")
 score(emm, EMMsim_test, method="weighted_sum")
 score(emm, EMMsim_test, method="weighted_log_sum")
+score(emm, EMMsim_test, method="supported_states", match="exact")
+score(emm, EMMsim_test, method="weighted_supported_states")
 
 ### shuffle the data and score again
 EMMsim_test <- EMMsim_test[sample(1:nrow(EMMsim_test)),]
@@ -137,6 +158,8 @@ score(emm, EMMsim_test, method="log_sum")
 score(emm, EMMsim_test, method="weighted_product")
 score(emm, EMMsim_test, method="weighted_sum")
 score(emm, EMMsim_test, method="weighted_log_sum")
+score(emm, EMMsim_test, method="supported_states", match="exact")
+score(emm, EMMsim_test, method="weighted_supported_states")
 
 ### deal with missing transitions
 score(emm, EMMsim_test, method="product", plus_one=TRUE)

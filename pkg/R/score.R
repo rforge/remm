@@ -49,7 +49,9 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 			"weighted_log_sum",
 			"weighted_sum",
 			"log_odds", 
-			"supported_transitions"
+			"supported_transitions",
+			"supported_states",
+			"weighted_supported_states"
 			), 
 		match_cluster = "nn", plus_one = FALSE, 
 		initial_transition = FALSE) {
@@ -85,29 +87,26 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 			match_cluster, plus_one=FALSE, initial_transition)
 		return((nrow(tTable)-sum(tTable[,3]==0))/nrow(tTable))
 	    }
+	    
+	    if(method == "supported_states") {
+		### We just ignore it
+		###if(plus_one) warning("plus_one has no effect on supported transitions!")
+		### match clusters should be "exact" for this to make sense
+		if(!pmatch(match_cluster, "exact", nomatch=0)) warning("Using 'exact 'for 'match_cluster' for supported clusters!")
+		states <- find_clusters(x, newdata, match_cluster="exact")
+		return(sum(!is.na(states))/length(states))
+	    }
 
 	    if(method == "weighted_product" 
 		    || method == "weighted_log_sum"
-		    || method == "weighted_sum") {
+		    || method == "weighted_sum"
+		    || method == "weighted_supported_states") {
 	   
+		if(!pmatch(match_cluster, "nn", nomatch=0)) warning("Using 'nn 'for 'match_cluster' for weighted scores!")
 
 		tTable <- transition_table(x, newdata, method="prob",
-			match_cluster, plus_one=plus_one,
+			match_cluster="nn", plus_one=plus_one,
 			initial_transition)
-		### find similarities between the sequence states and 
-		### the assigned clusters
-		
-		### FIXME: from sequence state to cluster!
-#		S <- numeric(nrow(newdata)-1)
-#		for(i in 1:(nrow(newdata)-1)) {
-#		    S[i] <- as.numeric(pr_dist2simil(
-#				    dist(
-#					    newdata[i, , drop=FALSE],
-#					    cluster_centers(x)[tTable[i,1], ,
-#					    drop=FALSE],
-#					    measure=x@measure)))
-#		}
-		
 	    
 ## Note: the last start is in the last row of tTable in column 2!
 		n <- nrow(newdata)
@@ -128,9 +127,13 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 				    ))
 		}
 
+
+		if(method == "weighted_supported_states"){
+		    return(sum(S)/length(S))
+		}
+
+		### product of source and target weight
 		S <- S[-n] * S[-1]
-
-
 
 		### probabilities
 		P <- tTable[,3]
