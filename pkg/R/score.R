@@ -51,7 +51,8 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 			"log_odds", 
 			"supported_transitions",
 			"supported_states",
-			"weighted_supported_states"
+			"weighted_supported_states",
+			"sum_transitions"
 			), 
 		match_cluster = "nn", plus_one = FALSE, 
 		initial_transition = FALSE) {
@@ -95,6 +96,11 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		if(!pmatch(match_cluster, "exact", nomatch=0)) warning("Using 'exact 'for 'match_cluster' for supported clusters!")
 		states <- find_clusters(x, newdata, match_cluster="exact")
 		return(sum(!is.na(states))/length(states))
+	    }
+	    
+	    if(method == "sum_transitions") {
+		cnt<-transition_table(x, newdata, method="counts")$counts
+		return(sum(cnt)/sum(smc_countMatrix(x@tracds_d$mm)))
 	    }
 
 	    if(method == "weighted_product" 

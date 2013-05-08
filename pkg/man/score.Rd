@@ -44,6 +44,9 @@ by the following methods:
     a score of 0. Use \code{plus_one} to avoid this.
     \deqn{S_\mathrm{product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{a_{s(i),s(i+1)}}}}{
 	S_product = prod(a_s(i),s(i+1))^(1/(l-1))}
+
+  where \eqn{a_{s(i),s(j)}}{a_s(i),s(j)} is the transition probability
+  between the state representing positions \eqn{i} and \eqn{j} in the sequence.
 }
 
 \item{"sum"}{
@@ -89,9 +92,16 @@ Weighted version of the sum of the log of probabilities.
 \item{"supported_transitions"}{Fraction of transitions in the new sequence \eqn{x} supported (present) in the model after assigning each data point in \eqn{x} to a state in
 the model.
 \deqn{S_\mathrm{supported\_transitions} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
-            S_\mathrm{supported\_transitions} = 1/(l-1) sum(I(a_s(i),s(i+1)))}
+            S_supported_transitions = 1/(l-1) sum(I(a_s(i),s(i+1)))}
 }
 
+\item{"sum_transitions"}{Sum of the counts on the edges in the model on the path of sequence \eqn{x} normalized by the total number of transition counts in the model.
+                               \deqn{S_\mathrm{sum\_transitions} = \sum_{i=1}^{l-1}c_{s(i),s(i+1)}}{
+                                 S_sum_transitions = sum(c_s(i),s(i+1))}
+
+  where \eqn{c_{s(i),s(i+1)}}{c_s(i),s(i+1)} is the transition count  between the state representing positions \eqn{i} and \eqn{j} in the sequence.
+
+}
 
 \item{"supported_states"}{Fraction of points in the new sequence \eqn{x} 
 for which a state (cluster) exists in the model. \code{match_cluster}
