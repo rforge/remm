@@ -12,7 +12,7 @@ by the same process as the sequences used to build the EMM.
 }
 \usage{
 \S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
-"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "supported_transitions", "supported_states", "weighted_supported_states"), 
+"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "supported_transitions", "supported_states", "weighted_supported_states", "sum_transitions"), 
 match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
 \S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", "supported_transitions"), 
 match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
@@ -24,7 +24,7 @@ match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
   \item{method}{ method to calculate the score (see details) }
   \item{match_cluster}{ do the new observations have to fall within
     the threshold of the cluster (\code{"exact"}) or is nearest neighbor 
-    used (\code{"nn"})?}
+    used (\code{"nn"})? If \code{match_cluster} is a number n then observations need to fall within n times the clustering threshold of the cluster.}
   \item{plus_one}{ add one to each transition count. This is equal
       to start with a count of one  for each transition, i.e. initially all
           transitions are equally likely. It prevents the product
@@ -96,8 +96,8 @@ the model.
 }
 
 \item{"sum_transitions"}{Sum of the counts on the edges in the model on the path of sequence \eqn{x} normalized by the total number of transition counts in the model.
-                               \deqn{S_\mathrm{sum\_transitions} = \sum_{i=1}^{l-1}c_{s(i),s(i+1)}}{
-                                 S_sum_transitions = sum(c_s(i),s(i+1))}
+                               \deqn{S_\mathrm{sum\_transitions} = \frac{1}{l-1} \sum_{i=1}^{l-1}c_{s(i),s(i+1)}}{
+                                 S_sum_transitions = 1/(l-1) sum(c_s(i),s(i+1))}
 
   where \eqn{c_{s(i),s(i+1)}}{c_s(i),s(i+1)} is the transition count  between the state representing positions \eqn{i} and \eqn{j} in the sequence.
 

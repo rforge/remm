@@ -100,7 +100,7 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 	    
 	    if(method == "sum_transitions") {
 		cnt<-transition_table(x, newdata, method="counts")$counts
-		return(sum(cnt)/sum(smc_countMatrix(x@tracds_d$mm)))
+		return(sum(cnt)/sum(smc_countMatrix(x@tracds_d$mm))/length(cnt))
 	    }
 
 	    if(method == "weighted_product" 
