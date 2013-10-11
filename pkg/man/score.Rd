@@ -12,10 +12,13 @@ by the same process as the sequences used to build the EMM.
 }
 \usage{
 \S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
-"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", "supported_transitions", "supported_states", "weighted_supported_states", "sum_transitions"), 
-match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
-\S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", "supported_transitions"), 
-match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
+"weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", 
+"supported_transitions", "supported_states", "weighted_supported_states", 
+"sum_transitions"), 
+match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE, threshold = NA)
+\S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", 
+"supported_transitions"), match_cluster = "nn", plus_one=FALSE, 
+initial_transition = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,13 +27,15 @@ match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
   \item{method}{ method to calculate the score (see details) }
   \item{match_cluster}{ do the new observations have to fall within
     the threshold of the cluster (\code{"exact"}) or is nearest neighbor 
-    used (\code{"nn"})? If \code{match_cluster} is a number n then observations need to fall within n times the clustering threshold of the cluster.}
+    used (\code{"nn"})? If \code{match_cluster} is a number n then observations 
+    need to fall within n times the clustering threshold of the cluster.}
   \item{plus_one}{ add one to each transition count. This is equal
       to start with a count of one  for each transition, i.e. initially all
           transitions are equally likely. It prevents the product
           of probabilities to be zero if a transition was never observed. }
   \item{initial_transition}{ include the initial transition 
          in the computation?}
+  \item{threshold}{ minimum count threshold used by supported transitions and supported states.}
 }
 \details{
 The scores for a new sequence \eqn{x} of length \eqn{l} can be computed
@@ -90,7 +95,7 @@ Weighted version of the sum of the log of probabilities.
 
 
 \item{"supported_transitions"}{Fraction of transitions in the new sequence \eqn{x} supported (present) in the model after assigning each data point in \eqn{x} to a state in
-the model.
+the model. 
 \deqn{S_\mathrm{supported\_transitions} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{I}(a_{s(i),s(i+1)})}}{
             S_supported_transitions = 1/(l-1) sum(I(a_s(i),s(i+1)))}
 }
@@ -101,19 +106,23 @@ the model.
 
   where \eqn{c_{s(i),s(i+1)}}{c_s(i),s(i+1)} is the transition count  between the state representing positions \eqn{i} and \eqn{j} in the sequence.
 
+
+If threshold is given, then only transitions with a count greater than the given threshold are counted as supported.
 }
 
 \item{"supported_states"}{Fraction of points in the new sequence \eqn{x} 
 for which a state (cluster) exists in the model. \code{match_cluster}
 is always \code{"exact"} because for \code{"nn"} this measure would
 always give 1. Note that this measure ignors transition information.
+
+If threshold is given, then only states with a count greater than the given threshold are counted as supported.
 }
 
 \item{"weighted_supported_states"}{
 Same as \code{"supported_states"} but instead of counting the 
 supported states, the similarity \eqn{\mathrm{simil}(x_i,s(i))}{simil(x_i,s(i))}
 is used as a weight. \code{match_cluster}
-is always \code{"nn"}.
+is always \code{"nn"}. Threshold is not implemented.
 }
 
 }

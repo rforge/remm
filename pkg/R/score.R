@@ -27,7 +27,7 @@
 setMethod("score", signature(x = "EMM", newdata = "numeric"),
 	function(x, newdata, method=NULL, 
 		match_cluster="nn", plus_one = FALSE, 
-		initial_transition = FALSE) 
+		initial_transition = FALSE, threshold = NA) 
 	score(x, as.matrix(rbind(newdata)), method, 
 		match_cluster, plus_one, initial_transition)
 )
@@ -35,7 +35,7 @@ setMethod("score", signature(x = "EMM", newdata = "numeric"),
 setMethod("score", signature(x = "EMM", newdata = "data.frame"),
 	function(x, newdata, method=NULL, 
 		match_cluster="nn", plus_one = FALSE, 
-		initial_transition = FALSE) 
+		initial_transition = FALSE, threshold = NA) 
 	score(x, as.matrix(newdata), method, 
 		match_cluster, plus_one, initial_transition)
 )
@@ -55,7 +55,7 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 			"sum_transitions"
 			), 
 		match_cluster = "nn", plus_one = FALSE, 
-		initial_transition = FALSE) {
+		initial_transition = FALSE, threshold = NA) {
 
 	method <- match.arg(method)
 
@@ -86,15 +86,26 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
 		###if(plus_one) warning("plus_one has no effect on supported transitions!")
 		tTable <- transition_table(x, newdata, method="count",
 			match_cluster, plus_one=FALSE, initial_transition)
+		
+		### remove transitions with count < threshold
+		if(!is.na(threshold)) tTable[["counts"]][tTable[["counts"]]<threshold] <- 0
+		
 		return((nrow(tTable)-sum(tTable[,3]==0))/nrow(tTable))
 	    }
 	    
 	    if(method == "supported_states") {
 		### We just ignore it
 		###if(plus_one) warning("plus_one has no effect on supported transitions!")
-		### match clusters should be "exact" for this to make sense
-		if(!pmatch(match_cluster, "exact", nomatch=0)) warning("Using 'exact 'for 'match_cluster' for supported clusters!")
-		states <- find_clusters(x, newdata, match_cluster="exact")
+		### match clusters should be "exact" or a number for this to make sense
+		if(!pmatch(match_cluster, "nn", nomatch=0)) {
+		    warning("Using 'exact 'for 'match_cluster' for supported clusters!")
+		    match_cluster <- "exact"
+		}
+		states <- find_clusters(x, newdata, match_cluster=match_cluster)
+		
+		### remove states with count < threshold
+		if(!is.na(threshold)) states[cluster_counts(x)[states]<threshold] <- NA  
+		
 		return(sum(!is.na(states))/length(states))
 	    }
 	    
