@@ -91,7 +91,7 @@ examples and applications.
         Dallas, TX 75275-0123\\
         E-mail: \email{mhahsler@lyle.smu.edu}\\
         URL: \url{http://lyle.smu.edu/~mhahsler}
-
+ 
     Margaret H. Dunham\\
         Computer Science and Engineering\\
         Lyle School of Engineering\\
@@ -1263,8 +1263,11 @@ S_\mathrm{sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{a_{s(i),s(i+1)}}
 \end{equation}
 
 Since the assignment of the $i^\textrm{th}$ data point in
-the new sequence to a state  $s(i)$ in the model is unlikely to not be perfect
-we can extend the scores above with weights representing  the  similarity between a new data point and the state in the model.
+the new sequence to a state  $s(i)$ in the model may not be perfect (the new 
+data point is slightly outside the assignment threshold)
+we can extend the scores above in the following way. We assign data points
+to the nearest state ignoring the threshold and then use weights representing  
+the  similarity between a new data point and the state in the model.
 
 \begin{align}
 S_\mathrm{weighted\_product} &= \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\,\mathrm{simil}(x_i,s(i+1))\,   a_{s(i),s(i+1)}}} \\
@@ -1272,11 +1275,13 @@ S_\mathrm{weighted\_sum} &= \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(
 S_\mathrm{weighted\_log\_sum} &= \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))\,\mathrm{simil}(x_i,s(i+1))\,   a_{s(i),s(i+1)})}
 \end{align}
 where 
-$x_i$ represents the $i$-th data point in the new sequence, 
-$\mathrm{simil}(x_i,s(i)) = 1$
-if $\mathrm{d}(x_i,s(i) \le \mathrm{threshold}$ and
-$\mathrm{simil}(x_i,s(i)) = \frac{1}{2^{\frac{\mathrm{d}(x_i,s(i))}{\mathrm{threshold}} -1}}$
-otherwise.
+$x_i$ represents the $i$-th data point in the new sequence, and
+
+$$\mathrm{simil}(x_i,s(i)) = \begin{cases}
+  1& \text{if $\mathrm{d}(x_i,s(i)) \le \mathrm{threshold}$, and}\\ 
+  \frac{1}{2^{\frac{\mathrm{d}(x_i,s(i))}{\mathrm{threshold}} -1}} &
+\text{otherwise.}
+\end{cases}$$
 $\mathrm{d}()$ is the distance function used to build the model.
 
 A final very rough score can be obtained by just counting the number of
@@ -1299,8 +1304,8 @@ fits the EMM created
 for the EMMsim data in the section above. The test data is 
 supplied together with the training set in \pkg{rEMM}.
 <<>>=
-score(emm, EMMsim_test, method="product", match_cluster="exact")
-score(emm, EMMsim_test, method="sum", match_cluster="exact")
+score(emm, EMMsim_test, method="product")
+score(emm, EMMsim_test, method="sum")
 @
 
 %\marginpar{Maybe introduce log\_odds for comparing EMMs of different size?}
@@ -1316,7 +1321,7 @@ The transition table is computed by \func{transition\_table}.
 
 %\marginpar{Problem with plus\_one and age!}
 <<>>=
-transition_table(emm, EMMsim_test, match_cluster="exact")
+transition_table(emm, EMMsim_test)
 @
 
 The low score is caused by data points that do not fall within the threshold
@@ -1334,7 +1339,7 @@ the ``supported transition'' score which gives the
 proportion of transitions in the (test) data supported in the model.
 
 <<>>=
-score(emm, EMMsim_test, method="supported_transitions", match_cluster="exact")
+score(emm, EMMsim_test, method="supported_transitions")
 @
 
 To reduce the problem of not being able to match a data point to a 
@@ -1499,8 +1504,8 @@ to give useful results.
 Derwent_scaled <- scale(Derwent)
 emm <- EMM(measure="euclidean", threshold=3)
 build(emm, Derwent_scaled)
-#cluster_counts(emm)
-#state_centers(emm)
+cluster_counts(emm)
+cluster_centers(emm)
 plot(emm, method = "cluster_counts", log="y")
 @
 \begin{figure}
@@ -1584,8 +1589,6 @@ mark_states <- function(states, state_sequence, ys, col=0, label=NULL, ...) {
 
 mark_states("11", state_sequence, Derwent[,catchment], col="blue", label="11")
 mark_states("12", state_sequence, Derwent[,catchment], col="red", label="12")
-#mark_states("9", state_sequence, Derwent[,catchment], col="green", label="9")
-#mark_states("3", state_sequence, Derwent[,catchment], col="blue")
 @
 \begin{figure}
 \begin{minipage}[b]{.49\linewidth}
@@ -1618,8 +1621,6 @@ main=colnames(Derwent)[catchment])
 
 mark_states("11", state_sequence, Derwent[,catchment], col="blue", label="11")
 mark_states("12", state_sequence, Derwent[,catchment], col="red", label="12")
-#mark_states("9", state_sequence, Derwent[,catchment], col="green", label="9")
-#mark_states("3", state_sequence, Derwent[,catchment], col="blue")
 @
 
 The catchment at Wind Field Park is at the Amber river which is a tributary of

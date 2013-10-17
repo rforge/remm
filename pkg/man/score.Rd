@@ -15,9 +15,9 @@ by the same process as the sequences used to build the EMM.
 "weighted_product", "weighted_log_sum", "weighted_sum", "log_odds", 
 "supported_transitions", "supported_states", "weighted_supported_states", 
 "sum_transitions"), 
-match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE, threshold = NA)
+match_cluster = "exact", plus_one=FALSE, initial_transition = FALSE, threshold = NA)
 \S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", 
-"supported_transitions"), match_cluster = "nn", plus_one=FALSE, 
+"supported_transitions"), match_cluster = "exact", plus_one=FALSE, 
 initial_transition = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -78,17 +78,17 @@ by the following methods:
 \item{"weighted_product"}{
     Weighted version of the product of probabilities. The weight is
     the  similarity between a new data point and the state in the model
-    it is assigned to.
+    it is assigned to. Uses always "nn" matching.
     \deqn{S_\mathrm{weighted\_product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\mathrm{simil}(x_i,s(i+1))  a_{s(i),s(i+1)}}}}{
 	P_weighted_product = prod(simil(x_i,s(i))simil(x_i,s(i+1)) a_s(i),s(i+1))^(1/(l-1))}
 }
 \item{"weighted_sum"}{
-    Weighted version of the sum of probabilities.
+    Weighted version of the sum of probabilities. Uses always "nn" matching.
     \deqn{S_\mathrm{weighted\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{simil}(x_i,s(i))\mathrm{simil}(x_i,s(i+1))  a_{s(i),s(i+1)}}}{
 	S_weighted_sum = 1/(l-1) sum(simil(x_i,s(i))simil(x_i,s(i+1))  a_s(i),s(i+1))}
 }
 \item{"weighted_log_sum"}{
-Weighted version of the sum of the log of probabilities.
+Weighted version of the sum of the log of probabilities. Uses always "nn" matching.
 \deqn{S_\mathrm{weighted\_log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(\mathrm{simil}(x_i,s(i))\mathrm{simil}(x_i,s(i+1))  a_{s(i),s(i+1)})}}{
 	S_sum = 1/(l-1) sum(simil(x_i,s(i))simil(x_i,s(i+1))  a_s(i),s(i+1))}
 }
@@ -122,7 +122,7 @@ If threshold is given, then only states with a count greater than the given thre
 Same as \code{"supported_states"} but instead of counting the 
 supported states, the similarity \eqn{\mathrm{simil}(x_i,s(i))}{simil(x_i,s(i))}
 is used as a weight. \code{match_cluster}
-is always \code{"nn"}. Threshold is not implemented.
+is always \code{"nn"}. Threshold is not implemented. Uses always "nn" matching.
 }
 
 }

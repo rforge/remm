@@ -11,7 +11,7 @@ with the transition probabilities or counts.
 }
 \usage{
 \S4method{transition_table}{EMM,matrix}(x, newdata, method = c("prob", "counts",
-"log_odds"), match_cluster = "nn", plus_one=FALSE, initial_transition = FALSE)
+"log_odds"), match_cluster = "exact", plus_one=FALSE, initial_transition = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
