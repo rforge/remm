@@ -1,6 +1,6 @@
 Changes in version 1.0-8
-    * score: supported_transactions and supported_states use now a minimum
-	threshold, the default is now "exact" instead of "nn"
+    * score: match_clusters can now be "exact", "nn" or "weighted", where 
+  weighted replaces all the weighted scores. 
 
 Changes in version 1.0-7
     * improved plot for tNN

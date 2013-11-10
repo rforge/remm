@@ -45,13 +45,9 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
             "product", 
             "log_sum", 
             "sum", 
-            "weighted_product",
-            "weighted_log_sum",
-            "weighted_sum",
             "log_odds", 
             "supported_transitions",
             "supported_states",
-            "weighted_supported_states",
             "sum_transitions"
           ), 
                    match_cluster = "exact", 
@@ -61,68 +57,68 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
             
             method <- match.arg(method)
             
-            if(method == "product" 
-               || method == "log_sum" 
-               || method == "sum") {
-              prob <- transition_table(x, newdata, method="prob", 
-                                       match_cluster, plus_one, 
-                                       initial_transition)[,3]
-              
-              if(method == "product")
-                return(prod(prob)^(1/length(prob)))
-              if(method == "log_sum")
-                return(sum(log(prob))/length(prob))
-              ### must be sum
-              return(sum(prob)/length(prob))
-            }
+            match_cluster <- match.arg(match_cluster, c("exact", "nn", "weighted"))
             
-            if(method == "log_odds") {
-              log_odds <- transition_table(x, newdata, method="log_odds", 
-                                           match_cluster, plus_one, 
-                                           initial_transition)[,3]
-              return(sum(log_odds))
-            }
-            
-            if(method == "supported_transitions") {
-              ### We just ignore it
-              ###if(plus_one) warning("plus_one has no effect on supported transitions!")
-              tTable <- transition_table(x, newdata, method="count",
-                                         match_cluster, plus_one=FALSE, initial_transition)
-              
-              ### remove transitions with count < threshold
-              if(!is.na(threshold)) tTable[["counts"]][tTable[["counts"]]<threshold] <- 0
-              
-              return((nrow(tTable)-sum(tTable[,3]==0))/nrow(tTable))
-            }
-            
-            if(method == "supported_states") {
-              ### We just ignore it
-              ###if(plus_one) warning("plus_one has no effect on supported transitions!")
-              ### match clusters should be "exact" or a number for this to make sense
-              if(!pmatch(match_cluster, "exact", nomatch=0)) {
-                warning("Using 'exact 'for 'match_cluster' for supported clusters!")
-                match_cluster <- "exact"
+            if(match_cluster != "weighted") {
+              if(method == "product" 
+                 || method == "log_sum" 
+                 || method == "sum") {
+                prob <- transition_table(x, newdata, method="prob", 
+                                         match_cluster, plus_one, 
+                                         initial_transition)[,3]
+                
+                if(method == "product")
+                  return(prod(prob)^(1/length(prob)))
+                if(method == "log_sum")
+                  return(sum(log(prob))/length(prob))
+                ### must be sum
+                return(sum(prob)/length(prob))
               }
-              states <- find_clusters(x, newdata, match_cluster=match_cluster)
               
-              ### remove states with count < threshold
-              if(!is.na(threshold)) states[cluster_counts(x)[states]<threshold] <- NA  
+              if(method == "log_odds") {
+                log_odds <- transition_table(x, newdata, method="log_odds", 
+                                             match_cluster, plus_one, 
+                                             initial_transition)[,3]
+                return(sum(log_odds))
+              }
               
-              return(sum(!is.na(states))/length(states))
-            }
+              if(method == "supported_transitions") {
+                ### We just ignore it
+                ###if(plus_one) warning("plus_one has no effect on supported transitions!")
+                tTable <- transition_table(x, newdata, method="count",
+                                           match_cluster, plus_one=FALSE, initial_transition)
+                
+                
+                C <- tTable[,"counts"]
+                ### remove transitions with count < threshold
+                if(!is.na(threshold)) C[C<threshold] <- 0
+                
+                return((sum(C>0))/length(C))
+              }
+              
+              if(method == "supported_states") {
+                ### We just ignore it
+                ###if(plus_one) warning("plus_one has no effect on supported transitions!")
+                ### match clusters should be "exact" or a number for this to make sense
+                if(!pmatch(match_cluster, "exact", nomatch=0)) {
+                  warning("Using 'exact 'for 'match_cluster' for supported clusters!")
+                  match_cluster <- "exact"
+                }
+                states <- find_clusters(x, newdata, match_cluster=match_cluster)
+                
+                ### remove states with count < threshold
+                if(!is.na(threshold)) states[cluster_counts(x)[states]<threshold] <- NA  
+                
+                return(sum(!is.na(states))/length(states))
+              }
+              
+              if(method == "sum_transitions") {
+                cnt<-transition_table(x, newdata, method="counts")$counts
+                return(sum(cnt)/sum(smc_countMatrix(x@tracds_d$mm))/length(cnt))
+              }
             
-            if(method == "sum_transitions") {
-              cnt<-transition_table(x, newdata, method="counts")$counts
-              return(sum(cnt)/sum(smc_countMatrix(x@tracds_d$mm))/length(cnt))
-            }
-            
-            if(method == "weighted_product" 
-               || method == "weighted_log_sum"
-               || method == "weighted_sum"
-               || method == "weighted_supported_states") {
               
-#              if(!pmatch(match_cluster, "nn", nomatch=0)) 
-#                warning("Using 'nn 'for 'match_cluster' for weighted scores!")
+            }else{ ### weighted
               
               tTable <- transition_table(x, newdata, method="prob",
                                          match_cluster="nn", plus_one=plus_one,
@@ -147,8 +143,7 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
                 ))
               }
               
-              
-              if(method == "weighted_supported_states"){
+              if(method == "supported_states"){
                 return(sum(S)/length(S))
               }
               
@@ -156,17 +151,32 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
               S <- S[-n] * S[-1]
               
               ### probabilities
-              P <- tTable[,3]
+              P <- tTable[,"prob"]
+        
+              if(method == "supported_transitions"){
+                C <- transition(emm, as.matrix(tTable[,1:2]), type="count",
+                                plus_one=FALSE)
+                
+                ### remove transitions with count < threshold
+                if(!is.na(threshold)) C[C<threshold] <- 0
+                
+                return(sum(S*C>0)/length(C))
+              }
               
-              if(method == "weighted_product") 
+              if(method == "product") 
                 return(prod(S*P)^(1/nrow(tTable)))
-              if(method == "weighted_log_sum") 
+              if(method == "log_sum") 
                 return(sum(log(S*P))/nrow(tTable))
-              ### must be weighted sum
-              return(sum(S*P)/nrow(tTable))
+              if(method == "sum") 
+                return(sum(S*P)/nrow(tTable))
+        
+              stop("Unknown method for match_cluster=weighted!")
             }
+
+            stop("Unknown method!")
             
-          })
+          }
+          )
 
 
 ### score two models
