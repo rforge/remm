@@ -154,7 +154,7 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
               P <- tTable[,"prob"]
         
               if(method == "supported_transitions"){
-                C <- transition(emm, as.matrix(tTable[,1:2]), type="count",
+                C <- transition(x, as.matrix(tTable[,1:2]), type="count",
                                 plus_one=FALSE)
                 
                 ### remove transitions with count < threshold
