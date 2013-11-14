@@ -23,6 +23,12 @@
   w
 }
 
+### use sigmoid curve instead
+#.simil_weight <- function(d, th) {
+#  w <- 1-plogis(d/th, 1.5, .2)
+#  w
+#}
+
 ## does newdata come from the EMM?
 setMethod("score", signature(x = "EMM", newdata = "numeric"),
           function(x, newdata, method=NULL, 

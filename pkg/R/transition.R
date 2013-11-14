@@ -28,7 +28,18 @@ setMethod("transition", signature(x = "TRACDS",
 		transition(x, from, to, type, plus_one)
 	}
 )
-		
+	
+setMethod("transition", signature(x = "TRACDS", 
+          from = "data.frame", to = "missing"),
+          function(x, from, to, 
+                   type=c("probability", "counts", "log_odds"), plus_one = FALSE){
+            
+            to <- from[,2]
+            from <- from[,1]
+            
+            transition(x, from, to, type, plus_one)
+          }
+)
 
 setMethod("transition", signature(x = "TRACDS", from = "character", to =
                 "character"), function(x, from, to, type=c("probability",

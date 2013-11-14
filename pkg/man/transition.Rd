@@ -2,6 +2,7 @@
 \alias{transition}
 \alias{transition,TRACDS,character,character-method}
 \alias{transition,TRACDS,matrix,missing-method}
+\alias{transition,TRACDS,data.frame,missing-method}
 \alias{transition_matrix}
 \alias{transition_matrix,TRACDS-method}
 \alias{initial_transition}
