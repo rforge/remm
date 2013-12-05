@@ -11,12 +11,14 @@
   by the same process as the sequences used to build the EMM.
 }
 \usage{
-  \S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
-                                                      "log_odds", "supported_transitions", "supported_states", "sum_transitions"), 
-                               match_cluster = "exact", plus_one=FALSE, initial_transition = FALSE, threshold = NA)
-  \S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", 
-                                                   "supported_transitions"), match_cluster = "exact", plus_one=FALSE, 
-                            initial_transition = FALSE)
+\S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
+        "log_odds", "supported_transitions", "supported_states", 
+        "sum_transitions",  "log_loss", "likelihood"), 
+        match_cluster = "exact", prior=TRUE, normalize=TRUE, 
+        initial_transition = FALSE, threshold = NA)
+\S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", 
+        "supported_transitions"), match_cluster = "exact", prior=TRUE, 
+        initial_transition = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,10 +30,11 @@
                         (\code{"nn"}) or weighted nearest neighbor (\code{weighted}) used? 
                         If \code{match_cluster} is a number n then observations 
                         need to fall within n times the clustering threshold of the cluster.}
-  \item{plus_one}{ add one to each transition count. This is equal
+  \item{prior}{ add one to each transition count. This is equal
                    to start with a count of one  for each transition, i.e. initially all
                    transitions are equally likely. It prevents the product
                    of probabilities to be zero if a transition was never observed. }
+  \item{normalize}{normalize the score by the length of the sequence.} 
   \item{initial_transition}{ include the initial transition 
                              in the computation?}
   \item{threshold}{ minimum count threshold used by supported transitions and supported states.}
@@ -45,7 +48,7 @@
         Product of transition probabilities along the path of \eqn{x} in the 
         model. A single missing transition (transition probability of zero) 
         will result in
-        a score of 0. Use \code{plus_one} to avoid this.
+        a score of 0. Use \code{prior} to avoid this.
         \deqn{S_\mathrm{product} = \sqrt[l-1]{\prod_{i=1}^{l-1}{a_{s(i),s(i+1)}}}}{
           S_product = prod(a_s(i),s(i+1))^(1/(l-1))}
         
@@ -67,7 +70,7 @@
         
         A single missing transition (transition probability of zero)
         will result in a score of neg. infinity. 
-        Use \code{plus_one} to avoid this. 
+        Use \code{prior} to avoid this. 
         
         \deqn{S_\mathrm{log\_sum} = \frac{1}{l-1} \sum_{i=1}^{l-1}{\mathrm{log}(a_{s(i),s(i+1)})}}{
           S_sum = 1/(l-1) sum(log(a_s(i),s(i+1)))}
@@ -136,22 +139,13 @@
     supported states, the similarity \eqn{\mathrm{simil}(x_i,s(i))}{simil(x_i,s(i))}
     is used as a weight. Threshold is not implemented. 
   }
-  
-  \item{"supported_transitions"}{
-    Same as \code{"supported_transitions"} but
-    \eqn{\mathrm{simil}(x_i,s(i))}{simil(x_i,s(i))}
-    is used as a weight.
-  }
 }
 
 where \eqn{\mathrm{simil}(\cdot)}{simil(.)} is a modified and normalized 
-similarity function.
-It is normalzed for the threshold such that it is 
-\eqn{\mathrm{simil} = 1}{simil = 1} for 
-\eqn{d \le \mathrm{threshold}}{d<=threshold} and 
-\eqn{\mathrm{simil} = .5^{(d/threshold -1)}}{simil = .5^(d/threshold -1)}
-otherwise.
-\eqn{d} is the same distance measure that was used to create the model.
+similarity function given by 
+\eqn{\mathrm{simil}(x,s) =  1- \frac{1}{1+e^{-\frac{\mathrm{d}(x, s)/t -1.5}{.2}}}}{simil(x,s)=1-1/(1+exp(-(d(x,s)/t-1.5)/.2))}
+where \eqn{d} is the distance measure and \eqn{t} is the threshold that 
+  was used to create the model.
 
 }
 \value{
@@ -162,51 +156,54 @@ otherwise.
 \seealso{\code{\link{transition}} to access transition probabilities
          and \code{\link{find_clusters}} for assigning observations to states/clusters. }
 \examples{
-  data("EMMsim")
+data("EMMsim")
   
-  emm <- EMM(threshold=.2)
-  emm <- build(emm, EMMsim_train)
+emm <- EMM(threshold=.2)
+emm <- build(emm, EMMsim_train)
   
-  score(emm, EMMsim_test) # default is method "product"
-  
-  
-  ### create shuffled data (destroy temporal relationship)
-  ### and noisy data
-  test_shuffled <- EMMsim_test[sample(1:nrow(EMMsim_test)),]
-  test_noise <- jitter(EMMsim_test, amount=.3)
-  
-  ### helper for plotting
-  mybars <- function(...) {
-    oldpar <- par(mar=c(5,10,4,2))
-    ss <- rbind(...) 
-    barplot(ss[,ncol(ss):1], xlim=c(-1,3), beside=TRUE, 
-            horiz=TRUE, las=2, 
-            legend = rownames(ss))
-    par(oldpar)
-  }
+score(emm, EMMsim_test) # default is method "product"
   
   
-  ### compare various scores
-  methods <- c("product", 
-               "sum", 
-               "log_sum", 
-               "supported_states", 
-               "supported_transitions")
+### create shuffled data (destroy temporal relationship)
+### and create noisy data
+test_shuffled <- EMMsim_test[sample(1:nrow(EMMsim_test)),]
+test_noise <- jitter(EMMsim_test, amount=.3)
   
-  ### default is exact matching
-  clean <- sapply(methods, FUN=function(m) score(emm, EMMsim_test, method=m))
-  shuffled <- sapply(methods, FUN=function(m) score(emm, test_shuffled, method=m))
-  noise <- sapply(methods, FUN=function(m) score(emm, test_noise, method=m))
-  mybars(shuffled, noise, clean)
+### helper for plotting
+mybars <- function(...) {
+  oldpar <- par(mar=c(5,10,4,2))
+  ss <- rbind(...) 
+  barplot(ss[,ncol(ss):1], xlim=c(-1,4), beside=TRUE, 
+          horiz=TRUE, las=2, 
+          legend = rownames(ss))
+  par(oldpar)
+}
   
-  ### weighted matching is better for noisy data
-  clean <- sapply(methods, FUN=function(m) score(emm, EMMsim_test, method=m, 
-                                                 match="weighted"))
-  shuffled <- sapply(methods, FUN=function(m) score(emm, test_shuffled, method=m, 
-                                                    match="weighted"))
-  noise <- sapply(methods, FUN=function(m) score(emm, test_noise, method=m, 
-                                                 match="weighted"))
-  mybars(shuffled, noise, clean)
+
+### compare various scores
+methods <- c("product", 
+             "sum", 
+             "log_sum", 
+             "supported_states", 
+             "supported_transitions",
+             "sum_transitions",
+             "log_loss",
+             "likelihood")
+
+### default is exact matching
+clean <- sapply(methods, FUN=function(m) score(emm, EMMsim_test, method=m))
+shuffled <- sapply(methods, FUN=function(m) score(emm, test_shuffled, method=m))
+noise <- sapply(methods, FUN=function(m) score(emm, test_noise, method=m))
+mybars(shuffled, noise, clean)
+  
+### weighted matching is better for noisy data
+clean <- sapply(methods, FUN=function(m) score(emm, EMMsim_test, method=m, 
+                                               match="weighted"))
+shuffled <- sapply(methods, FUN=function(m) score(emm, test_shuffled, method=m, 
+                                                  match="weighted"))
+noise <- sapply(methods, FUN=function(m) score(emm, test_noise, method=m, 
+                                               match="weighted"))
+mybars(shuffled, noise, clean)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

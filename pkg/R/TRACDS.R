@@ -54,8 +54,9 @@ setMethod("ntransitions", signature(x = "TRACDS"),
 
 setMethod("transitions", signature(x = "TRACDS"),
 	function(x) {
-	    m <- smc_countMatrix(x@tracds_d$mm)
-	    
+    
+    m <- smc_countMatrix(x@tracds_d$mm)
+      
 	    ### check for no transition
 	    if(sum(m)<1) edges <- matrix(as.character(NA), nrow=0, ncol=2)
 	    else edges <- apply(which(m>0, arr.ind=T), 
@@ -63,10 +64,11 @@ setMethod("transitions", signature(x = "TRACDS"),
 	    
 	    colnames(edges) <- c("from", "to")
 	    edges
-	})
+    })
 
 setMethod("rare_transitions", signature(x = "TRACDS"),
-	function(x, count_threshold)
-	transitions(x)[transition(x, transitions(x),
-		type="counts") <= count_threshold,]
-	)
+          function(x, count_threshold) {
+            ts <- transitions(x)
+            ts[transition(x, ts, type="counts", prior=FALSE) <= count_threshold,]
+          }
+)

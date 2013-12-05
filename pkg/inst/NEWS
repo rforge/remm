@@ -1,7 +1,10 @@
 Changes in version 1.0-8
     * score: match_clusters can now be "exact", "nn" or "weighted", where 
   weighted replaces all the weighted scores. 
-    * added smooth_transitions
+    * added smooth_transitions (experimental)
+    * plus_one is now called prior (since it adds a uniform prior for 
+  transition probabilities)
+    * score has now an argument called normalize
 
 Changes in version 1.0-7
     * improved plot for tNN
