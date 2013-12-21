@@ -43,18 +43,18 @@
 ## does newdata come from the EMM?
 setMethod("score", signature(x = "EMM", newdata = "numeric"),
           function(x, newdata, method=NULL, 
-                   match_cluster="exact", prior = TRUE, 
+                   match_cluster="exact", prior = TRUE, normalize=TRUE, 
                    initial_transition = FALSE, threshold = NA) 
             score(x, as.matrix(rbind(newdata)), method, 
-                  match_cluster, prior, initial_transition, threshold)
+                  match_cluster, prior, normalize, initial_transition, threshold)
 )
 
 setMethod("score", signature(x = "EMM", newdata = "data.frame"),
           function(x, newdata, method=NULL, 
-                   match_cluster="exact", prior = TRUE, 
+                   match_cluster="exact", prior = TRUE, normalize = TRUE, 
                    initial_transition = FALSE, threshold = NA) 
             score(x, as.matrix(newdata), method, 
-                  match_cluster, prior, initial_transition, threshold)
+                  match_cluster, prior, normalize, initial_transition, threshold)
 )
 
 setMethod("score", signature(x = "EMM", newdata = "matrix"),
@@ -67,7 +67,9 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
             "supported_states",
             "sum_transitions",
             "log_loss",
-            "likelihood"
+            "likelihood",
+            "log_likelihood",
+            "AIC"
           ), 
                    match_cluster = "exact", 
                    prior = TRUE,
@@ -174,6 +176,24 @@ setMethod("score", signature(x = "EMM", newdata = "matrix"),
             
             if(method == "likelihood") { ### this is the unnormalized product
               return(prod(tt[["probability"]]))
+            }
+            
+            if(method == "log_likelihood") { ### this is the unnormalized product
+              return(sum(log(tt[["probability"]])))
+            }
+            
+            if(method == "AIC") { 
+              ### AICc = 2k - 2 ln(L) * 2k(k+1)/(n-k-1)  
+              ### minimum AIC for model selection
+              
+              ### we use supported transitions a the Likelihood
+              L <- sum(tt[["count"]]>0, na.rm=TRUE)/length(tt[["count"]])
+              ### complexity is number of transitions
+              k <- ntransitions(x, threshold=threshold)
+              ### number of transitions
+              n <- length(tt[["count"]])
+              
+              return(2*k-2*log(L) * 2*k*(k-1)/(n-k-1))
             }
             
             if(method == "product") {

@@ -13,7 +13,7 @@
 \usage{
 \S4method{score}{EMM,matrix}(x, newdata, method = c("product", "log_sum", "sum",
         "log_odds", "supported_transitions", "supported_states", 
-        "sum_transitions",  "log_loss", "likelihood"), 
+        "sum_transitions",  "log_loss", "likelihood", "log_likelihood", "AIC"), 
         match_cluster = "exact", prior=TRUE, normalize=TRUE, 
         initial_transition = FALSE, threshold = NA)
 \S4method{score}{EMM,EMM}(x, newdata, method = c("product", "log_sum", "sum", 
@@ -23,7 +23,7 @@
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ an \code{EMM} object. }
-  \item{newdata}{ sequenc or another \code{EMM} object to score. }
+  \item{newdata}{ sequence or another \code{EMM} object to score. }
   \item{method}{ method to calculate the score (see details) }
   \item{match_cluster}{ do the new observations have to fall within
                         the threshold of the cluster (\code{"exact"}) or is nearest neighbor 
@@ -88,7 +88,7 @@
       \item{"supported_states"}{Fraction of points in the new sequence \eqn{x} 
                                 for which a state (cluster) exists in the model. \code{match_cluster}
                                 is always \code{"exact"} because for \code{"nn"} this measure would
-                                always give 1. Note that this measure ignors transition information.
+                                always give 1. Note that this measure ignores transition information.
                                 
                                 If threshold is given, then only states with a count greater than the given threshold are counted as supported.
       }
@@ -101,6 +101,21 @@
                                
                                
                                If threshold is given, then only transitions with a count greater than the given threshold are counted as supported.
+      }
+      \item{"likelihood", "log_likelihood"}{ The likelihood of the model given the new data is the 
+      unnormalized product score (product of transition probabilities).}
+      \item{"log_loss"}{ The average log loss is defined as 
+                         \deqn{-sum(log2(a_s(i),s(i+1)))/(l-1)}
+      It represents the average compression rate of the new sequence 
+                         given the model.
+      }
+      \item{"AIC"}{ Akaike Information Criterion corrected for finite sample size. 
+      \deqn{2k - 2log(L) 2k(k-1)/(n-k-1)}
+      where \eqn{n=l-1} and \eqn{k} is the model complexity measured by the number of
+                    non-zero entries in the transition matrix.  
+                    We use the likelihood of the model given by the proportion
+                    of supported transitions. AIC can be used for model selection
+                    where the smallest value indicates the preferred model.
       }
       
     }

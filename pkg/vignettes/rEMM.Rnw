@@ -864,6 +864,7 @@ as a data stream, strictly one after the other in a single pass.
 emm <- EMM(threshold=0.2, measure="eJaccard")
 build(emm, EMMTraffic)
 size(emm)
+ntransitions(emm)
 @
 
 Note that we do not need to assign the result of \func{build} back to
@@ -1450,11 +1451,12 @@ simulated data.}
 
 
 <<>>=
-sc <- sapply(emmc, score, EMMsim_test, "likelihood")
+sc <- sapply(emmc, score, EMMsim_test, "log_likelihood")
 names(sc) <- k
 sc
 @
 
+To find the best performing of these nested models we use the log-likelihood.
 The best performing model has a score of \Sexpr{round(max(sc),3)}
 for a $k$ of \Sexpr{names(sc[which.max(sc)])}.
 This model is depicted in Figure~\ref{fig:sim_optc}(a).
