@@ -1,6 +1,6 @@
 Package: rEMM
 Version: 1.0-8
-Date: 2013-xx-xx
+Date: 2014-01-13
 Title: Extensible Markov Model (EMM) for Data Stream Clustering in R
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
 	    email = "mhahsler@lyle.smu.edu"),
