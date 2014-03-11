@@ -1,4 +1,7 @@
-Changes in version 1.0-8
+Changes in version 1.0-9 (x/x/2014)
+    * Fixed dependencies in NAMESPACE
+
+Changes in version 1.0-8 (1/14/2014)
     * score: match_clusters can now be "exact", "nn" or "weighted", where 
   weighted replaces all the weighted scores. 
     * added smooth_transitions (experimental)
