@@ -75,3 +75,5 @@ export(
     synthetic_stream
 )
 
+S3method(as.graph, TRACDS)
+S3method(as.igraph, TRACDS)
